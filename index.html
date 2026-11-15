@@ -419,6 +419,15 @@ body.r7.touch:not(.touchCombat) #r7Hud button{display:none}
 body.r7.touch #r7Hud button{position:fixed;right:calc(18px + var(--sr));bottom:calc(108px + var(--sb));width:48px;height:44px;opacity:.6}
 body.r7.touch #r7Hud button:nth-last-child(2){right:calc(76px + var(--sr))}
 body.r7.touch #r8Cue{max-width:calc(100vw - 310px - var(--sl) - var(--sr));font-size:12px}
+#r7Modal.story #r7Buttons{display:contents}
+#r7Modal.story #r7Next{position:absolute;inset:0;z-index:5;width:100%;height:100%;margin:0;padding:0;background:transparent;border:0;border-radius:0;box-shadow:none;font-size:0;touch-action:none;cursor:pointer}
+#r7Modal.story #r7Next::after{content:'轻点画面继续';position:absolute;bottom:calc(14px + var(--sb));left:0;right:0;font:13px/1.4 sans-serif;color:#d8e4c8;text-shadow:0 1px 4px #000}
+#r7Modal.story #r7Next:focus-visible{outline:2px solid #e8e7a9;outline-offset:-4px}
+#r7Modal.story #r7Art{pointer-events:none}#r7Modal.story #r7Diagram{position:absolute;bottom:calc(64px + var(--sb));left:50%;transform:translateX(-50%);width:min(560px,70vw);max-height:126px;pointer-events:none}
+#r7Modal.story #r13Learn{position:absolute;bottom:calc(40px + var(--sb));left:12px;right:12px;margin:0;font:13px/1.3 sans-serif;color:#e2e9cf;text-align:center;pointer-events:none}
+#r7Modal.story.lesson #r7Text{bottom:calc(192px + var(--sb))}#r7Modal.story.lesson #r7Alt{bottom:auto;top:calc(48px + var(--st));font-size:10px}
+#r7Modal #r13Learn[hidden]{display:none}
+@media(max-height:500px){#r7Modal.story #r7Diagram{width:min(420px,58vw);max-height:90px;bottom:calc(54px + var(--sb))}#r7Modal.story #r13Learn{font-size:11px;bottom:calc(32px + var(--sb))}#r7Modal.story.lesson #r7Text{bottom:calc(140px + var(--sb));font-size:14px;padding-top:12px}#r7Modal.story #r7Next::after{bottom:calc(9px + var(--sb));font-size:12px}}
 /* R7_CSS_END */
 
 </style>
@@ -431,6 +440,7 @@ body.r7.touch #r8Cue{max-width:calc(100vw - 310px - var(--sl) - var(--sr));font-
 <div id="r7Modal" class="overlay" role="dialog" aria-modal="true" aria-labelledby="r7Heading"><div class="card panel">
 <h2 id="r7Heading" tabindex="-1">载入中…</h2><img id="r7Art" hidden alt="" width="1672" height="941"><p id="r7Alt"></p><p id="r7Text"></p>
 <svg id="r7Diagram" hidden viewBox="0 0 640 145" role="img" aria-labelledby="r7DiagramTitle"><title id="r7DiagramTitle">Select an enemy to approach, then the GPU gauntlets alternate. Only touching opponents take damage, at most three per strike.</title><g fill="none" stroke="#c7dab7" stroke-width="3"><circle cx="65" cy="64" r="20"/><path d="M95 64h62m-12-12 12 12-12 12"/><rect x="230" y="35" width="38" height="46" rx="8" fill="#508637"/><rect x="290" y="45" width="38" height="46" rx="8" fill="#508637"/><path d="M240 22q40-22 80 4m-10-10 10 10-14 4M350 64h62m-12-12 12 12-12 12"/><circle cx="470" cy="60" r="17"/><circle cx="520" cy="60" r="17"/><circle cx="570" cy="60" r="17"/></g><g fill="#edf2dd" font-size="15" font-family="sans-serif" text-anchor="middle"><text id="r12ApproachLabel" x="75" y="121">点选敌人</text><text x="279" y="121">交替出拳</text><text x="520" y="121">最多三人</text></g></svg>
+<p id="r13Learn" hidden></p>
 <div id="r7Buttons"><button id="r7Previous" type="button" hidden>Previous image</button><button id="r7Next" type="button" hidden>Continue</button><button id="r7Skip" type="button" hidden>Skip</button><button id="r7Retry" type="button" hidden>Retry save</button><button id="r7Reload" type="button" hidden>Reload saved frontier</button></div>
 </div></div>
 <div id="r8Cue" role="status" aria-live="polite" hidden></div>
@@ -1758,7 +1768,12 @@ const Input=(()=>{
     addEventListener('mouseup',e=>{if(e.button===0)st.lmb=false;});
     addEventListener('mousemove',e=>{if(e.target===cv||st.lmb){st.mx=e.clientX;st.my=e.clientY;}if(!(e.buttons&1))st.lmb=false;});
     addEventListener('contextmenu',e=>e.preventDefault());addEventListener('dragstart',e=>e.preventDefault());
-    cv.addEventListener('touchstart',e=>{o.onAction();e.preventDefault();},{passive:false});
+    // Scope native-gesture compatibility to contacts begun on live battle surfaces.
+    for(const el of [cv,joy,atkEl]){let guarded=false;for(const type of ['touchstart','touchmove','touchend','touchcancel'])el.addEventListener(type,e=>{
+      if(type==='touchstart'){guarded=!R7.enabled||R7.battleGesture();if(guarded)o.onAction();}
+      if(guarded&&e.cancelable)e.preventDefault();
+      if((type==='touchend'||type==='touchcancel')&&!e.targetTouches?.length)guarded=false;
+    },{passive:false});}
     const moveJoy=e=>{const r=base.getBoundingClientRect(),R=r.width/2||1;let dx=e.clientX-(r.left+R),dy=e.clientY-(r.top+R);const l=Math.hypot(dx,dy);
       if(l>R){dx*=R/l;dy*=R/l;}st.jx=dx/R;st.jy=dy/R;knobEl.style.transform='translate(calc(-50% + '+dx.toFixed(1)+'px),calc(-50% + '+dy.toFixed(1)+'px))';};
     const endJoy=e=>{if(e.pointerId!==st.joyId)return;st.joyId=null;st.jx=st.jy=0;knobEl.style.transform='translate(-50%,-50%)';o.onJoyEnd?.(e);};
@@ -5286,7 +5301,8 @@ const R7Store=(()=>{
 /* R7_RUNTIME_BEGIN */
 const R7=(()=>{
   const FIXED=1/120,profiles={bare:{damage:8,cycle:.7,reach:30,cap:1,radius:7},tray:{damage:12,cycle:.7,reach:45,cap:3,radius:14},gpu:{damage:12,cycle:.36,reach:45,cap:3,radius:9}};
-  let profile=null,store=null,phase='title',level=1,clock=0,acc=0,attempt=0,seq=0,hand=0,action=null,nextAttack=0,targetId=null,destination=null,route=[],routeGoal=null,routeUntil=0,portrait=false,hintUntil=8,tray=false,pickups=[],allies=[],offers=[],hazards=[],receipt=null,pending=null,busy=false,shot=0,replay=false,imageGeneration=0,lastError='',contacts=0;
+  let profile=null,store=null,phase='title',level=1,clock=0,acc=0,attempt=0,seq=0,hand=0,action=null,nextAttack=0,targetId=null,destination=null,route=[],routeGoal=null,routeUntil=0,portrait=false,hintUntil=8,tray=false,pickups=[],allies=[],offers=[],hazards=[],receipt=null,pending=null,busy=false,shot=0,replay=false,imageGeneration=0,lastError='',contacts=0,storyReadyAt=0,storyPointer=null;
+  const storyPointers=new Set();
   const live=()=>phase==='combat'&&!G.paused&&!portrait&&!document.hidden&&!G.hero.dead;
   const current=()=>profile?.frontier===2?profiles.gpu:tray?profiles.tray:profiles.bare;
   const copy=R7Store.clone;
@@ -5297,12 +5313,12 @@ const R7=(()=>{
   function clearInput(stop=true){Input.reset();if(stop&&G.hero){G.hero.vx=G.hero.vy=0;G.hitStop=0;}action=null;targetId=null;destination=null;route=[];routeGoal=null;acc=0;}
   function overlay(title,text,buttons=[]){
     $('r7Modal').classList.remove('hidden');$('r7Heading').textContent=title;$('r7Text').textContent=text;
-    $('r7Modal').classList.remove('story');$('r7Art').hidden=true;$('r7Diagram').setAttribute('hidden','');$('r7Alt').textContent='';imageGeneration++;
+    $('r7Modal').classList.remove('story','lesson');$('r13Learn').hidden=true;cancelStoryGesture();$('r7Art').hidden=true;$('r7Diagram').setAttribute('hidden','');$('r7Alt').textContent='';imageGeneration++;
     for(const id of ['r7Next','r7Skip','r7Previous','r7Retry','r7Reload'])$(id).hidden=!buttons.includes(id);
     for(const id of ['ovTitle','ovPause','hudR','touchUI','game'])$(id).inert=true;
     $('r7Heading').focus();viewport();
   }
-  function closeModal(){for(const id of ['ovTitle','ovPause','hudR','touchUI','game'])$(id).inert=false;$('r7Modal').classList.add('hidden');imageGeneration++;clearInput();$('game').inert=portrait;if(portrait)$('r9RotateFullscreen').focus();else if(phase==='combat')$('game').focus();}
+  function closeModal(){cancelStoryGesture();for(const id of ['ovTitle','ovPause','hudR','touchUI','game'])$(id).inert=false;$('r7Modal').classList.add('hidden');imageGeneration++;clearInput();$('game').inert=portrait;if(portrait)$('r9RotateFullscreen').focus();else if(phase==='combat')$('game').focus();}
   async function persist(next,after){
     if(busy)return;busy=true;pending={next:copy(next),after};clearInput();G.state='r7-save';phase='saving';
     overlay('保存中…','');
@@ -5328,27 +5344,34 @@ const R7=(()=>{
   }
   function showStory(){
     clearInput();G.state='r7-story';
-    if(phase==='onboarding'){
-      if(!receipt){phase='blocked';overlay('Receipt unavailable','A confirmed equipment reward is required.',['r7Reload']);return;}
-      overlay('GPU 双拳已获得','点选敌人，靠近后交替出拳。最多命中三人。',['r7Next','r7Skip']);
-      $('r7Diagram').removeAttribute('hidden');$('r7Next').textContent='进入 1997' ;return;
-    }
-    const node=phase==='n00'?R7_STORY.n00:R7_STORY.n01,s=node[shot];
-    overlay(s.period,s.caption,['r7Next','r7Skip',...(shot?['r7Previous']:[])]);
-    $('r7Modal').classList.add('story');$('r7Heading').textContent=s.period;
-    $('r7Next').textContent=shot===3?(phase==='n00'?'进入餐厅':'查看装备'):'继续';
+    const legacy=phase==='onboarding';
+    if(legacy&&!receipt){phase='blocked';overlay('Receipt unavailable','A confirmed equipment reward is required.',['r7Reload']);return;}
+    const node=phase==='n00'?R7_STORY.n00:R7_STORY.n01,index=legacy?3:shot,s=node[index],lesson=phase!=='n00'&&index===3;
+    overlay(s.period,s.caption,['r7Next']);$('r7Modal').classList.add('story');$('r7Modal').classList.toggle('lesson',lesson);$('r7Heading').textContent=s.period;
+    $('r7Next').textContent='轻点画面继续';$('r7Next').setAttribute('aria-label','轻点画面继续');$('r13Learn').hidden=!lesson;if(lesson)$('r7Diagram').removeAttribute('hidden');
+    storyReadyAt=performance.now()+300;$('r7Next').focus();ui();
     const image=$('r7Art'),generation=++imageGeneration,loader=document.createElement('img');
     $('r7Alt').textContent=s.label+' · 插画载入中，可继续';image.alt=s.alt;
-    loader.onload=()=>{if(generation!==imageGeneration)return;image.src=s.image;image.hidden=false;$('r7Alt').textContent=phase==='n00'?'原创幻想 · 打斗并非真实生平事件':s.label;const nextImage=node[shot+1];if(nextImage){const preload=document.createElement('img');preload.src=nextImage.image;}};
+    loader.onload=()=>{if(generation!==imageGeneration)return;image.src=s.image;image.hidden=false;$('r7Alt').textContent=phase==='n00'?'原创幻想 · 打斗并非真实生平事件':s.label;const nextImage=node[index+1];if(nextImage){const preload=document.createElement('img');preload.src=nextImage.image;}};
     loader.onerror=()=>{if(generation!==imageGeneration)return;image.hidden=true;$('r7Alt').textContent=s.label+' · 插画暂不可用：'+s.alt+' · 可继续';};
     loader.src=s.image;
   }
-
-  function next(skip=false){
-    if(busy||!['n00','n01','onboarding'].includes(phase))return;
-    if(replay){if(skip||shot===3){replay=false;phase='combat';closeModal();pause(true);G.state='play';return;}shot++;showStory();return;}
+  function next(){
+    if(busy||portrait||!['n00','n01','onboarding'].includes(phase))return;
+    if(replay){if(shot===3){replay=false;phase='combat';closeModal();pause(true);G.state='play';return;}shot++;showStory();return;}
     if(phase==='onboarding'){changePhase('combat2');return;}
-    if(skip||shot===3)changePhase(phase==='n00'?'combat1':'onboarding');else changePhase(phase,shot+1);
+    if(shot===3)changePhase(phase==='n00'?'combat1':'combat2');else changePhase(phase,shot+1);
+  }
+  function cancelStoryGesture(){storyPointer=null;storyPointers.clear();}
+  function advanceStory(){if(performance.now()<storyReadyAt||storyPointers.size||busy||portrait||document.hidden)return;next();}
+  function storyDown(e){
+    e.preventDefault();storyPointers.add(e.pointerId);storyPointer=null;
+    if(storyPointers.size!==1||e.isPrimary===false||e.button>0||busy||portrait||performance.now()<storyReadyAt||!['n00','n01','onboarding'].includes(phase))return;
+    storyPointer={id:e.pointerId,x:e.clientX,y:e.clientY,generation:imageGeneration};try{$('r7Next').setPointerCapture(e.pointerId);}catch(_){}
+  }
+  function storyEnd(e){
+    const held=storyPointer;storyPointers.delete(e.pointerId);if(held?.id!==e.pointerId)return;storyPointer=null;e.preventDefault();
+    if(e.type==='pointerup'&&held.generation===imageGeneration&&Math.hypot(e.clientX-held.x,e.clientY-held.y)<=12)advanceStory();
   }
   function actor(id,role,x,y,hp){return {id,r7:true,role,x,y,r:role==='troublemaker_boss'?20:role==='champion'?24:16,hp,maxHp:hp,scale:role==='troublemaker_boss'?1.25:1,state:'chase',t:0,wait:1+id*.27,face:Math.PI/2,walk:0,moveAmt:0,flash:0,jz:0,dead:false,dying:false,retire:0,attack:null,entered:true};}
   function enter(n){
@@ -5480,7 +5503,7 @@ const R7=(()=>{
   function touchEnd(event,which){if(event.type==='pointerup')return;if(which==='joy'){G.hero.vx=G.hero.vy=0;}else{action=null;targetId=null;}}
   function viewport(){
     const next=(Input.st.mode==='touch'||matchMedia('(pointer:coarse)').matches&&!matchMedia('(hover:hover)').matches)&&innerHeight>innerWidth;
-    if(next!==portrait){portrait=next;clearInput();}
+    if(next!==portrait){portrait=next;clearInput();cancelStoryGesture();}
     const recovery=['saving','blocked','pending','dead','end'].includes(phase),rotate=portrait&&!recovery,wasVisible=!$('r9Rotate').hidden;
     $('r9Rotate').hidden=!rotate;$('r7Modal').inert=rotate;$('r9Controls').inert=rotate;
     $('ovPause').inert=rotate||!$('r7Modal').classList.contains('hidden');$('game').inert=portrait||G.paused||phase!=='combat';
@@ -5572,7 +5595,7 @@ const R7=(()=>{
   function key(c){
     if(/^(Key[WASD]|Arrow(Up|Down|Left|Right))$/.test(c)&&Input.st.mode==='touch'){mode('kb');Input.keys.add(c);}
     if(portrait)return;
-    if(['Enter','Space'].includes(c)&&['n00','n01','onboarding'].includes(phase)){next();return;}
+    if(['Enter','Space'].includes(c)&&['n00','n01','onboarding'].includes(phase)){advanceStory();return;}
     if(c==='KeyM'){toggleMute();return;}
     if(c==='KeyP'||c==='Escape'){pause(!G.paused);return;}
     if(c==='Enter'&&G.paused){pause(false);return;}
@@ -5581,7 +5604,7 @@ const R7=(()=>{
   function ui(){
     const touch=Input.st.mode==='touch';touchControls();document.body.classList.toggle('touch',touch);
     $('btnAtk').textContent='攻击';$('r12ApproachLabel').textContent=touch?'摇杆靠近':'点选敌人';$('r7DiagramTitle').textContent=touch?'左摇杆靠近，按住攻击交替出拳。只有接触到的对手受伤，每拳最多三人。':'Select an enemy to approach, then the GPU gauntlets alternate. Only touching opponents take damage, at most three per strike.';
-    if(phase==='onboarding')$('r7Text').textContent=touch?'左摇杆靠近，按住右侧攻击交替出拳。最多命中三人。':'点选敌人，靠近后交替出拳。最多命中三人。';
+    $('r13Learn').textContent=touch?'左摇杆靠近，按住右侧攻击交替出拳。最多命中三人。':'点选敌人，靠近后交替出拳。最多命中三人。';
     $('r7Hud').hidden=phase!=='combat';$('r9Pause').hidden=phase!=='combat';$('r7Health').textContent='HP '+Math.ceil(G.hero?.hp||0)+' / 100';
     $('r7Kit').textContent=(level===1?'餐厅':'街机')+' · '+G.enemies.filter(e=>!e.dead).length;
     $('r7Replay').disabled=!profile?.receipt;
@@ -5670,13 +5693,17 @@ const R7=(()=>{
   function mount(){
     document.body.classList.add('r7');$('game').tabIndex=0;
     $('r7Skip').textContent='跳过';$('r7Previous').textContent='上一镜';$('btnResume').textContent='继续';$('btnRestartP').textContent='重试本关';$('r7Replay').textContent='重看创始故事';
-    $('r7Art').addEventListener('click',()=>next());
+    for(const type of ['blur','pagehide'])addEventListener(type,cancelStoryGesture);
+    document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelStoryGesture();});document.addEventListener('freeze',cancelStoryGesture);
+    const surface=$('r7Next');surface.addEventListener('pointerdown',storyDown);
+    surface.addEventListener('pointermove',e=>{if(storyPointer?.id===e.pointerId&&Math.hypot(e.clientX-storyPointer.x,e.clientY-storyPointer.y)>12)storyPointer=null;});
+    for(const type of ['pointerup','pointercancel','lostpointercapture'])surface.addEventListener(type,storyEnd);
+    surface.addEventListener('click',e=>{e.preventDefault();if(e.detail===0&&!e.sourceCapabilities?.firesTouchEvents)advanceStory();});
     $('r9Pause').addEventListener('click',()=>pause(!G.paused));
     for(const id of ['r9Fullscreen','r9RotateFullscreen'])$(id).addEventListener('click',()=>fullscreen());
     $('game').addEventListener('pointerdown',command);
     addEventListener('resize',viewport);viewport();
-    $('r7Next').addEventListener('click',()=>next());$('r7Skip').addEventListener('click',()=>next(true));
-    $('r7Previous').addEventListener('click',()=>{if(busy||shot<=0)return;if(replay){shot--;showStory();}else changePhase(phase,shot-1);});
+
     $('r7Retry').addEventListener('click',()=>{if(pending&&!busy)persist(pending.next,pending.after);});$('r7Reload').addEventListener('click',()=>start());
     $('r7Replay').addEventListener('click',()=>{if(!profile?.receipt||phase!=='combat')return;replay=true;phase='n01';shot=0;show('ovPause',false);showStory();});
     $('ovPause').addEventListener('keydown',e=>{if(e.key!=='Tab'||!G.paused||phase!=='combat')return;const buttons=[...$('ovPause').querySelectorAll('button,input,[tabindex]')].filter(b=>!b.disabled&&!b.hidden&&b.offsetParent!==null);const first=buttons[0],last=buttons[buttons.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
@@ -5684,7 +5711,7 @@ const R7=(()=>{
     $('r7Modal').addEventListener('keydown',e=>{if(e.key!=='Tab')return;const buttons=['r7Previous','r7Next','r7Skip','r7Retry','r7Reload'].map(id=>$(id)).filter(b=>!b.hidden&&!b.disabled);if(!buttons.length){e.preventDefault();$('r7Heading').focus();return;}const first=buttons[0],last=buttons[buttons.length-1];if(e.shiftKey&&(document.activeElement===first||document.activeElement===$('r7Heading'))){e.preventDefault();last.focus();}else if(!e.shiftKey&&(document.activeElement===last||document.activeElement===$('r7Heading'))){e.preventDefault();first.focus();}});
     ui();
   }
-  return Object.freeze({enabled:true,start,update,pause,key,ui,mode,touchPointer,touchAttack,touchEnd,drawHero,drawEnemy,drawImpact,foreground,ground,drawProp,home,mount,inspect:()=>({phase,level,clock,attempt,inputMode:Input.st.mode,targetId,destination:destination?copy(destination):null,route:copy(route),portrait,action:action?{...action,hits:[...action.hits]}:null,tray,pickups:copy(pickups),allies:copy(allies),offers:copy(offers),hazards:copy(hazards),profile:profile?copy(profile):null,receipt,contacts,lastError,busy}),retry:()=>pending&&!busy?persist(pending.next,pending.after):null});
+  return Object.freeze({enabled:true,start,update,pause,key,ui,battleGesture:live,mode,touchPointer,touchAttack,touchEnd,drawHero,drawEnemy,drawImpact,foreground,ground,drawProp,home,mount,inspect:()=>({phase,level,clock,attempt,inputMode:Input.st.mode,targetId,destination:destination?copy(destination):null,route:copy(route),portrait,action:action?{...action,hits:[...action.hits]}:null,tray,pickups:copy(pickups),allies:copy(allies),offers:copy(offers),hazards:copy(hazards),profile:profile?copy(profile):null,receipt,contacts,lastError,busy}),retry:()=>pending&&!busy?persist(pending.next,pending.after):null});
 })();
 /* R7_RUNTIME_END */
 
