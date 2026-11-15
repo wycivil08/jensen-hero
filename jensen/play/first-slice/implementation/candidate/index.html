@@ -439,6 +439,9 @@ body.r7.jensenLab #r7Hud button{pointer-events:auto;opacity:1;touch-action:none}
 body.r7.jensenLab #labBar a{display:inline-block;min-height:44px;padding:8px 2px;color:#d5dfb8}
 body.r7.jensenLab #labBar [hidden]{display:none!important}
 
+body.r7.jensenLab #r15Summary{white-space:pre-line}body.r7.jensenLab #r15Damage{color:#f2d79f;white-space:pre-line}
+body.r7.jensenLab #btnAtk.aiming::after{content:'';position:absolute;left:50%;top:50%;width:48px;height:4px;background:#f2d79f;border-radius:2px;transform-origin:0 50%;transform:rotate(var(--aim-angle,0rad));pointer-events:none}
+
 </style>
 </head>
 <body class="r7">
@@ -1790,7 +1793,8 @@ const Input=(()=>{
     joy.addEventListener('pointermove',e=>{if(e.pointerId===st.joyId)moveJoy(e);});
     joy.addEventListener('pointerup',endJoy);joy.addEventListener('pointercancel',endJoy);joy.addEventListener('lostpointercapture',endJoy);
     const endAtk=e=>{if(e.pointerId!==st.atkId)return;st.atkId=null;st.atk=false;atkEl.classList.remove('on');o.onAttackEnd?.(e);};
-    atkEl.addEventListener('pointerdown',e=>{if(o.acceptTouch&&!o.acceptTouch(e))return;o.onAction();e.preventDefault();if(st.atkId!==null)return;st.atk=true;st.atkId=e.pointerId;atkEl.classList.add('on');cap(atkEl,e.pointerId);o.onAttackStart?.();});
+    atkEl.addEventListener('pointerdown',e=>{if(o.acceptTouch&&!o.acceptTouch(e))return;o.onAction();e.preventDefault();if(st.atkId!==null)return;st.atk=true;st.atkId=e.pointerId;atkEl.classList.add('on');cap(atkEl,e.pointerId);o.onAttackStart?.(e);});
+    atkEl.addEventListener('pointermove',e=>{if(e.pointerId===st.atkId)o.onAttackMove?.(e);});
     atkEl.addEventListener('pointerup',endAtk);atkEl.addEventListener('pointercancel',endAtk);atkEl.addEventListener('lostpointercapture',endAtk);
     dodgeEl.addEventListener('pointerdown',e=>{if(R7.enabled)return;o.onAction();e.preventDefault();st.dodgeQ=true;});
     const lose=()=>{reset();o.onBlur();},gain=()=>{reset();o.onFocus();};
@@ -7045,6 +7049,35 @@ const R7Store=(()=>{
       steady_guard:{frontDegrees:120,damageMultiplier:.75},limits:{normalCap:50,bossCap:10,hazards:18,heat:6,tells:2,initialWaitBase:1,initialWaitStep:.27,enemyWait:.6},
       types:clone(BASE.types),encounters:clone(BASE.encounters)};
   }
+  // Native-stage budgets: light foes take 1–3 D; bosses use ~30 D before skills/mitigation.
+  // Ten seats share a 200 D encounter budget; each retains its own HP and role damage.
+  const growth = Object.freeze([
+    null,[20,100,.5],[60,180,.36],[180,300,.36],[500,500,.36],
+    [1200,800,.36],[2400,1200,.36],[4000,1800,.45],[6000,2500,.45]
+  ]);
+  const enemyGrowth = Object.freeze({
+    troublemaker_customer:[40,10],troublemaker_boss:[600,18],
+    champion:[1800,32],gunner:[120,18],rusher:[120,22],
+    ati_captain:[5400,60],shield_soldier:[540,36],rear_thrower:[360,30],
+    disc_champion:[15000,90],cross_disc_thrower:[1000,50],diagonal_runner:[1000,60],
+    boxing_mech:[36000,160],arc_thrower:[2400,80],
+    amd_leader:[72000,180],gun_column:[4800,120],diagonal_guard:[7200,144],
+    ember_beast:[160000,300],needle_creature:[8000,144],heat_creature:[8000,90],
+    seat_01:[144000,300],seat_02:[120000,225],seat_03:[108000,125],
+    seat_04:[144000,300],seat_05:[120000,225],seat_06:[108000,125],
+    seat_07:[144000,300],seat_08:[120000,225],seat_09:[108000,125],seat_10:[84000,225]
+  });
+  function growthDefaults(stage) {
+    const config=defaults(stage),[damage,hp,cycle]=growth[stage];
+    config.growth=true;config.entry.max_hp=hp;Object.assign(config.hero,{hp,maxHp:hp});
+    Object.assign(config.auto,{damage,cycle,critChance:.15,critMultiplier:2});
+    for(const [id,[hp,damage]] of Object.entries(enemyGrowth)) {
+      const type=config.types[id],ratio=damage/type.damage;type.hp=hp;type.damage=damage;
+      if(type.pattern==='locked_fist_sweep')type.pattern_params.sweep.damage*=ratio;
+      syncAliases(type);
+    }
+    return config;
+  }
   function section(config,name) {
     if (['hero','auto','breakthrough','clear_space','cuda','steady_guard','limits'].includes(name)) return config[name];
     if (typeof name==='string' && name.startsWith('enemy:') && typeIds.includes(name.slice(6))) return config.types[name.slice(6)];
@@ -7074,8 +7107,8 @@ const R7Store=(()=>{
       else if(target.typeId==='champion'&&full==='projectile.speed'){unit='wu/s';readOnlyReason='持续光束无飞行速度';}
       if(readOnlyReason){const fixed=get(BASE.types[target.typeId],path);return {min:fixed,max:fixed,integer:full==='default_count',unit,readOnly:true,readOnlyReason};}
       if (path[0]==='render' || ['stage'].includes(full) || ['multipart_owner_count','body_mitigation','shield_side_back_damage_multiplier'].includes(key)) return {min:get(BASE.types[target.typeId],path),max:get(BASE.types[target.typeId],path),integer:Number.isInteger(value),unit:'',readOnly:true};
-      if (full==='hp') {min=1;max=10000;unit='HP';}
-      else if (/damage/.test(key)) {max=1000;unit='HP';if(key.endsWith('multiplier')){max=1;unit='×';}}
+      if (full==='hp') {min=1;max=2000000;unit='HP';}
+      else if (/damage/.test(key)) {max=10000;unit='HP';if(key.endsWith('multiplier')){max=1;unit='×';}}
       else if (full==='collision_r') {min=4;max=80;unit='wu';}
       else if (full==='scale') {min=.1;max=4;unit='×';}
       else if (['default_count','burst_count','max_own_patches','parity'].includes(key)) {min=key==='burst_count'||key==='max_own_patches'?1:0;max=key==='parity'?1:key==='max_own_patches'?6:30;integer=true;unit='count';}
@@ -7091,8 +7124,8 @@ const R7Store=(()=>{
       if (alias) return {min:alias.product?0:min,max:alias.product?12000:max,integer,unit,readOnly:true,aliasOf:alias.from,...(alias.product?{alsoDependsOn:alias.product}:{})};
       return {min,max,integer,unit,readOnly:false};
     }
-    if (name==='hero') {if(key==='maxHp'){min=1;unit='HP';}else if(key==='hp'){max=target.maxHp;unit='HP';}else if(key==='r'){min=4;max=40;unit='wu';}else if(key==='speed'){max=600;unit='wu/s';}}
-    else if (name==='auto') {if(key==='cap'){min=1;max=200;integer=true;unit='owners';}else if(key==='damage'){max=1000;unit='HP';}else if(['reach','radius'].includes(key)){min=.000001;max=1200;unit='wu';}else{max=10;unit='s';if(key==='cycle')min=FIXED;}}
+    if (name==='hero') {if(key==='maxHp'){min=1;max=100000;unit='HP';}else if(key==='hp'){max=target.maxHp;unit='HP';}else if(key==='r'){min=4;max=40;unit='wu';}else if(key==='speed'){max=600;unit='wu/s';}}
+    else if (name==='auto') {if(key==='cap'){min=1;max=200;integer=true;unit='owners';}else if(key==='damage'){max=100000;unit='HP';}else if(key==='critChance'){max=1;unit='probability';}else if(key==='critMultiplier'){min=1;max=10;unit='×';}else if(['reach','radius'].includes(key)){min=.000001;max=1200;unit='wu';}else{max=10;unit='s';if(key==='cycle')min=FIXED;}}
     else if(name==='limits'){if(['initialWaitBase','initialWaitStep','enemyWait'].includes(key)){max=60;unit='s';}else{integer=true;max=key==='normalCap'?200:key==='bossCap'?30:key==='tells'?10:200;min=key==='tells'?1:0;unit='count';}}
     else if(name==='cuda'){if(key==='maxOwners'){min=1;max=4;integer=true;unit='owners';}else if(key==='maxDepth'){max=2;integer=true;unit='hops';}else if(key.endsWith('Range')){max=1200;unit='wu';}else if(key==='interval'){max=60;unit='s';}else{max=100;unit='×';}}
     else if(key.includes('Degrees')){max=360;unit=key==='turn_rate_deg_per_second'?'deg/s':'deg';}
@@ -7168,7 +7201,7 @@ const R7Store=(()=>{
   }
   function validate(config) {
     requireThat(stageIds.includes(config?.stage),'Invalid stage.');
-    const reference=defaults(config.stage);
+    const reference=config.growth===true?growthDefaults(config.stage):defaults(config.stage);
     requireThat(config.auto?.id===reference.auto.id||(config.stage===1&&config.auto?.id==='tray_sweep'),'Unknown or unowned automatic profile.');
     reference.auto.id=config.auto.id;
     validateShape(config,reference);
@@ -7199,7 +7232,7 @@ const R7Store=(()=>{
       return {ok:true,value:next};
     } catch(error) {return {ok:false,error:String(error.message||error)};}
   }
-  const api=Object.freeze({defaults,validatePatch,fields,stageIds,typeIds});
+  const api=Object.freeze({defaults,growthDefaults,validatePatch,fields,stageIds,typeIds});
   root.JensenCombatData=api;
   if(typeof module==='object'&&module.exports)module.exports=api;
 })(globalThis);
@@ -7270,7 +7303,7 @@ const JensenCombatActions = (() => {
       variant:owned(state,slot).variant,start:now,end:now+duration,
       angle:direction(frame,request),contactStart:now+(slot===1?values.contactStart:values.windup),
       contactEnd:now+(slot===1?values.contactEnd:values.windup+values.active),
-      config,contactLocked:slot===1};
+      config,contactLocked:slot===1||config.growth===true};
     state.active=action;
     state.guard=slot===1?{rootId:action.rootId,start:now+values.guardStart,
       end:now+values.guardEnd,angle:action.angle,
@@ -7685,6 +7718,9 @@ const R7=(()=>{
   const FIXED=1/120,profiles={bare:{damage:8,cycle:.7,reach:30,cap:1,radius:7},tray:{damage:12,cycle:.7,reach:45,cap:3,radius:14},gpu:{damage:12,cycle:.36,reach:45,cap:3,radius:9}};
   let profile=null,store=null,phase='title',level=1,clock=0,acc=0,attempt=0,seq=0,hand=0,action=null,nextAttack=0,targetId=null,destination=null,route=[],routeGoal=null,routeUntil=0,portrait=false,hintUntil=8,tray=false,pickups=[],allies=[],offers=[],hazards=[],receipt=null,pending=null,busy=false,shot=0,replay=false,imageGeneration=0,lastError='',contacts=0,storyReadyAt=0,storyPointer=null;
   const storyPointers=new Set();
+  let aimGesture=null,lastAim=null,damageLog=[];
+  const directional=()=>labMode;
+  const critical=()=>labMode&&Math.random()<current().critChance?current().critMultiplier:1;
   const live=()=>phase==='combat'&&!G.paused&&!portrait&&!document.hidden&&!G.hero.dead;
   const current=()=>labMode&&labConfig?labConfig.auto:profile?.frontier===2?profiles.gpu:tray?profiles.tray:profiles.bare;
   const copy=R7Store.clone;
@@ -7692,7 +7728,7 @@ const R7=(()=>{
     if(!globalThis.navigator?.locks?.request)return Promise.reject(Error('Saving is unavailable here. Open the secure preview page in a current browser.'));
     return navigator.locks.request(R7Store.KEY,{mode:'exclusive'},fn);
   });}
-  function clearInput(stop=true){Input.reset();if(stop&&combatState){JensenCombatActions.clear(combatState,clock);activeCarrier=null;activeRequests=[];activeFingers[1]=activeFingers[2]=null;}if(stop&&G.hero){G.hero.vx=G.hero.vy=0;G.hitStop=0;}action=null;targetId=null;destination=null;route=[];routeGoal=null;acc=0;}
+  function clearInput(stop=true){Input.reset();aimGesture=null;lastAim=null;if(stop&&combatState){JensenCombatActions.clear(combatState,clock);activeCarrier=null;activeRequests=[];activeFingers[1]=activeFingers[2]=null;}$('btnAtk').classList.remove('aiming');if(stop&&G.hero){G.hero.vx=G.hero.vy=0;G.hitStop=0;}action=null;targetId=null;destination=null;route=[];routeGoal=null;acc=0;}
   function overlay(title,text,buttons=[]){
     $('r7Modal').classList.remove('hidden');$('r7Heading').textContent=title;$('r7Text').textContent=text;
     $('r7Modal').classList.remove('story','lesson');$('r13Learn').hidden=true;cancelStoryGesture();$('r7Art').hidden=true;$('r7Diagram').setAttribute('hidden','');$('r7Alt').textContent='';imageGeneration++;
@@ -7777,21 +7813,24 @@ const R7=(()=>{
   function move(o,dx,dy){const n=Math.max(1,Math.ceil(Math.hypot(dx,dy)/6));for(let i=0;i<n;i++){o.x+=dx/n;o.y+=dy/n;for(let pass=0;pass<2;pass++){World.collide(o,o.r);for(const b of [G.hero,...G.enemies]){if(b===o||b.dead||(b!==G.hero&&b.hp<=0)||b.entered===false)continue;const x=o.x-b.x,y=o.y-b.y,d=Math.hypot(x,y),min=o.r+b.r;if(d<min){const nx=d>.001?x/d:1,ny=d>.001?y/d:0;o.x+=nx*(min-d);o.y+=ny*(min-d);}}}World.collide(o,o.r);}}
   function visible(a,b){return World.clearSegment(a.x,a.y,b.x,b.y,2);}
   const kit=(p=current())=>p===profiles.gpu||['gpu_fast','shield_gauntlet_fast','hammer_shield_fast'].includes(p.id)?'gpu':p===profiles.tray||p.id==='tray_sweep'?'tray':'bare';
-  function feedback(x,y,damage,hurt,p=null,point=null){
+  function feedback(x,y,damage,hurt,p=null,point=null,crit=false){
     const material=p?kit(p):null;
-    if(G.flashes.length>=12)G.flashes.shift();G.flashes.push({x:point?.x??x,y:(point?.y??y)-17,age:0,life:material==='bare'?.1:material==='tray'?.16:material==='gpu'?.13:.12,ang:-.7,size:hurt?5:7,crit:false,kit:material});
-    if(G.numbers.length>=16)G.numbers.shift();G.numbers.push({x,y:y-38,vy:-42,val:damage,kind:hurt?'h':'n',age:0,life:.55});
+    if(G.flashes.length>=12)G.flashes.shift();G.flashes.push({x:point?.x??x,y:(point?.y??y)-17,age:0,life:material==='bare'?.1:material==='tray'?.16:material==='gpu'?.13:.12,ang:-.7,size:hurt?5:7,crit,kit:material});
+    if(G.numbers.length>=16)G.numbers.shift();G.numbers.push({x,y:y-38,vy:-42,val:damage,kind:hurt?'h':crit?'c':'n',age:0,life:.55});
   }
   function hurt(amount){if(!live())return;G.hero.hp=Math.max(0,G.hero.hp-amount);G.hero.hurtT=.18;feedback(G.hero.x,G.hero.y,amount,true);G.hitStop=Math.max(G.hitStop,2*FIXED);addShake(.18,0,1);if(Sfx.hurt)Sfx.hurt();if(G.hero.hp===0&&!(labMode&&labImmortal))G.hero.dead=true;}
   function hit(e,root,point,rawDamage,source='auto',at=clock,sourcePoint=null){
     const secondary=source==='cuda',seen=secondary?(root.cudaHits||=new Set()):root.hits,cap=secondary?4:root.profile.cap;
     if(e.dead||e.hp<=0||seen.has(e.id)||seen.size>=cap)return null;
-    seen.add(e.id);const packet={attempt,rootId:root.id,emissionId:root.id+(secondary?':cuda:':':direct:')+e.ownerId,ownerId:'hero',targetId:e.ownerId,at,source,sourcePoint:sourcePoint||{x:G.hero.x,y:G.hero.y},contactPoint:{...point},rawDamage:rawDamage??root.profile.damage};
-    const damage=packet.rawDamage*JensenCombatEnemies.defenseMultiplier(e,packet),hpBefore=e.hp;e.hp=Math.max(0,e.hp-damage);e.flash=.16;contacts++;G.kills+=e.hp===0?1:0;
+    seen.add(e.id);const packet={attempt,rootId:root.id,emissionId:root.id+(secondary?':cuda:':':direct:')+e.ownerId,ownerId:'hero',targetId:e.ownerId,at,source,sourcePoint:sourcePoint||{x:G.hero.x,y:G.hero.y},contactPoint:{...point},baseDamage:rawDamage??root.profile.damage,critMultiplier:secondary?1:root.critMultiplier||1};
+    packet.rawDamage=packet.baseDamage*packet.critMultiplier;
+    const mitigation=JensenCombatEnemies.defenseMultiplier(e,packet),damage=packet.rawDamage*mitigation,hpBefore=e.hp;e.hp=Math.max(0,e.hp-damage);e.flash=.16;contacts++;G.kills+=e.hp===0?1:0;
     const commit={...packet,eligibleDamage:damage,hpBefore,hpAfter:e.hp,aliveBefore:true,killedByThisHit:e.hp===0,cudaSnapshot:root.cudaSnapshot};if(!secondary)originalCommits.push(commit);
     if(e.hp===0){if(level===1&&e.id===1)offer(0);const dyingRoot=e.attack?.rootId;if(dyingRoot)reservations.delete(dyingRoot);e.state='retiring';e.retire=.5;e.attack=null;}
     e.recoil=1;e.recoilAngle=root.angle;
-    feedback(e.x,e.y,damage,false,root.profile,point);
+    const detail={rootId:root.id,targetId:e.ownerId,source,at,baseDamage:packet.baseDamage,critMultiplier:packet.critMultiplier,rawDamage:packet.rawDamage,mitigation,mitigatedDamage:damage,hpBefore,hpAfter:e.hp,hpLoss:hpBefore-e.hp};
+    if(labMode){damageLog.push(detail);if(damageLog.length>64)damageLog.shift();}
+    feedback(e.x,e.y,labMode?detail.hpLoss:damage,false,root.profile,point,packet.critMultiplier>1);
     if(!root.feedback){root.feedback=true;G.hitStop=Math.max(G.hitStop,2*FIXED);addShake(.12,Math.cos(root.angle)*.6,Math.sin(root.angle)*.6);if(Sfx.hit)Sfx.hit();}
     return commit;
   }
@@ -7802,15 +7841,27 @@ const R7=(()=>{
   function auto(dt,c){
     const h=G.hero,p=current(),active=combatState?JensenCombatActions.inspect(combatState):null;if(active?.active||active?.pending&&clock<active.pending.expires)return;
     const touch=Input.st.mode==='touch';
-    if(touch&&!action){targetId=null;if(Input.st.atk||c?.attack){const eligible=G.enemies.filter(e=>e.entered&&!e.dead&&e.hp>0&&Math.hypot(e.x-h.x,e.y-h.y)<=p.reach+e.r&&visible(h,e));eligible.sort((a,b)=>Math.hypot(a.x-h.x,a.y-h.y)-Math.hypot(b.x-h.x,b.y-h.y)||a.id-b.id);targetId=eligible[0]?.id??null;}}
+    const aimed=touch&&directional();
+    let attackAngle=null;
+    if(aimed&&!action){
+      targetId=null;const held=aimGesture&&Input.st.atk&&Input.st.atkId===aimGesture.id&&(aimGesture.explicit||performance.now()-aimGesture.start>=120);
+      if(held||c?.attack){
+        const facing=lastAim??h.aim??h.bodyAng;
+        const eligible=G.enemies.filter(e=>e.entered&&!e.dead&&e.hp>0&&Math.hypot(e.x-h.x,e.y-h.y)<=p.reach+e.r&&visible(h,e)&&Math.abs(angDiff(facing,Math.atan2(e.y-h.y,e.x-h.x)))<=Math.PI/3);
+        eligible.sort((a,b)=>Math.hypot(a.x-h.x,a.y-h.y)-Math.hypot(b.x-h.x,b.y-h.y)||a.id-b.id);
+        const target=aimGesture?.explicit?null:eligible[0];targetId=target?.id??null;
+        attackAngle=target?Math.atan2(target.y-h.y,target.x-h.x):facing;
+      }
+    }else if(touch&&!action){targetId=null;if(Input.st.atk||c?.attack){const eligible=G.enemies.filter(e=>e.entered&&!e.dead&&e.hp>0&&Math.hypot(e.x-h.x,e.y-h.y)<=p.reach+e.r&&visible(h,e));eligible.sort((a,b)=>Math.hypot(a.x-h.x,a.y-h.y)-Math.hypot(b.x-h.x,b.y-h.y)||a.id-b.id);targetId=eligible[0]?.id??null;}}
     const selected=G.enemies.find(e=>e.id===targetId&&e.entered&&!e.dead&&e.hp>0);
-    if(!selected){targetId=null;action=null;return;}
-    if(!action&&clock>=nextAttack&&Math.hypot(selected.x-h.x,selected.y-h.y)<=p.reach+selected.r&&visible(h,selected)){
-      action={id:attempt+':hero:auto:'+(++seq),age:0,side:hand++%2,angle:Math.atan2(selected.y-h.y,selected.x-h.x),profile:labMode?copy(p):p,hits:new Set(),cudaSnapshot:{damage:p.damage,...copy(combatConfig.cuda)}};action.expires=clock+p.cycle+.25;rootRecords.set(action.id,action);nextAttack=clock+p.cycle;
+    if(!aimed&&!selected){targetId=null;action=null;return;}
+    if(!action&&clock>=nextAttack&&(aimed?attackAngle!==null:selected&&Math.hypot(selected.x-h.x,selected.y-h.y)<=p.reach+selected.r&&visible(h,selected))){
+      const angle=aimed?attackAngle:Math.atan2(selected.y-h.y,selected.x-h.x);
+      action={id:attempt+':hero:auto:'+(++seq),age:0,side:hand++%2,angle,directionLocked:aimed,critMultiplier:critical(),profile:labMode?copy(p):p,hits:new Set(),cudaSnapshot:{damage:p.damage,...copy(combatConfig.cuda)}};action.expires=clock+p.cycle+.25;rootRecords.set(action.id,action);nextAttack=clock+p.cycle;
     }
     const a=action;if(!a)return;
     const old=a.age,start=a.profile.contactStart??.1,end=a.profile.contactEnd??.18;a.age+=dt;
-    if(old<start&&a.age>=start){const e=G.enemies.find(e=>e.id===targetId&&e.hp>0);if(e)a.angle=Math.atan2(e.y-h.y,e.x-h.x);}
+    if(!a.directionLocked&&old<start&&a.age>=start){const e=G.enemies.find(e=>e.id===targetId&&e.hp>0);if(e)a.angle=Math.atan2(e.y-h.y,e.x-h.x);}
     if(a.age>=start&&old<end){
       // Hand, both bodies and packet time use the same clipped contact subwindow.
       const fromAge=Math.max(start,old),toAge=Math.min(end,a.age),q0=(fromAge-old)/dt,q1=(toAge-old)/dt;
@@ -7825,7 +7876,7 @@ const R7=(()=>{
     const active=combatState?JensenCombatActions.inspect(combatState).active:null,skill=pose?.skill||active;
     const hasShield=combatConfig.entry.equipment.right==='wafer_shield';
     return {attempt,time:to,hero:{x:h.x,y:h.y,oldX:h.oldX??h.x,oldY:h.oldY??h.y,r:h.r,face:h.bodyAng,aim:h.aim},movement:{x:c.mx||0,y:c.my||0},autoRestart:nextAttack,shieldPresented:hasShield&&active?.slot!==2,config:combatConfig,owners:G.enemies.filter(e=>e.entered).map(e=>({ownerId:e.ownerId,x:e.x,y:e.y,hp:e.hp,dead:e.dead})),visible,
-      defenseAt(at){const q=to>from?clamp((at-from)/(to-from),0,1):1,atSkill=[p.accepted,active,p.skill].find(a=>a&&at>=a.start&&at<a.end),aim=atSkill?.angle??action?.angle??(Math.hypot(c.mx||0,c.my||0)>0?Math.atan2(c.my,c.mx):h.aim),endFace=p.face+angDiff(p.face,aim)*Math.min(1,(p.dt??to-from)*16),face=atSkill?.slot===1?atSkill.angle:p.face+angDiff(p.face,endFace)*q;return {x:lerp(p.x,h.x,q),y:lerp(p.y,h.y,q),face,shieldPresented:hasShield&&atSkill?.slot!==2};}};
+      defenseAt(at){const q=to>from?clamp((at-from)/(to-from),0,1):1,atSkill=[p.accepted,active,p.skill].find(a=>a&&at>=a.start&&at<a.end),aim=atSkill?.angle??action?.angle??(directional()?lastAim:null)??(Math.hypot(c.mx||0,c.my||0)>0?Math.atan2(c.my,c.mx):h.aim),endFace=p.face+angDiff(p.face,aim)*Math.min(1,(p.dt??to-from)*16),face=atSkill?.slot===1?atSkill.angle:p.face+angDiff(p.face,endFace)*q;return {x:lerp(p.x,h.x,q),y:lerp(p.y,h.y,q),face,shieldPresented:hasShield&&atSkill?.slot!==2};}};
   }
   function capsuleTime(a,b,u,v,r){
     if(segDist(a.x,a.y,u.x,u.y,v.x,v.y).d<=r)return 0;
@@ -7860,7 +7911,7 @@ const R7=(()=>{
       if(total.tells+cost.tells>limits.tells||hazards.length+total.hazards+cost.hazards>limits.hazards||hazards.filter(h=>h.kind==='heat').length+total.heat+cost.heat>limits.heat)return false;
       reservations.set(rootId,{...cost});return true;
     },releaseReservation:rootId=>reservations.delete(rootId),emit(hazard){const reserved=reservations.get(hazard.rootId);if(hazard.attempt!==attempt||!reserved||reserved.hazards<1||hazard.kind==='heat'&&reserved.heat<1)throw Error('Unreserved enemy emission');reserved.hazards--;if(hazard.kind==='heat')reserved.heat--;hazards.push(hazard);}};}
-  function requestActive(slot){if(!live()||!combatState)return;const c=controls(FIXED);activeRequests.push({slot,at:clock,direction:Math.hypot(c.mx,c.my)>0?{x:c.mx,y:c.my}:null});}
+  function requestActive(slot){if(!live()||!combatState)return;const c=controls(FIXED);activeRequests.push({slot,at:clock,direction:directional()?{x:Math.cos(lastAim??G.hero.aim),y:Math.sin(lastAim??G.hero.aim)}:Math.hypot(c.mx,c.my)>0?{x:c.mx,y:c.my}:null});}
   function activeContacts(carrier,from,to){
     if(!carrier)return;const h=G.hero,root=rootRecords.get(carrier.rootId);if(!root)return;
     const span=Math.abs(carrier.endAngle-carrier.startAngle),steps=Math.max(1,Math.ceil(span/.12)),hits=[];
@@ -7921,8 +7972,28 @@ const R7=(()=>{
     clearInput();Input.st.mode=value;document.body.classList.toggle('touch',value==='touch');hintUntil=clock+8;viewport();ui();
   }
   function touchPointer(event){if(event.pointerType==='touch')mode('touch');return Input.st.mode==='touch'&&live()&&!(event.button>0);}
-  function touchAttack(){if(live()&&Input.st.mode==='touch')auto(0,{attack:true});}
-  function touchEnd(event,which){if(event.type==='pointerup')return;if(which==='joy'){G.hero.vx=G.hero.vy=0;}else{action=null;targetId=null;}}
+  function touchAttack(event){
+    if(!live()||Input.st.mode!=='touch')return;
+    if(!directional()){auto(0,{attack:true});return;}
+    $('btnAtk').classList.add('aiming');$('btnAtk').style.setProperty('--aim-angle',(lastAim??G.hero.aim)+'rad');
+    aimGesture={id:event.pointerId,x:event.clientX,y:event.clientY,start:performance.now(),explicit:false};
+  }
+  function touchAim(event){
+    if(!directional()||aimGesture?.id!==event.pointerId||!live())return;
+    const dx=event.clientX-aimGesture.x,dy=event.clientY-aimGesture.y;
+    if(Math.hypot(dx,dy)>=10){aimGesture.explicit=true;lastAim=Math.atan2(dy,dx);$('btnAtk').style.setProperty('--aim-angle',lastAim+'rad');}
+  }
+  function touchEnd(event,which){
+    if(which==='attack'&&directional()){
+      if(aimGesture?.id!==event.pointerId)return;
+      const tap=event.type==='pointerup'&&!aimGesture.explicit&&performance.now()-aimGesture.start<120;
+      aimGesture=null;$('btnAtk').classList.remove('aiming');
+      if(event.type==='pointerup'){if(tap&&live())auto(0,{attack:true});}
+      else{action=null;targetId=null;}
+      return;
+    }
+    if(event.type==='pointerup')return;if(which==='joy'){G.hero.vx=G.hero.vy=0;}else{action=null;targetId=null;}
+  }
   function viewport(){
     const next=(Input.st.mode==='touch'||matchMedia('(pointer:coarse)').matches&&!matchMedia('(hover:hover)').matches)&&innerHeight>innerWidth;
     if(next!==portrait){portrait=next;clearInput();cancelStoryGesture();}
@@ -7965,7 +8036,7 @@ const R7=(()=>{
   function motion(h,c,dt){
     const skill=combatState?JensenCombatActions.inspect(combatState).active:null;
     const a=action,side=a?(a.side?1:-1):(hand%2?1:-1),moving=Math.hypot(c.mx,c.my)>.001;
-    const aim=skill?skill.angle:a?a.angle:moving?Math.atan2(c.my,c.mx):h.aim;
+    const aim=skill?skill.angle:a?a.angle:directional()&&lastAim!==null?lastAim:moving?Math.atan2(c.my,c.mx):h.aim;
     h.aim=aim;h.bodyAng+=angDiff(h.bodyAng,aim)*Math.min(1,dt*16);h.headAng+=angDiff(h.headAng,aim)*Math.min(1,dt*20);
     let target;
     if(skill){h.phase=clock<skill.contactStart?'windup':clock<skill.contactEnd?'swing':'recover';const from=h.phase==='windup'?skill.start:h.phase==='swing'?skill.contactStart:skill.contactEnd,to=h.phase==='windup'?skill.contactStart:h.phase==='swing'?skill.contactEnd:skill.end;target=CharacterRenderer.samplePose(h.phase,clamp((clock-from)/Math.max(FIXED,to-from),0,1),1);if(skill.slot===2&&activeCarrier){h.bodyAng=activeCarrier.endAngle;h.headAng=h.bodyAng;}}
@@ -7997,7 +8068,7 @@ const R7=(()=>{
     if(!live())return;frameStart=clock;incoming=[];originalCommits=[];
     const h=G.hero,c=controls(dt),pose={x:h.x,y:h.y,face:h.bodyAng,dt,skill:JensenCombatActions.inspect(combatState).active};
     const requested=JensenCombatActions.request(combatState,activeRequests.filter(r=>r.at===frameStart),frameStart,hostFrame(c,frameStart,end,pose));activeRequests=[];
-    if(requested.started){action=null;nextAttack=Math.max(nextAttack,requested.autoNotBefore);pose.accepted=requested.started;if(pose.skill)pose.skill.end=frameStart;const a=requested.started,values=a.slot===1?combatConfig.breakthrough:combatConfig.clear_space;rootRecords.set(a.rootId,{id:a.rootId,angle:a.angle,hits:new Set(),profile:{...copy(current()),cap:values.cap},cudaSnapshot:{damage:current().damage,...copy(combatConfig.cuda)},expires:a.end+.25});}
+    if(requested.started){action=null;nextAttack=Math.max(nextAttack,requested.autoNotBefore);pose.accepted=requested.started;if(pose.skill)pose.skill.end=frameStart;const a=requested.started,values=a.slot===1?combatConfig.breakthrough:combatConfig.clear_space;rootRecords.set(a.rootId,{id:a.rootId,angle:a.angle,critMultiplier:critical(),hits:new Set(),profile:{...copy(current()),cap:values.cap},cudaSnapshot:{damage:current().damage,...copy(combatConfig.cuda)},expires:a.end+.25});}
     const acceptedBoundary=JensenCombatActions.nextBoundary(combatState,frameStart,end);if(acceptedBoundary<end){end=acceptedBoundary;dt=end-frameStart;pose.dt=dt;}
     const advance=JensenCombatActions.advance(combatState,frameStart,end,hostFrame(c,frameStart,end,pose));activeCarrier=advance.carrier;clock=end;G.t+=dt;G.time+=dt;
     h.oldX=h.x;h.oldY=h.y;locomotion(h,{mx:c.mx*advance.motion.multiplier,my:c.my*advance.motion.multiplier},dt,!advance.motion.replace,advance.motion.multiplier);if(advance.motion.replace)move(h,advance.motion.dx,advance.motion.dy);gait(h,dt);h.hurtT=Math.max(0,h.hurtT-dt);
@@ -8045,7 +8116,7 @@ const R7=(()=>{
   }
   function ui(){
     const touch=Input.st.mode==='touch';touchControls();document.body.classList.toggle('touch',touch);
-    $('btnAtk').textContent='攻击';$('r12ApproachLabel').textContent=touch?'摇杆靠近':'点选敌人';$('r7DiagramTitle').textContent=touch?'左摇杆靠近，按住攻击交替出拳。只有接触到的对手受伤，每拳最多三人。':'Select an enemy to approach, then the GPU gauntlets alternate. Only touching opponents take damage, at most three per strike.';
+    $('btnAtk').textContent=labMode?'瞄准':'攻击';$('btnAtk').setAttribute('aria-label',labMode?'拖动瞄准并连续攻击，轻点辅助一击':'攻击');$('r12ApproachLabel').textContent=touch?'摇杆靠近':'点选敌人';$('r7DiagramTitle').textContent=touch?'左摇杆靠近，按住攻击交替出拳。只有接触到的对手受伤，每拳最多三人。':'Select an enemy to approach, then the GPU gauntlets alternate. Only touching opponents take damage, at most three per strike.';
     $('r13Learn').textContent=touch?'左摇杆靠近，按住右侧攻击交替出拳。最多命中三人。':'点选敌人，靠近后交替出拳。最多命中三人。';
     $('r7Hud').hidden=phase!=='combat';$('r9Pause').hidden=phase!=='combat';$('r7Health').textContent='HP '+Math.ceil(G.hero?.hp||0)+' / '+(labMode?G.hero.maxHp:100);
     $('r7Kit').textContent=(labMode?'调试 G'+level:level===1?'餐厅':'街机')+' · '+G.enemies.filter(e=>!e.dead).length;
@@ -8152,7 +8223,7 @@ const R7=(()=>{
     }
   }
   function ground(ctx){
-    if(level===1){ctx.save();ctx.fillStyle='#394d43';ctx.fillRect(0,0,World.W,World.H);for(let y=World.WALL;y<World.H-World.WALL;y+=84)for(let x=World.WALL;x<World.W-World.WALL;x+=84){ctx.fillStyle=(Math.floor(x/84)+Math.floor(y/84))%2?'#455347':'#5b5e4f';ctx.fillRect(x,y,Math.min(84,World.W-World.WALL-x),Math.min(84,World.H-World.WALL-y));}if(phase==='combat')B1Appearance.drawFloor(ctx,World.W,World.H,World.WALL);ctx.strokeStyle='#a68458';ctx.lineWidth=World.WALL;ctx.strokeRect(World.WALL/2,World.WALL/2,World.W-World.WALL,World.H-World.WALL);ctx.fillStyle='#d2c297';ctx.font='bold 26px sans-serif';ctx.textAlign='center';ctx.fillText('DINER · 守住这一班',720,180);ctx.restore();}
+    if(level===1&&!labMode){ctx.save();ctx.fillStyle='#394d43';ctx.fillRect(0,0,World.W,World.H);for(let y=World.WALL;y<World.H-World.WALL;y+=84)for(let x=World.WALL;x<World.W-World.WALL;x+=84){ctx.fillStyle=(Math.floor(x/84)+Math.floor(y/84))%2?'#455347':'#5b5e4f';ctx.fillRect(x,y,Math.min(84,World.W-World.WALL-x),Math.min(84,World.H-World.WALL-y));}if(phase==='combat')B1Appearance.drawFloor(ctx,World.W,World.H,World.WALL);ctx.strokeStyle='#a68458';ctx.lineWidth=World.WALL;ctx.strokeRect(World.WALL/2,World.WALL/2,World.W-World.WALL,World.H-World.WALL);ctx.fillStyle='#d2c297';ctx.font='bold 26px sans-serif';ctx.textAlign='center';ctx.fillText('DINER · 守住这一班',720,180);ctx.restore();}
     else{ctx.save();ctx.fillStyle='rgba(18,38,60,.8)';ctx.fillRect(45,45,World.W-90,World.H-90);ctx.strokeStyle='#426c87';ctx.lineWidth=1;for(let x=80;x<World.W;x+=80){ctx.beginPath();ctx.moveTo(x,45);ctx.lineTo(x,World.H-45);ctx.stroke();}ctx.restore();}
     if(phase!=='combat')return;
     drawSupport(ctx);
@@ -8162,7 +8233,7 @@ const R7=(()=>{
     for(const e of G.enemies)if((labMode||level>=3)&&e.entered&&e.hp>0&&e.state==='tell'&&e.attack){for(const shape of e.attack.shapes)drawThreat(ctx,shape);if(e.attack.trajectory){ctx.save();ctx.strokeStyle='#dab774';ctx.setLineDash([4,4]);ctx.beginPath();e.attack.trajectory.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.stroke();ctx.restore();}if(e.attack.turnPoint){const p=e.attack.turnPoint;ctx.save();ctx.strokeStyle='#d8c395';ctx.strokeRect(p.x-5,p.y-5,10,10);ctx.restore();}}
     for(const p of hazards){ctx.save();ctx.fillStyle='#ffcf76';ctx.strokeStyle='#ffcf76';if(p.kind==='heat'){drawThreat(ctx,{kind:'circle',x:p.x,y:p.y,r:p.r},'#e28b51',true);ctx.restore();continue;}if(p.kind==='returnDisc'){ctx.strokeStyle=p.phase==='return'?'#a0d8e6':'#f0cb81';ctx.lineWidth=3;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,TAU);ctx.stroke();ctx.lineWidth=1;ctx.strokeRect(p.x-3,p.y-3,6,6);ctx.restore();continue;}if(p.kind==='curvedArc'&&p.trail?.length){ctx.strokeStyle='#bdc8a1';ctx.globalAlpha=.5;ctx.lineWidth=2;ctx.beginPath();p.trail.forEach((q,i)=>i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y));ctx.stroke();ctx.globalAlpha=1;}if(p.kind==='beam'){const end=beamEnd(p);ctx.lineWidth=p.r*2;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(end.x,end.y);ctx.stroke();ctx.lineWidth=3;ctx.strokeStyle='#fff9dc';ctx.stroke();}else{ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,TAU);ctx.fill();}ctx.restore();}
   }
-  function drawProp(ctx,p){ctx.save();ctx.fillStyle=level===1?'#806443':'#38475f';ctx.strokeStyle='#bcad80';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,TAU);ctx.fill();ctx.stroke();ctx.fillStyle='#d4c8ab';ctx.beginPath();ctx.ellipse(p.x,p.y-4,p.r*.6,p.r*.35,0,0,TAU);ctx.fill();ctx.restore();}
+  function drawProp(ctx,p){ctx.save();ctx.fillStyle=level===1&&!labMode?'#806443':'#38475f';ctx.strokeStyle='#bcad80';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,TAU);ctx.fill();ctx.stroke();ctx.fillStyle='#d4c8ab';ctx.beginPath();ctx.ellipse(p.x,p.y-4,p.r*.6,p.r*.35,0,0,TAU);ctx.fill();ctx.restore();}
   function labSnapshot(){const config=copy(labConfig);Object.assign(config.hero,{hp:G.hero.hp,maxHp:G.hero.maxHp,r:G.hero.r});return config;}
   function legalPosition(x,y,r,exclude=null){return World.walkable(x,y,r)&&[G.hero,...G.enemies].every(e=>e===exclude||e.dead||(e!==G.hero&&e.hp<=0)||e.entered===false||Math.hypot(x-e.x,y-e.y)>=r+e.r);}
   function placeNear(x,y,r,exclude=null){
@@ -8172,11 +8243,11 @@ const R7=(()=>{
   function labActor(typeId,spawn){const id=++labOrdinal;return JensenCombatEnemies.create(labConfig.types[typeId],{...spawn,id,spawnOrdinal:id,initialWait:labConfig.limits.initialWaitBase+id*labConfig.limits.initialWaitStep},attempt);}
   function labReset(stage){
     if(!Number.isInteger(stage)||stage<1||stage>8)return {ok:false,error:'入场状态必须为G1–G8'};
-    labConfig=JensenCombatData.defaults(stage);profile=null;receipt=null;busy=false;pending=null;labOrdinal=0;labStatic=false;labImmortal=true;tray=false;
+    labConfig=JensenCombatData.growthDefaults(stage);damageLog=[];profile=null;receipt=null;busy=false;pending=null;labOrdinal=0;labStatic=false;labImmortal=true;tray=false;
     enter(Math.min(stage,2));level=stage;G.lab=true;G.hero.maxHp=labConfig.hero.maxHp;G.hero.hp=G.hero.hpLag=labConfig.hero.hp;G.hero.r=labConfig.hero.r;
-    if(stage<=2){for(const e of G.enemies){e.typeId=e.role;e.ownerId=attempt+':owner:'+e.id;e.spawnOrdinal=e.id;e.config=copy(labConfig.types[e.role]);labOrdinal=Math.max(labOrdinal,e.id);}}
+    if(stage<=2){for(const e of G.enemies){e.typeId=e.role;e.ownerId=attempt+':owner:'+e.id;e.spawnOrdinal=e.id;e.config=copy(labConfig.types[e.role]);e.hp=e.maxHp=e.config.hp;labOrdinal=Math.max(labOrdinal,e.id);}}
     else{G.enemies=[];allies=[];pickups=[];const formation=labConfig.encounters.find(e=>e.stage===stage);G.hero.x=formation.hero_xy[0];G.hero.y=formation.hero_xy[1];World.collide(G.hero,G.hero.r);for(const spawn of formation.actors){const e=labActor(spawn.typeId,spawn),point=placeNear(e.x,e.y,e.r);if(!point)throw Error('调试阵型无法合法放置 '+spawn.typeId);Object.assign(e,point);G.enemies.push(e);}}
-    G.cam.x=G.hero.x;G.cam.y=G.hero.y;if(!labMounted){labMounted=true;JensenLab.mount(labAPI);}ui();return {ok:true};
+    G.growth.chapterId='arcade';G.cam.x=G.hero.x;G.cam.y=G.hero.y;if(!labMounted){labMounted=true;JensenLab.mount(labAPI);}ui();return {ok:true};
   }
   function labSpawn(typeId,count){
     if(!labConfig.types[typeId]||!Number.isInteger(count)||count<0||count>30)return {ok:false,error:'请选择有效对手与0–30整数数量'};
@@ -8197,7 +8268,7 @@ const R7=(()=>{
     if(level!==1)return {ok:false,error:'临时托盘仅用于G1'};
     value=!!value;
     if(labMode){
-      const candidate=labSnapshot();candidate.auto={...profiles[value?'tray':'bare'],id:value?'tray_sweep':'bare_fists',contactStart:.1,contactEnd:.18};
+      const candidate=labSnapshot();candidate.auto=value?{...profiles.tray,damage:35,cycle:.55,critChance:candidate.auto.critChance,critMultiplier:candidate.auto.critMultiplier,id:'tray_sweep',contactStart:.1,contactEnd:.18}:JensenCombatData.growthDefaults(1).auto;
       const checked=JensenCombatData.validatePatch(candidate,'auto',{});if(!checked.ok)return checked;
       labConfig=checked.value;combatConfig=labConfig;
     }
@@ -8206,9 +8277,9 @@ const R7=(()=>{
   const labAPI=Object.freeze({
     config:labSnapshot,reset:labReset,spawn:labSpawn,patch:labPatch,cancelInput:()=>clearInput(),immortal:labSetImmortal,
     staticAI:value=>{labStatic=!!value;clearInput();},
-    clear:()=>{clearInput();G.enemies=[];hazards=[];reservations.clear();incomingSeen.clear();rootRecords.clear();combatState.evaluated.clear();networkFX=[];},
+    clear:()=>{clearInput();damageLog=[];G.enemies=[];hazards=[];reservations.clear();incomingSeen.clear();rootRecords.clear();combatState.evaluated.clear();networkFX=[];},
     tray:value=>{const result=setTray(value);if(result.ok)clearInput();return result;},
-    inspect:()=>({stage:level,hp:G.hero.hp,maxHp:G.hero.maxHp,count:G.enemies.filter(e=>!e.dead).length,immortal:labImmortal,staticAI:labStatic,tray,phase,portrait,paused:G.paused})
+    inspect:()=>({stage:level,hp:G.hero.hp,maxHp:G.hero.maxHp,count:G.enemies.filter(e=>!e.dead).length,immortal:labImmortal,staticAI:labStatic,tray,phase,portrait,paused:G.paused,latestDamage:damageLog.at(-1)?copy(damageLog.at(-1)):null,latestDirect:copy(damageLog.findLast(hit=>hit.source!=='cuda')||null),latestCuda:copy(damageLog.findLast(hit=>hit.source==='cuda')||null)})
   });
   function home(){if(!busy)start();}
   function mount(){
@@ -8237,18 +8308,25 @@ const R7=(()=>{
     $('r7Modal').addEventListener('keydown',e=>{if(e.key!=='Tab')return;const buttons=['r7Previous','r7Next','r7Skip','r7Retry','r7Reload'].map(id=>$(id)).filter(b=>!b.hidden&&!b.disabled);if(!buttons.length){e.preventDefault();$('r7Heading').focus();return;}const first=buttons[0],last=buttons[buttons.length-1];if(e.shiftKey&&(document.activeElement===first||document.activeElement===$('r7Heading'))){e.preventDefault();last.focus();}else if(!e.shiftKey&&(document.activeElement===last||document.activeElement===$('r7Heading'))){e.preventDefault();first.focus();}});
     ui();
   }
-  return Object.freeze({enabled:true,labMode,lab:labAPI,start,update,pause,key,ui,battleGesture:live,mode,touchPointer,touchAttack,touchEnd,drawHero,drawEnemy,drawImpact,foreground,ground,drawProp,home,mount,inspect:()=>({phase,level,clock,attempt,inputMode:Input.st.mode,activeState:combatState?JensenCombatActions.inspect(combatState):null,carrier:activeCarrier?copy(activeCarrier):null,network:copy(networkFX),reservations:[...reservations.entries()].map(([id,value])=>({id,...value})),targetId,destination:destination?copy(destination):null,route:copy(route),portrait,action:action?{...action,hits:[...action.hits]}:null,tray,pickups:copy(pickups),allies:copy(allies),offers:copy(offers),hazards:copy(hazards),profile:profile?copy(profile):null,receipt,contacts,lastError,busy}),retry:()=>pending&&!busy?persist(pending.next,pending.after):null});
+  return Object.freeze({enabled:true,labMode,lab:labAPI,start,update,pause,key,ui,battleGesture:live,mode,touchPointer,touchAttack,touchAim,touchEnd,drawHero,drawEnemy,drawImpact,foreground,ground,drawProp,home,mount,inspect:()=>({phase,level,clock,attempt,aim:aimGesture?{...aimGesture,angle:lastAim}:null,lastAim,damageLog:copy(damageLog),inputMode:Input.st.mode,activeState:combatState?JensenCombatActions.inspect(combatState):null,carrier:activeCarrier?copy(activeCarrier):null,network:copy(networkFX),reservations:[...reservations.entries()].map(([id,value])=>({id,...value})),targetId,destination:destination?copy(destination):null,route:copy(route),portrait,action:action?{...action,hits:[...action.hits]}:null,tray,pickups:copy(pickups),allies:copy(allies),offers:copy(offers),hazards:copy(hazards),profile:profile?copy(profile):null,receipt,contacts,lastError,busy}),retry:()=>pending&&!busy?persist(pending.next,pending.after):null});
 })();
 /* R7_RUNTIME_END */
 
 /* Existing Trial/labBar presentation, adapted to ephemeral Jensen configuration only. */
 const JensenLab=(()=>{
-  let api=null,open=true,section='hero';
+  let api=null,open=true,section='hero',enemyStage=null;
   const node=(tag,text)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;return e;};
   function message(text,error=false){$('r14Status').textContent=text;$('r14Status').classList.toggle('error',error);}
   function result(value){if(value?.ok===false)message(value.error,true);else message('已应用 · 仅当前调试');refresh();}
   function refresh(){
-    if(!api)return;const cfg=api.config();$('r14Stage').value=String(cfg.stage);$('r14Immortal').checked=api.inspect().immortal;$('r14Tray').checked=api.inspect().tray;$('r14TrayLabel').hidden=cfg.stage!==1;$('r14AI').setAttribute('aria-pressed',String(api.inspect().staticAI));$('r14AI').textContent=api.inspect().staticAI?'恢复AI':'停止AI';
+    if(!api)return;const cfg=api.config();
+    if(enemyStage!==cfg.stage){
+      enemyStage=cfg.stage;const select=$('r14Enemy');select.replaceChildren();
+      const ordered=[...JensenCombatData.typeIds].sort((a,b)=>(cfg.types[b].stage===cfg.stage)-(cfg.types[a].stage===cfg.stage)||cfg.types[a].stage-cfg.types[b].stage);
+      for(const id of ordered){const type=cfg.types[id],option=node('option',(type.stage===cfg.stage?'本关 · ':'')+'G'+type.stage+' · '+type.label+' · '+id);option.value=id;select.appendChild(option);}
+      select.value=ordered.find(id=>cfg.types[id].stage===cfg.stage&&!cfg.types[id].boss)||ordered[0];
+    }
+$('r14Stage').value=String(cfg.stage);$('r14Immortal').checked=api.inspect().immortal;$('r14Tray').checked=api.inspect().tray;$('r14TrayLabel').hidden=cfg.stage!==1;$('r14AI').setAttribute('aria-pressed',String(api.inspect().staticAI));$('r14AI').textContent=api.inspect().staticAI?'恢复AI':'停止AI';
     const holder=$('r14Fields');holder.replaceChildren();section=$('r14Section').value||'hero';$('r14ExistingLabel').hidden=section!=='enemy';if(section==='enemy')section='enemy:'+$('r14Enemy').value;
     for(const field of JensenCombatData.fields(cfg,section)){
       const label=node('label',field.label+' ('+field.unit+') '),input=node('input');input.type='number';input.value=String(field.value);input.disabled=!!field.readOnly;input.dataset.path=JSON.stringify(field.path);input.min=String(field.min??'');input.max=String(field.max??'');input.step=field.integer?'1':'any';label.appendChild(input);holder.appendChild(label);
@@ -8256,18 +8334,25 @@ const JensenLab=(()=>{
   }
   function apply(){const patch={};for(const input of $('r14Fields').querySelectorAll('input')){if(input.disabled)continue;const path=JSON.parse(input.dataset.path);let at=patch;for(const key of path.slice(0,-1))at=at[key]||=(Object.create(null));at[path.at(-1)]=input.value.trim()===''?NaN:Number(input.value);}result(api.patch(section,patch,$('r14Existing').checked));}
   function toggle(){if(!api)return;open=!open;show('labBar',open);$('trialPanelToggle').setAttribute('aria-expanded',String(open));$('trialPanelToggle').textContent=open?'收起调试':'战斗调试';}
-  function sync(){if(!api)return;const s=api.inspect(),inactive=s.paused||s.portrait||s.phase!=='combat';$('labBar').inert=inactive;$('trialPanelToggle').inert=inactive;$('r14Live').textContent='G'+s.stage+' · HP '+Math.ceil(s.hp)+' / '+s.maxHp+' · 敌人 '+s.count+(s.immortal?' · 不死':' · 可死亡');}
+  function sync(){
+    if(!api)return;const s=api.inspect(),cfg=api.config(),inactive=s.paused||s.portrait||s.phase!=='combat';
+    $('labBar').inert=inactive;$('trialPanelToggle').inert=inactive;
+    $('r14Live').textContent='G'+s.stage+' · HP '+Math.ceil(s.hp)+' / '+s.maxHp+' · 敌人 '+s.count+(s.immortal?' · 不死':' · 可死亡');
+    const names={gpu_gauntlet:'GPU拳套',wafer_shield:'晶圆盾',thor_hammer:'雷神锤'},entry=cfg.entry;
+    $('r15Summary').textContent='右手 '+(names[entry.equipment.right]||'空手')+' · 左手 '+(names[entry.equipment.left]||'空手')+(s.tray?' · 临时托盘':'')+'\n普攻 '+cfg.auto.damage+' / '+cfg.auto.cycle+'s · 暴击 '+(cfg.auto.critChance*100)+'% ×'+cfg.auto.critMultiplier+'\n1 '+(entry.slot_1?(cfg.auto.damage*cfg.breakthrough.damageMultiplier)+' / '+cfg.breakthrough.cooldown+'s':'未解锁')+' · 2 '+(entry.slot_2?(cfg.auto.damage*cfg.clear_space.damageMultiplier)+' / '+cfg.clear_space.cooldown+'s':'未解锁')+'\nCUDA '+(entry.buffs.includes('cuda_link')?(cfg.auto.damage*cfg.cuda.damageMultiplier)+' / '+cfg.cuda.interval+'s':'未解锁')+' · 稳态防御 '+(entry.buffs.includes('steady_guard')?'开启':'未解锁');
+    const describe=hit=>hit?'t'+hit.at.toFixed(2)+'s · 基础 '+hit.baseDamage+' × '+hit.critMultiplier+(hit.critMultiplier>1?' 暴击':'')+' · 减伤后 '+Number(hit.mitigatedDamage.toFixed(2))+' (×'+hit.mitigation+') · 实扣 '+Number(hit.hpLoss.toFixed(2)):'尚未命中';
+    $('r15Damage').textContent='最近直接：'+describe(s.latestDirect)+'\n最近CUDA：'+describe(s.latestCuda);
+  }
   function mount(host){
     api=host;document.body.classList.add('jensenLab');
-    $('labBar').innerHTML='<strong>Jensen · 战斗调试</strong><label>入场状态<select id="r14Stage"></select></label><label id="r14TrayLabel"><input id="r14Tray" type="checkbox">G1 临时托盘</label><label>对手<select id="r14Enemy"></select></label><label>数量<input id="r14Count" type="number" min="0" max="30" value="1"></label><div><button id="r14Spawn" type="button">召唤</button><button id="r14Clear" type="button">清空</button><button id="r14Reset" type="button">重置入场</button></div><label><input id="r14Immortal" type="checkbox" checked>不死：HP可降到0</label><button id="r14AI" type="button" aria-pressed="false">停止AI</button><span id="r14Live"></span><details><summary>有效战斗参数 · 本地起测值</summary><label>配置<select id="r14Section"><option value="hero">主角</option><option value="auto">普通攻击</option><option value="breakthrough">1 突围</option><option value="clear_space">2 清场</option><option value="cuda">CUDA</option><option value="steady_guard">稳态防御</option><option value="limits">全局节奏与容量</option><option value="enemy">选中对手</option></select></label><label id="r14ExistingLabel"><input id="r14Existing" type="checkbox">应用现有同型（下次动作；HP/尺寸即时）</label><div id="r14Fields"></div><button id="r14Apply" type="button">应用本组数值</button><p>已释放危险与已受理动作保留原快照。节奏应用于下一次召唤/等待，不改正在倒计时。重置恢复该入场默认值。G3–G8数值为可调起测假设。</p></details><details><summary>比较与显示</summary><button id="r14Shake" type="button">切换震屏</button><button id="r14Sound" type="button">切换声音</button><p>原战士对照保留在上方调试入口；正常游戏只推进已实现故事。</p></details><p id="r14Status" role="status"></p>';
+    $('labBar').innerHTML='<strong>Jensen · 战斗调试</strong><label>入场状态<select id="r14Stage"></select></label><button id="r15Full" type="button">终态满配（G8）</button><label id="r14TrayLabel"><input id="r14Tray" type="checkbox">G1 临时托盘</label><label>对手<select id="r14Enemy"></select></label><label>数量<input id="r14Count" type="number" min="0" max="30" value="1"></label><div><button id="r14Spawn" type="button">召唤</button><button id="r14Clear" type="button">清空</button><button id="r14Reset" type="button">重置入场</button></div><label><input id="r14Immortal" type="checkbox" checked>不死：HP可降到0</label><button id="r14AI" type="button" aria-pressed="false">停止AI</button><span id="r14Live"></span><p id="r15Summary"></p><p id="r15Damage" role="status"></p><details><summary>有效战斗参数 · 本地起测值</summary><label>配置<select id="r14Section"><option value="hero">主角</option><option value="auto">普通攻击</option><option value="breakthrough">1 突围</option><option value="clear_space">2 清场</option><option value="cuda">CUDA</option><option value="steady_guard">稳态防御</option><option value="limits">全局节奏与容量</option><option value="enemy">选中对手</option></select></label><label id="r14ExistingLabel"><input id="r14Existing" type="checkbox">应用现有同型（下次动作；HP/尺寸即时）</label><div id="r14Fields"></div><button id="r14Apply" type="button">应用本组数值</button><p>已释放危险与已受理动作保留原快照。节奏应用于下一次召唤/等待，不改正在倒计时。重置恢复该入场默认值。G3–G8数值为可调起测假设。</p></details><details><summary>比较与显示</summary><button id="r14Shake" type="button">切换震屏</button><button id="r14Sound" type="button">切换声音</button><p>原战士对照保留在上方调试入口；正常游戏只推进已实现故事。</p></details><p id="r14Status" role="status"></p>';
     const comparison=Array.from($('labBar').querySelectorAll('details')).at(-1)||$('labBar');
     for(const p of comparison.querySelectorAll('p'))p.textContent='原战士页保留历史规则；Jensen调试不会写入职业进度。';
     for(const [label,href]of [['原战士对照（新标签）','/runeforge-public/games/v0.2.html'],['原调试入口（含模式切换）','/runeforge-public/debug/']]){const link=node('a',label);link.href=href;link.target='_blank';link.rel='noopener';comparison.appendChild(link);}
-    for(const stage of JensenCombatData.stageIds){const entry=JensenCombatData.defaults(stage).entry,names={gpu_gauntlet:'GPU',wafer_shield:'盾',thor_hammer:'雷神锤'},gear='右'+(names[entry.equipment.right]||'空手')+'·左'+(names[entry.equipment.left]||'空手'),skills=[entry.slot_1?'1':'',entry.slot_2?'2':'',entry.buffs.includes('cuda_link')?'CUDA':'',entry.buffs.includes('steady_guard')?'稳守':''].filter(Boolean).join('/');const option=node('option','G'+stage+' · '+gear+(skills?' · '+skills:''));option.value=String(stage);$('r14Stage').appendChild(option);}
-    for(const id of JensenCombatData.typeIds){const option=node('option',JensenCombatData.defaults(1).types[id].label+' · '+id);option.value=id;$('r14Enemy').appendChild(option);}
-    $('r14Enemy').value=JensenCombatData.typeIds[0];$('r14Section').value='hero';
+    for(const stage of JensenCombatData.stageIds){const entry=JensenCombatData.growthDefaults(stage).entry,names={gpu_gauntlet:'GPU',wafer_shield:'盾',thor_hammer:'雷神锤'},gear='右'+(names[entry.equipment.right]||'空手')+'·左'+(names[entry.equipment.left]||'空手'),skills=[entry.slot_1?'1':'',entry.slot_2?'2':'',entry.buffs.includes('cuda_link')?'CUDA':'',entry.buffs.includes('steady_guard')?'稳守':''].filter(Boolean).join('/');const option=node('option','G'+stage+' · '+gear+(skills?' · '+skills:''));option.value=String(stage);$('r14Stage').appendChild(option);}
+    $('r14Section').value='hero';
     const on=(id,type,fn)=>$(id).addEventListener(type,fn);
-    on('r14Stage','change',()=>result(api.reset(Number($('r14Stage').value))));on('r14Reset','click',()=>result(api.reset(api.config().stage)));on('r14Spawn','click',()=>result(api.spawn($('r14Enemy').value,Number($('r14Count').value))));on('r14Clear','click',()=>{api.clear();message('场地已清空；不会推进或保存');});
+    on('r15Full','click',()=>result(api.reset(8)));on('r14Stage','change',()=>result(api.reset(Number($('r14Stage').value))));on('r14Reset','click',()=>result(api.reset(api.config().stage)));on('r14Spawn','click',()=>result(api.spawn($('r14Enemy').value,Number($('r14Count').value))));on('r14Clear','click',()=>{api.clear();message('场地已清空；不会推进或保存');});
     on('r14Immortal','change',()=>api.immortal($('r14Immortal').checked));on('r14Tray','change',()=>result(api.tray($('r14Tray').checked)));on('r14AI','click',()=>{const value=!api.inspect().staticAI;api.staticAI(value);$('r14AI').setAttribute('aria-pressed',String(value));$('r14AI').textContent=value?'恢复AI':'停止AI';});
     on('r14Section','change',refresh);on('r14Enemy','change',refresh);on('r14Apply','click',apply);on('r14Shake','click',()=>{G.opt.shake=!G.opt.shake;});on('r14Sound','click',toggleMute);
     $('labBar').addEventListener('pointerdown',()=>api.cancelInput());$('labBar').addEventListener('focusin',()=>api.cancelInput());
@@ -8288,7 +8373,7 @@ if(new URLSearchParams(location.search).has('debug')){
   const prepare=()=>{Sfx.unlock();SkillPrototype.requestPrepare();};
   $('prototypePrepare').addEventListener('pointerdown',e=>{e.preventDefault();prepare();});
   $('prototypePrepare').addEventListener('click',e=>{if(e.detail===0)prepare();});
-  Input.init({acceptTouch:e=>R7.touchPointer(e),onAttackStart:()=>R7.touchAttack(),onJoyEnd:e=>R7.touchEnd(e,'joy'),onAttackEnd:e=>R7.touchEnd(e,'attack'),canvas,joy:$('joy'),joyBase:$('joyBase'),knob:$('joyKnob'),atk:$('btnAtk'),dodge:$('btnDodge'),
+  Input.init({acceptTouch:e=>R7.touchPointer(e),onAttackStart:e=>R7.touchAttack(e),onAttackMove:e=>R7.touchAim(e),onJoyEnd:e=>R7.touchEnd(e,'joy'),onAttackEnd:e=>R7.touchEnd(e,'attack'),canvas,joy:$('joy'),joyBase:$('joyBase'),knob:$('joyKnob'),atk:$('btnAtk'),dodge:$('btnDodge'),
     onAction:()=>Sfx.unlock(),onTarget:selectSkillTarget,
     onKey:c=>{if(R7.enabled)return R7.key(c);
       if(c==='KeyM'){toggleMute();return;}
