@@ -4948,6 +4948,7 @@ const Render=(()=>{
       }
     }
     for(const f of G.flashes){
+      if(R7.enabled&&f.kit){R7.drawImpact(g,f);continue;}
       const q=f.age/f.life,al=1-q,c=Math.cos(f.ang),s=Math.sin(f.ang),Ls=f.crit?30:13;
       g.strokeStyle=(f.crit?'rgba(255,214,150,':'rgba(255,244,222,')+(al*.9).toFixed(3)+')';g.lineWidth=f.crit?2.4:1.5;
       g.beginPath();g.moveTo(f.x-c*Ls*(.4+q*.3),f.y-s*Ls*(.4+q*.3));g.lineTo(f.x+c*Ls*(.6+q*.5),f.y+s*Ls*(.6+q*.5));g.stroke();
@@ -4960,6 +4961,7 @@ const Render=(()=>{
     for(const e of G.enemies){if(e.dead||e.dying)continue;const label=e.bomb?'Overload':e.broken>0?'Stance Broken':e.pinned>0?'Pinned':e.state==='fly'?'Flying':'';
       if(label){g.fillStyle=e.bomb?'#90ff70':'#ffe08b';g.font='bold 13px sans-serif';g.textAlign='center';g.fillText(label,e.x,e.y-e.jz-42*e.scale);}
       if(e.state==='fly'){g.strokeStyle='#ffd878';g.lineWidth=3;g.beginPath();g.moveTo(e.x,e.y-e.jz);g.lineTo(e.x-e.fvx*.05,e.y-e.jz-e.fvy*.05);g.stroke();}}
+    if(R7.enabled)R7.foreground(g);
     screenT();
     const fsc=clamp(sc/1.7,.8,1.3);g.textAlign='center';g.textBaseline='middle';g.lineJoin='round';
     for(const n of G.numbers){
@@ -5357,8 +5359,10 @@ const R7=(()=>{
   }
   function move(o,dx,dy){const n=Math.max(1,Math.ceil(Math.hypot(dx,dy)/6));for(let i=0;i<n;i++){o.x+=dx/n;o.y+=dy/n;for(let pass=0;pass<2;pass++){World.collide(o,o.r);for(const b of [G.hero,...G.enemies]){if(b===o||b.dead||b.hp<=0||b.entered===false)continue;const x=o.x-b.x,y=o.y-b.y,d=Math.hypot(x,y),min=o.r+b.r;if(d<min){const nx=d>.001?x/d:1,ny=d>.001?y/d:0;o.x+=nx*(min-d);o.y+=ny*(min-d);}}}World.collide(o,o.r);}}
   function visible(a,b){return World.clearSegment(a.x,a.y,b.x,b.y,2);}
-  function feedback(x,y,damage,hurt){
-    if(G.flashes.length>=12)G.flashes.shift();G.flashes.push({x,y:y-17,age:0,life:.12,ang:-.7,size:hurt?5:7,crit:false});
+  const kit=(p=current())=>p===profiles.gpu?'gpu':p===profiles.tray?'tray':'bare';
+  function feedback(x,y,damage,hurt,p=null,point=null){
+    const material=p?kit(p):null;
+    if(G.flashes.length>=12)G.flashes.shift();G.flashes.push({x:point?.x??x,y:(point?.y??y)-17,age:0,life:material==='bare'?.1:material==='tray'?.16:material==='gpu'?.13:.12,ang:-.7,size:hurt?5:7,crit:false,kit:material});
     if(G.numbers.length>=16)G.numbers.shift();G.numbers.push({x,y:y-38,vy:-42,val:damage,kind:hurt?'h':'n',age:0,life:.55});
   }
   function hurt(amount){if(!live())return;G.hero.hp=Math.max(0,G.hero.hp-amount);G.hero.hurtT=.18;feedback(G.hero.x,G.hero.y,amount,true);G.hitStop=Math.max(G.hitStop,2*FIXED);addShake(.18,0,1);if(Sfx.hurt)Sfx.hurt();if(G.hero.hp===0)G.hero.dead=true;}
@@ -5367,7 +5371,7 @@ const R7=(()=>{
     root.hits.add(e.id);e.hp=Math.max(0,e.hp-root.profile.damage);e.flash=.16;contacts++;G.kills+=e.hp===0?1:0;
     if(e.hp===0){if(level===1&&e.id===1)offer(0);e.state='retiring';e.retire=.5;e.attack=null;}
     e.recoil=1;e.recoilAngle=root.angle;
-    feedback(e.x,e.y,root.profile.damage,false);
+    feedback(e.x,e.y,root.profile.damage,false,root.profile,point);
     // One freeze per swing, shared by every combat clock; cleaves cannot stack it.
     if(!root.feedback){root.feedback=true;G.hitStop=Math.max(G.hitStop,2*FIXED);addShake(.12,Math.cos(root.angle)*.6,Math.sin(root.angle)*.6);if(Sfx.hit)Sfx.hit();}
   }
@@ -5492,8 +5496,9 @@ const R7=(()=>{
     let target;
     if(a){const t=a.age;h.phase=t<.1?'windup':t<.18?'swing':'recover';target=CharacterRenderer.samplePose(h.phase,t<.1?t/.1:t<.18?(t-.1)/.08:(t-.18)/(a.profile.cycle-.18),side);}
     else{h.phase='idle';target=CharacterRenderer.pose('idle',side);const bob=Math.sin(h.walk)*h.moveAmt;target.tw+=bob*.1;target.hip-=bob*.12;target.sa+=bob*.06;}
-    // Reuse the sword rig's torso/hip mechanics at a compact unarmed amplitude.
-    target.tw*=.55;target.hip*=.65;target.ld*=.65;target.cr+=h.hurtT>0?.06:0;
+    // Tool weight changes the body accent; contact hands retain the same physical sweep.
+    const material=kit(a?.profile),tw=material==='bare'?.4:material==='tray'?.8:.58,hip=material==='bare'?.5:material==='tray'?.8:.65,lean=material==='bare'?.4:material==='tray'?.85:.6;
+    target.tw*=tw;target.hip*=hip;target.ld*=lean;target.cr+=h.hurtT>0?.06:0;
     for(const key of PK)h.pose[key]+= (target[key]-h.pose[key])*(a?1:Math.min(1,dt*18));
     h.visual ||= CharacterRenderer.createVisualState(h);CharacterRenderer.updateVisual(h.visual,dt,h);h.cloakAng=h.visual.cloakAng;
   }
@@ -5564,14 +5569,37 @@ const R7=(()=>{
     }
     const activeHand=a?.side?'right':'left',otherHand=activeHand==='left'?'right':'left',otherGuard=guard(activeHand==='left'?1:-1);
     s.prototypeHands={[activeHand]:{x:handPos.x,y:handPos.y-17},[otherHand]:{x:otherGuard.x,y:otherGuard.y-17}};
-    const rig=CharacterRenderer.computeRig(s);
     CharacterRenderer.drawCharacter(ctx,s,level===1?'jensen-young':'jensen-founder',{shadow:false,drawProp:false});
-    ctx.save();ctx.translate(handPos.x,handPos.y-17);ctx.rotate(a?.angle??angle);
-    if(tray&&level===1){ctx.fillStyle='#c9cec3';ctx.strokeStyle='#f9f1cf';ctx.lineWidth=2;ctx.fillRect(-14,-10,28,20);ctx.strokeRect(-14,-10,28,20);}
-    else if(profile?.frontier===2){ctx.fillStyle='#89c953';ctx.fillRect(-8,-7,16,14);ctx.strokeStyle='#d2f6aa';ctx.strokeRect(-8,-7,16,14);const other=activeHand==='left'?rig.right:rig.left;ctx.restore();ctx.save();ctx.fillStyle='#89c953';ctx.fillRect(other.handX-6,other.handY-6,12,12);}
-    else{ctx.fillStyle='#e3bf93';ctx.beginPath();ctx.arc(0,0,7,0,TAU);ctx.fill();}
-    ctx.restore();
+    if(profile?.frontier===2){for(const key of ['left','right']){const point=s.prototypeHands[key];drawGauntlet(ctx,point,key===activeHand?(a?.angle??angle):angle);}}
+    else{ctx.save();ctx.translate(handPos.x,handPos.y-17);ctx.rotate(a?.angle??angle);
+      if(tray){ctx.fillStyle='#9ca9a6';ctx.strokeStyle='#252f33';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(0,0,14,10,0,0,TAU);ctx.fill();ctx.stroke();ctx.strokeStyle='#f3ead0';ctx.lineWidth=1.7;ctx.beginPath();ctx.ellipse(0,0,12,8,0,0,TAU);ctx.stroke();ctx.strokeStyle='#627174';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(-7,3);ctx.lineTo(7,3);ctx.stroke();}
+      else{ctx.fillStyle='#e3bf93';ctx.beginPath();ctx.arc(0,0,5,0,TAU);ctx.fill();}
+      ctx.restore();
+    }
     if(level===1){ctx.save();ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.fillStyle='#e4f2bb';ctx.fillText('Jensen · 少年',h.x,h.y-47);ctx.restore();}
+  }
+  function drawGauntlet(ctx,point,angle){
+    ctx.save();ctx.translate(point.x,point.y);ctx.rotate(angle);
+    ctx.fillStyle='#252e30';ctx.strokeStyle='#c3cfbc';ctx.lineWidth=1.5;ctx.fillRect(-10,-8,20,16);ctx.strokeRect(-10,-8,20,16);
+    ctx.fillStyle='#709843';ctx.fillRect(-3,-6,11,12);ctx.fillStyle='#bac3ad';ctx.fillRect(-8,-6,3,12);
+    ctx.strokeStyle='#e3efcf';ctx.lineWidth=1;ctx.beginPath();for(const y of [-4,0,4]){ctx.moveTo(4,y);ctx.lineTo(8,y);}ctx.stroke();ctx.restore();
+  }
+  function drawImpact(ctx,f){
+    const q=clamp(f.age/f.life,0,1);ctx.save();ctx.globalCompositeOperation='source-over';ctx.translate(f.x,f.y);ctx.globalAlpha=1-q;ctx.lineCap='round';ctx.lineJoin='round';
+    if(f.kit==='bare'){ctx.strokeStyle='#d9c2a0';ctx.lineWidth=1.6;ctx.beginPath();for(const a of [-.8,.5,2.2]){ctx.moveTo(Math.cos(a)*2,Math.sin(a)*2);ctx.lineTo(Math.cos(a)*(5+q*2),Math.sin(a)*(5+q*2));}ctx.stroke();}
+    else if(f.kit==='tray'){ctx.strokeStyle='#252f33';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-8,-4);ctx.lineTo(8,4);ctx.moveTo(-3,6);ctx.lineTo(4,-7);ctx.stroke();ctx.strokeStyle='#e9e1bd';ctx.lineWidth=1;ctx.stroke();}
+    else{ctx.strokeStyle='#222f2f';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-8,2);ctx.lineTo(-3,-3);ctx.lineTo(0,2);ctx.lineTo(3,-3);ctx.lineTo(8,-1);ctx.stroke();ctx.strokeStyle='#b9e9bd';ctx.lineWidth=1.3;ctx.stroke();}
+    ctx.restore();
+  }
+  function foreground(ctx){
+    if(phase!=='combat')return;
+    const a=action,h=G.hero;
+    if(a&&kit(a.profile)==='tray'&&a.age>=.1&&a.age<=.18){const from=handPoint(h,a,Math.max(.1,a.age-.025)),to=handPoint(h,a,a.age);ctx.save();ctx.strokeStyle='#d8dfcd';ctx.globalAlpha=.35;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(from.x,from.y-17);ctx.lineTo(to.x,to.y-17);ctx.stroke();ctx.restore();}
+    for(const e of G.enemies)if(e.entered&&e.hp>0&&e.state==='tell'&&['troublemaker_boss','champion'].includes(e.role)&&e.attack){
+      // Directional spine and source chevrons clarify the existing tell, not its danger boundary.
+      ctx.save();ctx.translate(e.x,e.y);ctx.rotate(e.attack.angle);ctx.beginPath();ctx.moveTo(12,0);ctx.lineTo(72,0);ctx.strokeStyle='#172128';ctx.lineWidth=7;ctx.stroke();ctx.strokeStyle='#ffe1a0';ctx.lineWidth=2;ctx.stroke();ctx.restore();
+      ctx.save();ctx.translate(e.x,e.y-24*e.scale);ctx.rotate(e.attack.angle);ctx.beginPath();for(const x of [15,25]){ctx.moveTo(x-5,-5);ctx.lineTo(x,0);ctx.lineTo(x-5,5);}ctx.strokeStyle='#172128';ctx.lineWidth=5;ctx.stroke();ctx.strokeStyle='#ffe1a0';ctx.lineWidth=1.8;ctx.stroke();ctx.restore();
+    }
   }
   function drawEnemy(ctx,e){
     if(e.dead||!e.entered)return;
@@ -5628,7 +5656,7 @@ const R7=(()=>{
     $('r7Modal').addEventListener('keydown',e=>{if(e.key!=='Tab')return;const buttons=['r7Previous','r7Next','r7Skip','r7Retry','r7Reload'].map(id=>$(id)).filter(b=>!b.hidden&&!b.disabled);if(!buttons.length){e.preventDefault();$('r7Heading').focus();return;}const first=buttons[0],last=buttons[buttons.length-1];if(e.shiftKey&&(document.activeElement===first||document.activeElement===$('r7Heading'))){e.preventDefault();last.focus();}else if(!e.shiftKey&&(document.activeElement===last||document.activeElement===$('r7Heading'))){e.preventDefault();first.focus();}});
     ui();
   }
-  return Object.freeze({enabled:true,start,update,pause,key,ui,drawHero,drawEnemy,ground,drawProp,home,mount,inspect:()=>({phase,level,clock,attempt,targetId,destination:destination?copy(destination):null,route:copy(route),portrait,action:action?{...action,hits:[...action.hits]}:null,tray,pickups:copy(pickups),allies:copy(allies),offers:copy(offers),hazards:copy(hazards),profile:profile?copy(profile):null,receipt,contacts,lastError,busy}),retry:()=>pending&&!busy?persist(pending.next,pending.after):null});
+  return Object.freeze({enabled:true,start,update,pause,key,ui,drawHero,drawEnemy,drawImpact,foreground,ground,drawProp,home,mount,inspect:()=>({phase,level,clock,attempt,targetId,destination:destination?copy(destination):null,route:copy(route),portrait,action:action?{...action,hits:[...action.hits]}:null,tray,pickups:copy(pickups),allies:copy(allies),offers:copy(offers),hazards:copy(hazards),profile:profile?copy(profile):null,receipt,contacts,lastError,busy}),retry:()=>pending&&!busy?persist(pending.next,pending.after):null});
 })();
 /* R7_RUNTIME_END */
 
