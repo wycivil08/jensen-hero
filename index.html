@@ -395,7 +395,7 @@ body.finalChapter:not(.touch) #finaleBottom>#sliceBottomRail{position:fixed;inse
 @media(max-width:520px){#b1Portraits img{height:68px}}
 /* B1_APPEARANCE_CSS_END */
 /* R7_CSS_BEGIN */
-body.r7 #hudL,body.r7 #hudR,body.r7 #skills,body.r7 #finaleBottom,body.r7 #chapterHud,body.r7 #touchUI,body.r7 #hint,body.r7 #evolutionCanvas,body.r7 #ovTitle,body.r7 #prototypeLabel,body.r7 #labBar{display:none!important}
+body.r7 #hudL,body.r7 #hudR,body.r7 #skills,body.r7 #finaleBottom,body.r7 #chapterHud,body.r7 #hint,body.r7 #evolutionCanvas,body.r7 #ovTitle,body.r7 #prototypeLabel,body.r7 #labBar{display:none!important}
 #r7Hud{position:fixed;z-index:8;left:calc(12px + var(--sl));top:calc(12px + var(--st));display:flex;align-items:center;gap:12px;padding:8px 12px;background:#14251ed9;border:1px solid #829576;border-radius:8px;font:13px/1.3 sans-serif;color:#eef1dc;pointer-events:none}
 #r7Hud strong{font-size:13px}#r7Hud button{min-width:34px;min-height:32px;margin:0;padding:4px;opacity:.6}#r7Hud[hidden]{display:none}
 #r9Controls{position:fixed;z-index:75;right:calc(10px + var(--sr));top:calc(10px + var(--st));display:flex;gap:6px}#r9Controls button{min-width:44px;min-height:44px;padding:6px;background:#14251ecc;color:#eaf1dd;border:1px solid #7f9382;border-radius:8px}
@@ -411,6 +411,14 @@ body.r7 #ovPause>.card>*{display:none!important}body.r7 #ovPause>.card>#btnResum
 #r9Rotate{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#0b1716;color:#e6efdb;text-align:center;padding:24px}#r9Rotate[hidden]{display:none}#r9Rotate button{min-height:44px}
 @media(max-height:500px){#r7Hud{padding:5px 8px;gap:8px}#r7Modal .card{padding:10px}#r7Modal.story #r7Text{font-size:16px}#r7Modal.story #r7Alt{font-size:10px;bottom:calc(104px + var(--sb))}#r7Diagram{max-height:110px}}
 body.r7 #ovPause>.card>.audioSettings{display:flex!important;justify-content:center;margin:8px}
+body.r7 #touchUI[hidden]{display:none!important}body.r7 #btnDodge{display:none!important}
+body.r7.touch #joy{left:calc(8px + var(--sl));bottom:calc(8px + var(--sb));width:136px;height:136px}
+body.r7.touch #joyBase{width:104px;height:104px;left:16px;bottom:16px}body.r7.touch #joyKnob{width:46px;height:46px}
+body.r7.touch #btnAtk{width:72px;height:72px;right:calc(18px + var(--sr));bottom:calc(20px + var(--sb));font-size:18px}
+body.r7.touch:not(.touchCombat) #r7Hud button{display:none}
+body.r7.touch #r7Hud button{position:fixed;right:calc(18px + var(--sr));bottom:calc(108px + var(--sb));width:48px;height:44px;opacity:.6}
+body.r7.touch #r7Hud button:nth-last-child(2){right:calc(76px + var(--sr))}
+body.r7.touch #r8Cue{max-width:calc(100vw - 310px - var(--sl) - var(--sr));font-size:12px}
 /* R7_CSS_END */
 
 </style>
@@ -422,7 +430,7 @@ body.r7 #ovPause>.card>.audioSettings{display:flex!important;justify-content:cen
 <div id="r9Controls"><button id="r9Pause" type="button" aria-label="暂停">Ⅱ</button><button id="r9Fullscreen" type="button" aria-label="全屏">⛶</button></div>
 <div id="r7Modal" class="overlay" role="dialog" aria-modal="true" aria-labelledby="r7Heading"><div class="card panel">
 <h2 id="r7Heading" tabindex="-1">载入中…</h2><img id="r7Art" hidden alt="" width="1672" height="941"><p id="r7Alt"></p><p id="r7Text"></p>
-<svg id="r7Diagram" hidden viewBox="0 0 640 145" role="img" aria-labelledby="r7DiagramTitle"><title id="r7DiagramTitle">Select an enemy to approach, then the GPU gauntlets alternate. Only touching opponents take damage, at most three per strike.</title><g fill="none" stroke="#c7dab7" stroke-width="3"><circle cx="65" cy="64" r="20"/><path d="M95 64h62m-12-12 12 12-12 12"/><rect x="230" y="35" width="38" height="46" rx="8" fill="#508637"/><rect x="290" y="45" width="38" height="46" rx="8" fill="#508637"/><path d="M240 22q40-22 80 4m-10-10 10 10-14 4M350 64h62m-12-12 12 12-12 12"/><circle cx="470" cy="60" r="17"/><circle cx="520" cy="60" r="17"/><circle cx="570" cy="60" r="17"/></g><g fill="#edf2dd" font-size="15" font-family="sans-serif" text-anchor="middle"><text x="75" y="121">点选敌人</text><text x="279" y="121">交替出拳</text><text x="520" y="121">最多三人</text></g></svg>
+<svg id="r7Diagram" hidden viewBox="0 0 640 145" role="img" aria-labelledby="r7DiagramTitle"><title id="r7DiagramTitle">Select an enemy to approach, then the GPU gauntlets alternate. Only touching opponents take damage, at most three per strike.</title><g fill="none" stroke="#c7dab7" stroke-width="3"><circle cx="65" cy="64" r="20"/><path d="M95 64h62m-12-12 12 12-12 12"/><rect x="230" y="35" width="38" height="46" rx="8" fill="#508637"/><rect x="290" y="45" width="38" height="46" rx="8" fill="#508637"/><path d="M240 22q40-22 80 4m-10-10 10 10-14 4M350 64h62m-12-12 12 12-12 12"/><circle cx="470" cy="60" r="17"/><circle cx="520" cy="60" r="17"/><circle cx="570" cy="60" r="17"/></g><g fill="#edf2dd" font-size="15" font-family="sans-serif" text-anchor="middle"><text id="r12ApproachLabel" x="75" y="121">点选敌人</text><text x="279" y="121">交替出拳</text><text x="520" y="121">最多三人</text></g></svg>
 <div id="r7Buttons"><button id="r7Previous" type="button" hidden>Previous image</button><button id="r7Next" type="button" hidden>Continue</button><button id="r7Skip" type="button" hidden>Skip</button><button id="r7Retry" type="button" hidden>Retry save</button><button id="r7Reload" type="button" hidden>Reload saved frontier</button></div>
 </div></div>
 <div id="r8Cue" role="status" aria-live="polite" hidden></div>
@@ -1753,20 +1761,21 @@ const Input=(()=>{
     cv.addEventListener('touchstart',e=>{o.onAction();e.preventDefault();},{passive:false});
     const moveJoy=e=>{const r=base.getBoundingClientRect(),R=r.width/2||1;let dx=e.clientX-(r.left+R),dy=e.clientY-(r.top+R);const l=Math.hypot(dx,dy);
       if(l>R){dx*=R/l;dy*=R/l;}st.jx=dx/R;st.jy=dy/R;knobEl.style.transform='translate(calc(-50% + '+dx.toFixed(1)+'px),calc(-50% + '+dy.toFixed(1)+'px))';};
-    const endJoy=e=>{if(e.pointerId!==st.joyId)return;st.joyId=null;st.jx=st.jy=0;knobEl.style.transform='translate(-50%,-50%)';};
-    joy.addEventListener('pointerdown',e=>{o.onAction();e.preventDefault();if(st.joyId!==null)return;st.joyId=e.pointerId;cap(joy,e.pointerId);moveJoy(e);});
+    const endJoy=e=>{if(e.pointerId!==st.joyId)return;st.joyId=null;st.jx=st.jy=0;knobEl.style.transform='translate(-50%,-50%)';o.onJoyEnd?.(e);};
+    joy.addEventListener('pointerdown',e=>{if(o.acceptTouch&&!o.acceptTouch(e))return;o.onAction();e.preventDefault();if(st.joyId!==null)return;st.joyId=e.pointerId;cap(joy,e.pointerId);moveJoy(e);});
     joy.addEventListener('pointermove',e=>{if(e.pointerId===st.joyId)moveJoy(e);});
     joy.addEventListener('pointerup',endJoy);joy.addEventListener('pointercancel',endJoy);joy.addEventListener('lostpointercapture',endJoy);
-    const endAtk=e=>{if(e.pointerId!==st.atkId)return;st.atkId=null;st.atk=false;atkEl.classList.remove('on');};
-    atkEl.addEventListener('pointerdown',e=>{o.onAction();e.preventDefault();if(st.atkId!==null)return;st.atk=true;st.atkId=e.pointerId;atkEl.classList.add('on');cap(atkEl,e.pointerId);});
+    const endAtk=e=>{if(e.pointerId!==st.atkId)return;st.atkId=null;st.atk=false;atkEl.classList.remove('on');o.onAttackEnd?.(e);};
+    atkEl.addEventListener('pointerdown',e=>{if(o.acceptTouch&&!o.acceptTouch(e))return;o.onAction();e.preventDefault();if(st.atkId!==null)return;st.atk=true;st.atkId=e.pointerId;atkEl.classList.add('on');cap(atkEl,e.pointerId);o.onAttackStart?.();});
     atkEl.addEventListener('pointerup',endAtk);atkEl.addEventListener('pointercancel',endAtk);atkEl.addEventListener('lostpointercapture',endAtk);
-    dodgeEl.addEventListener('pointerdown',e=>{o.onAction();e.preventDefault();st.dodgeQ=true;});
+    dodgeEl.addEventListener('pointerdown',e=>{if(R7.enabled)return;o.onAction();e.preventDefault();st.dodgeQ=true;});
     const lose=()=>{reset();o.onBlur();},gain=()=>{reset();o.onFocus();};
     addEventListener('blur',lose);addEventListener('pagehide',lose);document.addEventListener('freeze',lose);
     document.addEventListener('visibilitychange',()=>{if(document.hidden)lose();else gain();});
     addEventListener('focus',gain);addEventListener('pageshow',gain);
   }
-  return{st,keys,reset,init};
+  function movement(){const l=Math.hypot(st.jx,st.jy),k=l>.2?Math.min(1,(l-.2)/.7)/l:0;return {mx:st.jx*k,my:st.jy*k};}
+  return{st,keys,reset,init,movement};
 })();
 
 /* ================= 5. 世界（有界竞技场：墙 / 石柱 / 尖刺墙；地面素材沿用） ================= */
@@ -5023,6 +5032,7 @@ function syncUI(force){if(R7.enabled)return R7.ui();
   uiText('msg',G.notice&&G.notice.life>0?G.notice.text:'');Trial.ui();updateStoryUI();document.body.classList.toggle('finalChapter',G.wave===GROWTH_DATA.chapters.length);
 }
 function setMode(m){
+  if(R7.enabled)return R7.mode(m);
   Input.st.mode=m;Input.reset();document.body.classList.toggle('touch',m==='touch');
   uiText('btnMode','Controls: '+(m==='touch'?'Touch':'Keyboard + Mouse'));
   $('hint').textContent=m==='touch'?'Local Skill Prototype · Push/Throw button · Prepare parallel throws manually from CUDA':SkillPrototype.hint;
@@ -5152,7 +5162,7 @@ function sampleControls(){
     const l=Math.hypot(c.mx,c.my);if(l>1){c.mx/=l;c.my/=l;}
     const w=s2w(st.mx,st.my);c.aim=Math.atan2(w[1]-h.y,w[0]-h.x);c.attack=st.lmb||K.has('KeyJ');
   }else{
-    const l=Math.hypot(st.jx,st.jy);if(l>.2){const k=Math.min(1,(l-.2)/.7)/l;c.mx=st.jx*k;c.my=st.jy*k;}
+    Object.assign(c,Input.movement());
     c.attack=st.atk;
   }
   return c;
@@ -5381,6 +5391,8 @@ const R7=(()=>{
   }
   function auto(dt,c){
     const h=G.hero,p=current();
+    const touch=Input.st.mode==='touch';
+    if(touch&&!action){targetId=null;if(Input.st.atk||c?.attack){const eligible=G.enemies.filter(e=>e.entered&&!e.dead&&e.hp>0&&Math.hypot(e.x-h.x,e.y-h.y)<=p.reach+e.r&&visible(h,e));eligible.sort((a,b)=>Math.hypot(a.x-h.x,a.y-h.y)-Math.hypot(b.x-h.x,b.y-h.y)||a.id-b.id);targetId=eligible[0]?.id??null;}}
     const selected=G.enemies.find(e=>e.id===targetId&&e.entered&&!e.dead&&e.hp>0);
     if(!selected){targetId=null;action=null;return;}
     if(!action&&clock>=nextAttack&&Math.hypot(selected.x-h.x,selected.y-h.y)<=p.reach+selected.r&&visible(h,selected)){
@@ -5434,6 +5446,9 @@ const R7=(()=>{
     }return [];
   }
   function command(event){
+    if(event.pointerType==='touch'){mode('touch');return;}
+    if(event.pointerType==='mouse'&&!event.sourceCapabilities?.firesTouchEvents)mode('kb');
+    if(Input.st.mode==='touch')return;
     if(!live()||event.button>0||event.isPrimary===false)return;
     const rect=$('game').getBoundingClientRect(),[x,y]=s2w((event.clientX-rect.left)*View.cw/rect.width,(event.clientY-rect.top)*View.ch/rect.height);
     if(!Number.isFinite(x)||!Number.isFinite(y))return;
@@ -5443,6 +5458,7 @@ const R7=(()=>{
     event.preventDefault();clearInput(false);targetId=enemy?.id??null;destination=enemy?null:{x,y};routeUntil=0;hintUntil=0;$('game').focus();
   }
   function controls(dt){
+    if(Input.st.mode==='touch')return Input.movement();
     const keys=Input.keys,h=G.hero,c={mx:(keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0),my:(keys.has('KeyS')||keys.has('ArrowDown')?1:0)-(keys.has('KeyW')||keys.has('ArrowUp')?1:0)};
     const manual=Math.hypot(c.mx,c.my);if(manual){targetId=null;destination=null;route=[];action=null;c.mx/=manual;c.my/=manual;return c;}
     const e=G.enemies.find(e=>e.id===targetId&&e.entered&&!e.dead&&e.hp>0);if(targetId!==null&&!e){targetId=null;route=[];action=null;}
@@ -5454,13 +5470,21 @@ const R7=(()=>{
     while(route.length>1&&Math.hypot(route[0].x-h.x,route[0].y-h.y)<3)route.shift();
     if(route.length){const q=route[0],dx=q.x-h.x,dy=q.y-h.y,d=Math.hypot(dx,dy),speed=Math.min(1,d/(CFG.hero.speed*dt));c.mx=dx/d*speed;c.my=dy/d*speed;}return c;
   }
+  function touchControls(){const active=Input.st.mode==='touch'&&live();$('touchUI').hidden=!active;$('touchUI').inert=!active;document.body.classList.toggle('touchCombat',active);}
+  function mode(value){
+    if(!['kb','touch'].includes(value)||Input.st.mode===value)return;
+    clearInput();Input.st.mode=value;document.body.classList.toggle('touch',value==='touch');hintUntil=clock+8;viewport();ui();
+  }
+  function touchPointer(event){if(event.pointerType==='touch')mode('touch');return Input.st.mode==='touch'&&live()&&!(event.button>0);}
+  function touchAttack(){if(live()&&Input.st.mode==='touch')auto(0,{attack:true});}
+  function touchEnd(event,which){if(event.type==='pointerup')return;if(which==='joy'){G.hero.vx=G.hero.vy=0;}else{action=null;targetId=null;}}
   function viewport(){
-    const next=matchMedia('(pointer:coarse)').matches&&!matchMedia('(hover:hover)').matches&&innerHeight>innerWidth;
+    const next=(Input.st.mode==='touch'||matchMedia('(pointer:coarse)').matches&&!matchMedia('(hover:hover)').matches)&&innerHeight>innerWidth;
     if(next!==portrait){portrait=next;clearInput();}
     const recovery=['saving','blocked','pending','dead','end'].includes(phase),rotate=portrait&&!recovery,wasVisible=!$('r9Rotate').hidden;
     $('r9Rotate').hidden=!rotate;$('r7Modal').inert=rotate;$('r9Controls').inert=rotate;
     $('ovPause').inert=rotate||!$('r7Modal').classList.contains('hidden');$('game').inert=portrait||G.paused||phase!=='combat';
-    if(rotate!==wasVisible){if(rotate)$('r9RotateFullscreen').focus();else if(recovery||['n00','n01','onboarding'].includes(phase))$('r7Heading').focus();else $(G.paused?'btnResume':'game').focus();}
+    if(rotate!==wasVisible){if(rotate)$('r9RotateFullscreen').focus();else if(recovery||['n00','n01','onboarding'].includes(phase))$('r7Heading').focus();else $(G.paused?'btnResume':'game').focus();}touchControls();
   }
   async function fullscreen(){
     try{if(!document.fullscreenElement&&document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen();if(document.fullscreenElement&&globalThis.screen?.orientation?.lock)await screen.orientation.lock('landscape');$('r9RotateStatus').textContent='请将设备横放';}
@@ -5543,9 +5567,10 @@ const R7=(()=>{
     if(phase!=='combat')return;G.paused=value;clearInput();Sfx.suspend(value);show('ovPause',value);
     for(const id of ['game','hudR','touchUI'])$(id).inert=value;
     $('game').inert=value||portrait;$(portrait?'r9RotateFullscreen':value?'btnResume':'game').focus();
-    $('pauseWhy').textContent=auto?'Paused on focus loss.':'Paused';$('pauseRunes').textContent='';
+    $('pauseWhy').textContent=auto?'Paused on focus loss.':'Paused';$('pauseRunes').textContent='';touchControls();
   }
   function key(c){
+    if(/^(Key[WASD]|Arrow(Up|Down|Left|Right))$/.test(c)&&Input.st.mode==='touch'){mode('kb');Input.keys.add(c);}
     if(portrait)return;
     if(['Enter','Space'].includes(c)&&['n00','n01','onboarding'].includes(phase)){next();return;}
     if(c==='KeyM'){toggleMute();return;}
@@ -5554,10 +5579,13 @@ const R7=(()=>{
     if(c==='Enter'&&phase==='title')start();
   }
   function ui(){
+    const touch=Input.st.mode==='touch';touchControls();document.body.classList.toggle('touch',touch);
+    $('btnAtk').textContent='攻击';$('r12ApproachLabel').textContent=touch?'摇杆靠近':'点选敌人';$('r7DiagramTitle').textContent=touch?'左摇杆靠近，按住攻击交替出拳。只有接触到的对手受伤，每拳最多三人。':'Select an enemy to approach, then the GPU gauntlets alternate. Only touching opponents take damage, at most three per strike.';
+    if(phase==='onboarding')$('r7Text').textContent=touch?'左摇杆靠近，按住右侧攻击交替出拳。最多命中三人。':'点选敌人，靠近后交替出拳。最多命中三人。';
     $('r7Hud').hidden=phase!=='combat';$('r9Pause').hidden=phase!=='combat';$('r7Health').textContent='HP '+Math.ceil(G.hero?.hp||0)+' / 100';
     $('r7Kit').textContent=(level===1?'餐厅':'街机')+' · '+G.enemies.filter(e=>!e.dead).length;
     $('r7Replay').disabled=!profile?.receipt;
-    const provider=allies.findLast(a=>a.until>clock);$('r8Cue').textContent=provider?(provider.target===0?'同事：托盘放这儿！':'领班：这里还有托盘！')+(tray?'（已持盘）':''):clock<hintUntil?'点地移动 · 点敌追击': '';$('r8Cue').hidden=phase!=='combat'||(!provider&&clock>=hintUntil);
+    const provider=allies.findLast(a=>a.until>clock);$('r8Cue').textContent=provider?(provider.target===0?'同事：托盘放这儿！':'领班：这里还有托盘！')+(tray?'（已持盘）':''):clock<hintUntil?(touch?'左摇杆移动 · 按住右侧攻击':'点地移动 · 点敌追击'): '';$('r8Cue').hidden=phase!=='combat'||(!provider&&clock>=hintUntil);
   }
   function drawHero(ctx,h){
     const a=action,angle=h.bodyAng;
@@ -5656,7 +5684,7 @@ const R7=(()=>{
     $('r7Modal').addEventListener('keydown',e=>{if(e.key!=='Tab')return;const buttons=['r7Previous','r7Next','r7Skip','r7Retry','r7Reload'].map(id=>$(id)).filter(b=>!b.hidden&&!b.disabled);if(!buttons.length){e.preventDefault();$('r7Heading').focus();return;}const first=buttons[0],last=buttons[buttons.length-1];if(e.shiftKey&&(document.activeElement===first||document.activeElement===$('r7Heading'))){e.preventDefault();last.focus();}else if(!e.shiftKey&&(document.activeElement===last||document.activeElement===$('r7Heading'))){e.preventDefault();first.focus();}});
     ui();
   }
-  return Object.freeze({enabled:true,start,update,pause,key,ui,drawHero,drawEnemy,drawImpact,foreground,ground,drawProp,home,mount,inspect:()=>({phase,level,clock,attempt,targetId,destination:destination?copy(destination):null,route:copy(route),portrait,action:action?{...action,hits:[...action.hits]}:null,tray,pickups:copy(pickups),allies:copy(allies),offers:copy(offers),hazards:copy(hazards),profile:profile?copy(profile):null,receipt,contacts,lastError,busy}),retry:()=>pending&&!busy?persist(pending.next,pending.after):null});
+  return Object.freeze({enabled:true,start,update,pause,key,ui,mode,touchPointer,touchAttack,touchEnd,drawHero,drawEnemy,drawImpact,foreground,ground,drawProp,home,mount,inspect:()=>({phase,level,clock,attempt,inputMode:Input.st.mode,targetId,destination:destination?copy(destination):null,route:copy(route),portrait,action:action?{...action,hits:[...action.hits]}:null,tray,pickups:copy(pickups),allies:copy(allies),offers:copy(offers),hazards:copy(hazards),profile:profile?copy(profile):null,receipt,contacts,lastError,busy}),retry:()=>pending&&!busy?persist(pending.next,pending.after):null});
 })();
 /* R7_RUNTIME_END */
 
@@ -5671,7 +5699,7 @@ if(new URLSearchParams(location.search).has('debug')){
   const prepare=()=>{Sfx.unlock();SkillPrototype.requestPrepare();};
   $('prototypePrepare').addEventListener('pointerdown',e=>{e.preventDefault();prepare();});
   $('prototypePrepare').addEventListener('click',e=>{if(e.detail===0)prepare();});
-  Input.init({canvas,joy:$('joy'),joyBase:$('joyBase'),knob:$('joyKnob'),atk:$('btnAtk'),dodge:$('btnDodge'),
+  Input.init({acceptTouch:e=>R7.touchPointer(e),onAttackStart:()=>R7.touchAttack(),onJoyEnd:e=>R7.touchEnd(e,'joy'),onAttackEnd:e=>R7.touchEnd(e,'attack'),canvas,joy:$('joy'),joyBase:$('joyBase'),knob:$('joyKnob'),atk:$('btnAtk'),dodge:$('btnDodge'),
     onAction:()=>Sfx.unlock(),onTarget:selectSkillTarget,
     onKey:c=>{if(R7.enabled)return R7.key(c);
       if(c==='KeyM'){toggleMute();return;}
@@ -5718,7 +5746,7 @@ if(new URLSearchParams(location.search).has('debug')){
   document.querySelectorAll('.modeBtn').forEach(b=>b.addEventListener('click',e=>{Sfx.unlock();Sfx.ui();setMode(b.dataset.mode);e.currentTarget.blur();}));
   const mm=q=>!!(window.matchMedia&&matchMedia(q).matches);
   setMode(mm('(pointer:coarse)')&&!mm('(pointer:fine)')?'touch':'kb');
-  addEventListener('touchstart',()=>{if(Input.st.mode!=='touch')setMode('touch');},{once:true,passive:true});
+  addEventListener('touchstart',()=>{if(R7.enabled){R7.mode('touch');return;}if(Input.st.mode!=='touch')setMode('touch');},{passive:true});
 
   // Every real pointer/key interaction may retry browser-blocked playback.
   document.addEventListener('pointerdown',()=>Sfx.unlock(),{capture:true,passive:true});
