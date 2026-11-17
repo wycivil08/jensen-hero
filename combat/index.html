@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'self' blob:">
+<link rel="icon" href="data:,">
+<title>Jensen · R28 Combat Laboratory</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#f4f2ec;background:#a7ad94}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}
+button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #f2c66b;outline-offset:3px}
+#view{display:block;width:100%;height:100%;outline:none;touch-action:none}
+#overlay,#floats,#bossBars{position:fixed;inset:0;pointer-events:none}
+#lowHealth{position:fixed;inset:0;pointer-events:none;box-shadow:inset 0 0 45px 9px #a72e2d52;border:2px solid #d56b5859}#health[data-low="true"]{box-shadow:0 0 0 2px #ffd3b8,0 0 0 5px #a9443b80}#health[data-low="true"] #hp{color:#fff0d5}
+#heroCue{position:absolute;left:0;top:0;width:24px;height:17px;filter:drop-shadow(0 2px 1px #162d32aa);z-index:2;will-change:transform}#heroCue svg{display:block;width:100%;height:100%}
+#health{position:absolute;left:18px;top:17px;width:296px;height:31px;border-radius:16px;padding:5px;background:#3a4147;box-shadow:0 2px 0 #ffffff5e,0 3px 8px #32372b22}
+.track{height:100%;border-radius:12px;overflow:hidden;background:#242c31}
+#hpFill{height:100%;width:100%;border-radius:inherit;background:linear-gradient(#ff4a50,#ef343f);transition:width .08s linear}
+#hp{position:absolute;top:6px;left:0;width:100%;text-align:center;font-size:12px;line-height:19px;font-weight:650;font-variant-numeric:tabular-nums;text-shadow:0 1px 2px #6d192f;letter-spacing:.02em}
+#training{position:absolute;top:9px;left:50%;transform:translateX(-50%);padding:5px 23px 7px;border-radius:15px;background:linear-gradient(#444b51,#30383f);box-shadow:inset 0 1px 0 #ffffff24,0 2px 1px #0002;font-size:22px;font-weight:800;line-height:1.1;letter-spacing:.02em}
+#target{position:absolute;top:64px;left:50%;transform:translateX(-50%);max-width:62vw;font-size:12px;line-height:1.4;text-align:center;color:#fff1d0;background:#29353ce8;border-radius:6px;padding:4px 9px;font-weight:650;font-variant-numeric:tabular-nums}#target:empty{display:none}
+#status{position:absolute;top:88px;left:50%;transform:translateX(-50%);max-width:70vw;text-align:center;font-size:13px;color:#263639;text-shadow:0 1px 2px #ffffffa6}
+#gainCue{position:absolute;top:113px;left:50%;transform:translateX(-50%);max-width:min(680px,80vw);padding:7px 13px;border-radius:9px;background:#263633e8;color:#f5efdb;font-size:13px;line-height:1.45;text-align:center;box-shadow:0 2px 8px #25312a20}
+#hint{position:absolute;bottom:112px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:12px;color:#2c3635;text-shadow:0 1px #ffffff6b;transition:opacity .25s}
+#skills{position:absolute;bottom:25px;left:50%;transform:translateX(-50%);display:flex;gap:13px;pointer-events:auto}
+.skill{position:relative;width:84px;height:80px;display:grid;place-items:center;padding:9px 8px 13px;border-radius:16px;border:1px solid #f4f1df86;color:#f8f8f5;background:linear-gradient(135deg,#464e55,#2c343c);box-shadow:inset 0 2px 1px #ffffff14,0 3px 6px #25302c22;overflow:hidden}
+.skill:hover:not(:disabled){background:linear-gradient(135deg,#586167,#39464a);border-color:#fff4c4}
+.skill:disabled{cursor:default;color:#a7b1b2;background:linear-gradient(135deg,#464b50,#333d42)}
+.skill[data-available="false"]{opacity:.56}.skill[data-available="false"] .icon{opacity:.45}
+.skill kbd{position:absolute;left:9px;top:5px;font-size:18px;font-weight:700;line-height:1;font-family:inherit}
+.skill .icon{display:grid;place-items:center}.skill svg{width:57px;height:49px;fill:currentColor;stroke:currentColor;stroke-linejoin:round;stroke-linecap:round;margin-top:4px}
+.skill .cooldown{position:absolute;bottom:4px;left:0;width:100%;font-size:11px;font-weight:650;line-height:14px;text-align:center;font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+details{position:absolute;right:14px;top:14px;width:288px;pointer-events:auto;font-size:12px}
+summary{width:max-content;margin-left:auto;padding:7px 10px;border-radius:9px;background:#343f40dc;border:1px solid #f7f3e04d;color:#f4f2e7;cursor:pointer;list-style:none;font-size:12px}
+summary::-webkit-details-marker{display:none}details[open] summary{margin-bottom:7px}
+form{padding:14px;border:1px solid #e5e2cc5c;border-radius:12px;background:#283437f2;box-shadow:0 8px 24px #2a342c44;max-height:78vh;overflow:auto}
+label.row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+input[type=number],select{width:137px;padding:6px 7px;border:1px solid #a8b6a659;border-radius:5px;background:#3b474a;color:#faf7ed;font-size:12px}
+input[type=number]:disabled{opacity:.55}input[type=checkbox]{accent-color:#bbcba1}.check{display:block;margin:9px 0;font-size:12px}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+.debugButton{padding:8px 7px;border:1px solid #b7c3ac80;border-radius:6px;background:#4e6258;color:#faf8ef;font-size:12px}
+.debugButton.wide{width:100%;margin-top:8px}.debugButton.secondary{background:#404d52}
+.note{font-size:10px;line-height:1.6;color:#d0d4c8;margin:10px 0 0}
+#settingsError{font-size:11px;color:#ffc4af;min-height:1em;margin-top:7px}
+#debug{font-size:10px;color:#ced9ce;line-height:1.5;white-space:pre-line;margin-top:8px;font-variant-numeric:tabular-nums}
+#boot,#pause{position:fixed;left:50%;top:44%;transform:translate(-50%,-50%);width:min(480px,88vw);padding:23px;text-align:center;border:1px solid #f7edcf88;border-radius:16px;background:#303c40f2;box-shadow:0 10px 36px #2b383a33;color:#faf7ef}
+#boot .title{font-size:22px;font-weight:700;letter-spacing:.04em;margin-bottom:12px}#bootText{font-size:13px;line-height:1.8}
+progress{width:100%;height:7px;margin-top:15px;accent-color:#bac89d}
+#pause{font-size:18px;line-height:1.7}#pause small{font-size:12px;color:#d9dfd0}#resume{display:block;margin:15px auto 0;min-width:150px;padding:8px 18px;border:1px solid #f2e3b1aa;border-radius:8px;background:#5c7162;color:#fff9e7}
+[hidden]{display:none!important}
+.floatLeader{position:absolute;left:0;top:0;height:2px;background:#ffe8ab;transform-origin:0 50%;pointer-events:none}.floatLeader::before{content:"";position:absolute;left:-3px;top:-2px;width:6px;height:6px;border-radius:50%;background:inherit}.floatLeader.cuda{background:#a4f3ee}.floatLeader.incoming{background:#ffb1a8}.floatLeader.heal{background:#b7f1a1}.floatLeader.block{background:#e0eaf4}
+.damageFloat{position:absolute;left:0;top:0;font-size:26px;font-weight:900;color:#ffe8ab;text-shadow:-2px -2px 0 #34312a,2px -2px 0 #34312a,-2px 2px 0 #34312a,2px 2px 0 #34312a,0 3px 1px #34312a;will-change:transform,opacity;font-variant-numeric:tabular-nums}
+.damageFloat.critical{font-size:31px;color:#fff4c1}.damageFloat.cuda{font-size:21px;color:#a4f3ee}.damageFloat.incoming{font-size:21px;color:#ffb1a8}.damageFloat.heal{font-size:21px;color:#b7f1a1}.damageFloat.block{font-size:19px;color:#e0eaf4}
+.bossBar{position:absolute;width:108px;height:12px;padding:3px;border-radius:7px;background:#35434a;box-shadow:0 1px 0 #fff4;will-change:transform;overflow:hidden}
+.bossBar .fill{height:100%;width:100%;border-radius:4px;background:#ff3e4b}.bossBar small{display:none}.bossBar.named{overflow:visible}.bossBar.named small{display:block;position:absolute;bottom:15px;left:50%;transform:translateX(-50%);white-space:nowrap;color:#f4eedf;background:#303a3eea;border-radius:4px;padding:2px 5px;font-size:10px;line-height:13px;font-weight:750;letter-spacing:.025em}
+.bossBar.seat{width:86px;height:10px;padding:2px;background:#303a3e}.bossBar.seat small{bottom:12px;min-width:86px;text-align:center;font-size:9px;line-height:12px;padding:2px 4px}.bossBar.seat::after{content:"";position:absolute;left:50%;top:100%;height:var(--lift,0px);border-left:1px solid #f2efda80}
+.bossBar.seat[data-selected="false"]:not([data-casting="true"]) small{opacity:.78}.bossBar[data-threatening="true"]{outline:1px solid #ff9d79;outline-offset:1px}.bossBar[data-threatening="true"]:not([data-casting="true"]) small{opacity:1;color:#ffd3bd;background:#633d32}.bossBar[data-threatening="true"]:not([data-casting="true"]) small::before{content:"! ";color:#ffb18a;font-weight:900}.bossBar[data-selected="true"]{box-shadow:0 0 0 2px #ffdc84;z-index:2}.bossBar[data-selected="true"] small{color:#fff0ae;background:#4f452bea;font-size:10px;opacity:1}
+.bossBar.healer small{color:#ffd5ed;background:#59344fea}.bossBar[data-casting="true"] small{color:#fff1fa;background:#873b6b;box-shadow:0 0 0 1px #f7b6de}.bossBar[data-casting="true"] small::after{content:"";position:absolute;left:0;bottom:0;width:var(--cast);height:2px;background:#ffd4ed;border-radius:2px}
+#notice{display:none;position:absolute;left:10px;bottom:4px;font-size:11px;color:#2c3637;background:#f2ebdccc;padding:4px 7px;border-radius:4px}
+@media(max-aspect-ratio:1/1),(pointer:coarse){#notice{display:block}}
+@media(max-width:900px){#health{left:10px;top:13px;width:215px;height:28px}#hp{top:5px;font-size:10px}#training{font-size:21px;top:10px;padding:7px 15px}details{top:12px;right:10px;width:270px}.skill{width:74px;height:72px}#skills{bottom:15px}#hint{bottom:94px;font-size:11px}}
+@media(prefers-reduced-motion:reduce){#hpFill,#hint{transition:none}}
+</style>
+<script>
+window.engineCBootFailure=function(message){
+  var box=document.getElementById("boot"),text=document.getElementById("bootText"),bar=document.getElementById("progress");
+  if(box)box.hidden=false;if(text)text.textContent="Unable to start the combat laboratory: "+message;if(bar)bar.hidden=true;
+};
+</script>
+</head>
+<body>
+<canvas id="view" tabindex="0" aria-label="3D combat laboratory: click ground to move, enemies to attack; use 1 and 2 for unlocked skills"></canvas>
+<div id="overlay">
+  <div id="lowHealth" aria-hidden="true" hidden></div>
+  <div id="heroCue" aria-hidden="true" hidden><svg viewBox="0 0 24 17"><path d="m3 4 9 9 9-9" fill="none" stroke="#203e43" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="m3 4 9 9 9-9" fill="none" stroke="#c2fff2" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  <section id="health" aria-label="Hero health"><div class="track"><div id="hpFill"></div></div><div id="hp">100 / 100</div></section>
+  <div id="training"><span id="stageLabel">G1 · 1/2</span></div>
+  <div id="target"></div><div id="status" role="status" aria-live="polite"></div>
+  <div id="gainCue" role="status" aria-live="polite" hidden></div>
+  <div id="hint">Click ground to move · enemies to attack · skills 1 / 2</div>
+  <div id="skills">
+    <button id="skill1" class="skill" type="button" disabled data-available="false" aria-label="Slot 1 locked"><kbd>1</kbd><span id="label1" class="sr">Breaker Punch · Locked</span><span id="icon1" class="icon"><svg viewBox="0 0 64 52" aria-hidden="true"><path d="M20 16v-5c0-4 7-4 7 0v-2c0-4 7-4 7 0v1c0-4 7-4 7 0v3c0-4 7-3 7 1v15l-7 13H22l-9-14c-3-5 2-8 5-4l3 4Z" stroke-width="2"/><path d="M7 13h8M3 20h10M8 37h8" fill="none" stroke-width="3"/></svg></span><span id="cool1" class="cooldown">Locked</span></button>
+    <button id="skill2" class="skill" type="button" disabled data-available="false" aria-label="Slot 2 locked"><kbd>2</kbd><span id="label2" class="sr">Parallel Pulse · Locked</span><span id="icon2" class="icon"><svg viewBox="0 0 64 52" aria-hidden="true"><path d="m32 12 5 9 10 5-10 5-5 9-5-9-10-5 10-5Z" stroke="none"/><path d="M15 15a19 14 0 0 0 0 23m34-23a19 14 0 0 1 0 23M8 9a28 21 0 0 0 0 35m48-35a28 21 0 0 1 0 35" fill="none" stroke-width="2.5"/></svg></span><span id="cool2" class="cooldown">Locked</span></button>
+  </div>
+  <details id="debugDetails"><summary aria-label="Open debug settings">Debug</summary>
+    <form id="settings" novalidate>
+      <label class="row">Stage<select id="stageSelect" aria-label="Debug stage"><option value="1">G1 · Diner Brawl</option><option value="2">G2 · Arcade Duel</option><option value="3">G3 · Shield Line</option><option value="4">G4 · Disc Duel</option><option value="5">G5 · Parallel Breakthrough</option><option value="6">G6 · Crossfire</option><option value="7">G7 · Thunder Breakout</option><option value="8">G8 · The Ten Seats</option></select></label>
+      <label class="row">Wave<select id="waveSelect" aria-label="Debug wave"><option value="0">1 · First Wave</option></select></label>
+      <label class="row">Enemies<select id="scenario"><option value="all">Stage Waves</option><option value="single">Single Stage Boss</option><option value="dummy">Stationary Dummy</option><option value="group">Isolated Stage Group</option></select></label>
+      <label class="row">Style<select id="styleSelect"><option value="3d">3D</option><option value="painted">Painted</option></select></label>
+      <label class="check"><input id="heroOverride" type="checkbox"> Override hero HP / D / crit</label>
+      <label class="row">Hero HP<input id="heroHP" type="number" min="1" max="1000000" step="1" value="100" required></label>
+      <label class="row">Base damage D<input id="damage" type="number" min="0" max="1000000" step="1" value="20" required></label>
+      <label class="row">Crit %<input id="crit" type="number" min="0" max="100" step="0.1" value="15" required></label>
+      <label class="check"><input id="enemyOverride" type="checkbox"> Override enemy HP</label>
+      <label class="row">Enemy HP<input id="enemyHP" type="number" min="1" max="10000000" step="1" value="160000" required></label>
+      <label class="check"><input id="immortal" type="checkbox" checked> Practice immortality (HP can reach 0)</label>
+      <label class="check"><input id="mute" type="checkbox"> Mute</label>
+      <label class="check"><input id="reduced" type="checkbox"> Reduce screen shake</label>
+      <div class="buttons"><button class="debugButton" type="submit">Apply & Reset</button><button id="resetButton" class="debugButton secondary" type="button">Reset Applied</button></div>
+      <div class="buttons"><button id="freezeButton" class="debugButton secondary" type="button" aria-pressed="false">Freeze Frame</button><button id="captureButton" class="debugButton secondary" type="button">Next Real Contact</button></div>
+      <div id="settingsError" role="status"></div>
+      <p class="note">Without overrides, stage hero stats and native enemy HP apply. Isolated practice does not advance the campaign. Changing stage or wave resets this run. Painted style preserves the simulation. Contact frames require real hits. No career progress is read or saved.</p>
+      <div id="debug"></div>
+    </form>
+  </details>
+  <div id="notice">Desktop mouse first. Mobile controls are outside this review.</div>
+</div>
+<div id="bossBars"></div><div id="floats"></div>
+<div id="boot" role="status"><div class="title">JENSEN · R28</div><div id="bootText">Loading local engine…</div><progress id="progress" value="0" max="100"></progress></div>
+<div id="pause" hidden><div>Paused</div><small>Resume continues the scene without issuing a move order</small><button id="resume" type="button">Resume · Enter</button></div>
+<noscript>Enable JavaScript to use this laboratory.</noscript>
+<script defer src="./vendor/babylon.js" onerror="engineCBootFailure('Missing ./vendor/babylon.js')"></script>
+<script defer src="./vendor/HavokPhysics_umd.js" onerror="engineCBootFailure('Missing Havok UMD')"></script>
+<script defer src="./models.js" onerror="engineCBootFailure('Missing ./models.js')"></script>
+<script defer src="./campaign-data.js" onerror="engineCBootFailure('Missing ./campaign-data.js')"></script>
+<script defer src="./render-style.js" onerror="engineCBootFailure('Missing ./render-style.js')"></script>
+<script defer src="./game.js" onerror="engineCBootFailure('Missing ./game.js')"></script>
+</body>
+</html>

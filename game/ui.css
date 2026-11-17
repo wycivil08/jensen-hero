@@ -1,0 +1,50 @@
+/* R7_CSS_BEGIN */
+body.r7 #hudL,body.r7 #hudR,body.r7 #skills,body.r7 #finaleBottom,body.r7 #chapterHud,body.r7 #hint,body.r7 #evolutionCanvas,body.r7 #ovTitle,body.r7 #prototypeLabel,body.r7 #labBar{display:none!important}
+#r7Hud{position:fixed;z-index:8;left:calc(12px + var(--sl));top:calc(12px + var(--st));display:flex;align-items:center;gap:12px;padding:8px 12px;background:#14251ed9;border:1px solid #829576;border-radius:8px;font:13px/1.3 sans-serif;color:#eef1dc;pointer-events:none}
+#r7Hud strong{font-size:13px}#r7Hud button{min-width:34px;min-height:32px;margin:0;padding:4px;opacity:.6}#r7Hud[hidden]{display:none}
+#r9Controls{position:fixed;z-index:75;right:calc(10px + var(--sr));top:calc(10px + var(--st));display:flex;gap:6px}#r9Controls button{min-width:44px;min-height:44px;padding:6px;background:#14251ecc;color:#eaf1dd;border:1px solid #7f9382;border-radius:8px}
+#r7Modal{z-index:70;background:#0c1514f7}#r7Modal .card{width:min(720px,94vw);max-height:94dvh;overflow:auto;padding:24px;text-align:center}#r7Heading{font-size:clamp(18px,3vw,28px);margin:8px 0}#r7Text{white-space:pre-line;font:clamp(15px,2vw,22px)/1.5 sans-serif}#r7Alt{font:12px/1.4 sans-serif;color:#d0d7cb}#r7Buttons{display:flex;align-items:center;justify-content:center;gap:12px}#r7Buttons button{min-height:44px}#r7Buttons button:focus-visible,#r9Controls button:focus-visible{outline:3px solid #e8e7a9}
+#r7Modal.story .card{position:relative;width:100vw;height:100dvh;max-height:none;padding:0;margin:0;border:0;border-radius:0;overflow:hidden;background:#0b1211}
+#r7Modal.story #r7Art{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#0b1211;cursor:pointer}#r7Modal.story #r7Heading{position:absolute;top:calc(16px + var(--st));left:calc(20px + var(--sl));max-width:65%;font-size:14px;background:#0b1511b8;padding:5px 8px;z-index:1}
+#r7Modal.story #r7Text{position:absolute;bottom:calc(62px + var(--sb));left:0;right:0;margin:0;padding:24px max(5vw,18px) 10px;background:linear-gradient(transparent,#0b1511dd);text-align:center;pointer-events:none}
+#r7Modal.story #r7Alt{position:absolute;bottom:calc(116px + var(--sb));left:5%;right:5%;text-align:center;background:#10221dbb;margin:0;padding:4px;pointer-events:none}
+#r7Modal.story #r7Buttons{position:absolute;bottom:calc(8px + var(--sb));left:max(12px,var(--sl));right:max(12px,var(--sr));justify-content:center}#r7Skip,#r7Previous{font-size:12px;padding:6px 10px;background:transparent}
+#r7Modal img[hidden],#r7Modal button[hidden]{display:none!important}#r7Diagram{display:block;width:100%;height:auto;max-height:180px;background:#15291f;border-radius:8px}#r7Diagram[hidden]{display:none}
+body.r7 #ovPause>.card>*{display:none!important}body.r7 #ovPause>.card>#btnResume,body.r7 #ovPause>.card>#btnRestartP,body.r7 #ovPause>.card>#r7Replay:not(:disabled){display:inline-block!important;margin:8px;min-height:44px}body.r7 #ovPause>.card{width:min(480px,90vw);padding:24px}
+#r8Cue{position:fixed;z-index:8;bottom:calc(12px + var(--sb));left:50%;transform:translateX(-50%);max-width:calc(100vw - 24px);width:max-content;padding:6px 10px;background:#14251ee8;color:#e6f3d5;border-radius:7px;font:13px/1.4 sans-serif;pointer-events:none}#r8Cue[hidden]{display:none}
+#r9Rotate{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#0b1716;color:#e6efdb;text-align:center;padding:24px}#r9Rotate[hidden]{display:none}#r9Rotate button{min-height:44px}
+@media(max-height:500px){#r7Hud{padding:5px 8px;gap:8px}#r7Modal .card{padding:10px}#r7Modal.story #r7Text{font-size:16px}#r7Modal.story #r7Alt{font-size:10px;bottom:calc(104px + var(--sb))}#r7Diagram{max-height:110px}}
+body.r7 #ovPause>.card>.audioSettings{display:flex!important;justify-content:center;margin:8px}
+body.r7 #touchUI[hidden]{display:none!important}body.r7 #btnDodge{display:none!important}
+body.r7.touch #joy{left:calc(8px + var(--sl));bottom:calc(8px + var(--sb));width:136px;height:136px}
+body.r7.touch #joyBase{width:104px;height:104px;left:16px;bottom:16px}body.r7.touch #joyKnob{width:46px;height:46px}
+body.r7.touch #btnAtk{width:72px;height:72px;right:calc(18px + var(--sr));bottom:calc(20px + var(--sb));font-size:18px}
+body.r7.touch:not(.touchCombat) #r7Hud button{display:none}
+body.r7.touch #r7Hud button{position:fixed;right:calc(18px + var(--sr));bottom:calc(108px + var(--sb));width:48px;height:44px;opacity:.6}
+body.r7.touch #r7Hud button:nth-last-child(2){right:calc(76px + var(--sr))}
+body.r7.touch #r8Cue{max-width:calc(100vw - 310px - var(--sl) - var(--sr));font-size:12px}
+#r7Modal.story #r7Buttons{display:contents}
+#r7Modal.story #r7Next{position:absolute;inset:0;z-index:5;width:100%;height:100%;margin:0;padding:0;background:transparent;border:0;border-radius:0;box-shadow:none;font-size:0;touch-action:none;cursor:pointer}
+#r7Modal.story #r7Next::after{content:'轻点画面继续';position:absolute;bottom:calc(14px + var(--sb));left:0;right:0;font:13px/1.4 sans-serif;color:#d8e4c8;text-shadow:0 1px 4px #000}
+#r7Modal.story #r7Next:focus-visible{outline:2px solid #e8e7a9;outline-offset:-4px}
+#r7Modal.story #r7Art{pointer-events:none}#r7Modal.story #r7Diagram{position:absolute;bottom:calc(64px + var(--sb));left:50%;transform:translateX(-50%);width:min(560px,70vw);max-height:126px;pointer-events:none}
+#r7Modal.story #r13Learn{position:absolute;bottom:calc(40px + var(--sb));left:12px;right:12px;margin:0;font:13px/1.3 sans-serif;color:#e2e9cf;text-align:center;pointer-events:none}
+#r7Modal.story.lesson #r7Text{bottom:calc(192px + var(--sb))}#r7Modal.story.lesson #r7Alt{bottom:auto;top:calc(48px + var(--st));font-size:10px}
+#r7Modal #r13Learn[hidden]{display:none}
+@media(max-height:500px){#r7Modal.story #r7Diagram{width:min(420px,58vw);max-height:90px;bottom:calc(54px + var(--sb))}#r7Modal.story #r13Learn{font-size:11px;bottom:calc(32px + var(--sb))}#r7Modal.story.lesson #r7Text{bottom:calc(140px + var(--sb));font-size:14px;padding-top:12px}#r7Modal.story #r7Next::after{bottom:calc(9px + var(--sb));font-size:12px}}
+/* R7_CSS_END */
+
+body.r7.jensenLab #labBar{display:flex!important;width:260px;max-width:calc(100vw - 24px);top:calc(72px + var(--st));max-height:calc(100dvh - 88px - var(--st) - var(--sb));z-index:16;touch-action:pan-y}body.r7.jensenLab #labBar.hidden{display:none!important}
+body.r7.jensenLab #trialPanelToggle{display:block;right:calc(210px + var(--sr));top:calc(12px + var(--st));z-index:76}
+body.r7.jensenLab #labBar select,body.r7.jensenLab #labBar input[type=number]{max-width:146px;min-height:32px;color:#edf3da;background:#14251e;border:1px solid #627e6b}body.r7.jensenLab #labBar button{min-height:36px}
+body.r7.jensenLab #labBar details{border-top:1px solid #627e6b;padding-top:6px}body.r7.jensenLab #labBar summary{min-height:38px}body.r7.jensenLab #labBar p{font:11px/1.4 sans-serif;white-space:normal}body.r7.jensenLab #labBar .error{color:#ffc2a0}
+@media(max-height:500px){body.r7.jensenLab #labBar{top:calc(58px + var(--st));max-height:calc(100dvh - 72px - var(--st) - var(--sb));width:245px}body.r7.jensenLab #labBar label{font-size:11px}body.r7.jensenLab #labBar input[type=number]{max-width:112px}}
+
+body.r7.jensenLab #r7Hud button{pointer-events:auto;opacity:1;touch-action:none}body.r7.jensenLab #r7Hud button:disabled{opacity:.45}
+body.r7.jensenLab #labBar a{display:inline-block;min-height:44px;padding:8px 2px;color:#d5dfb8}
+body.r7.jensenLab #labBar [hidden]{display:none!important}
+
+body.r7.jensenLab #r15Summary{white-space:pre-line}body.r7.jensenLab #r15Damage{color:#f2d79f;white-space:pre-line}
+body.r7.jensenLab #btnAtk.aiming::after{content:'';position:absolute;left:50%;top:50%;width:48px;height:4px;background:#f2d79f;border-radius:2px;transform-origin:0 50%;transform:rotate(var(--aim-angle,0rad));pointer-events:none}
+
+body.r7.jensenLab.touch #btnAtk::before{content:'';position:absolute;inset:-12px;border-radius:50%;pointer-events:auto}

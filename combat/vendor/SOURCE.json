@@ -1,0 +1,37 @@
+{
+  "note": "Copied pinned R18 runtime dependencies; no new install; glTF loaders/peasant model not part of new procedural actor path.",
+  "babylon": "9.36.0",
+  "havok": "1.3.14",
+  "files": [
+    {
+      "file": "babylon.js",
+      "sha256": "7edf5405501eee0ea55e31d7501f4ac17c7ca87dfc8e3227bb3cd99499309dbc",
+      "bytes": 8909061,
+      "source": "collaboration/tasks/jensen-3d-r18-20261115/runtime/vendor/babylon.js"
+    },
+    {
+      "file": "HavokPhysics_umd.js",
+      "sha256": "8ffcf3b71f434e489275699abda074baa841c50c4fbcdf18a7fa94cdb998e590",
+      "bytes": 67584,
+      "source": "collaboration/tasks/jensen-3d-r18-20261115/runtime/vendor/HavokPhysics_umd.js"
+    },
+    {
+      "file": "HavokPhysics.wasm",
+      "sha256": "026917766f534c156286f07975850978dabf17c42e742bbfaaebbcb2215e4e11",
+      "bytes": 2094563,
+      "source": "collaboration/tasks/jensen-3d-r18-20261115/runtime/vendor/HavokPhysics.wasm"
+    },
+    {
+      "file": "LICENSE.babylon.md",
+      "sha256": "9362ea9ea17cb221a20cbbd63f404710834cc273d2a9a7b60314fd68ab702cd6",
+      "bytes": 9226,
+      "source": "collaboration/tasks/jensen-3d-r18-20261115/runtime/vendor/LICENSE.babylon.md"
+    },
+    {
+      "file": "LICENSE.havok",
+      "sha256": "d8b00cac49e55c3e93840e02868989c73520e50a865dfbd25b9d20d35397ccf0",
+      "bytes": 1069,
+      "source": "collaboration/tasks/jensen-3d-r18-20261115/runtime/vendor/LICENSE.havok"
+    }
+  ]
+}

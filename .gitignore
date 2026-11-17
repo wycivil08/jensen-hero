@@ -1,0 +1,8 @@
+dist/
+node_modules/
+.env*
+.vercel/
+__pycache__/
+*.py[cod]
+.DS_Store
+test-results/

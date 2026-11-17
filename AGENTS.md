@@ -1,0 +1,13 @@
+# Jensen Hero agent workflow
+
+Read `docs/REQUIREMENTS.md`, `docs/STATUS.md`, relevant source and tests before editing. Confirm Git status and preserve others' dirty work. The coordinator alone updates requirements, accepts reviewed changes, stages and performs authorized commits/pushes. A push to `main` deploys Pages; treat it as publication.
+
+Use the installed `codex-orchestrator` skill when delegating. Give each useful task explicit file ownership, requirement revision/hash, protected requirements and checkable outputs. One writer per file. Workers do not commit or deploy; independent reviewers inspect the frozen changes and do not fix them. The coordinator integrates fixes and reruns affected checks. External handoffs and new player copy are English; do not call a paid model automatically. Fable owns future 0→1 work only once available and explicitly dispatched; native agents handle bounded iterations. External opinions are not gameplay evidence.
+
+Source locations: `combat/` owns the current 3D lab; `game/` owns the separate player story/save prototype; `art/` owns current and labelled historical design; `warrior/` is a frozen feel reference. `scripts/build.py` produces ignored `dist/`. Do not build from earlier HTML snapshots or add more competing active versions. Do not edit vendor code or alter save keys, numbers, slot count or equipment handedness as incidental cleanup.
+
+Risk-based checks: docs/link changes get focused smoke; state/input/storage/physics changes need invariant and negative tests plus independent review. Run `npm test`, then real browser mouse/keys for affected interaction/visuals. Actual screenshots must come from the matching runtime hash; distinguish fixtures, debug immortality, simulation-time samples and real play. Full campaign/device/audio/performance acceptance requires its own evidence. No test-count or coverage target.
+
+Before each iteration decide whether an observed dependency, duplicate rule or missing boundary warrants a small cleanup. File count alone is not a reason to rewrite. Keep small self-contained changes; no framework, history deletion, bulk format or generated screenshots without purpose. Preserve useful provenance and dependency licenses. Record only concise changes/checks/limits in `docs/STATUS.md`; use Git for detailed history.
+
+No secrets, raw conversations, local accounts, absolute personal paths or temporary test outputs in Git. No force push, visibility change, repository deletion or paid setup without explicit user authorization. Do not reuse obsolete workspace AGENTS/current pointers as a second source of authority.

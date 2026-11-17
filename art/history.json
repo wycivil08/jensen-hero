@@ -1,0 +1,482 @@
+{
+  "project": "Runeforge art review",
+  "contract": "JEN-CONTRACT-021",
+  "contract_sha256": "13f4242264a39f2d8fa793787bd99988f4ea1ced01bc5b35f89939c9e1419aac",
+  "current": {
+    "version": "R28",
+    "source": "jensen-combat-polish-r28-20261117/site/index.html",
+    "assets": [
+      {
+        "asset": "assets/g1-entry-3d.webp",
+        "sha256": "b05298bafd3177089d2590b352cd0cfdb7402d091014df309d5206ea38cb3b79",
+        "bytes": 42806,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g1-entry-3d.webp",
+        "sourceSha256": "b05298bafd3177089d2590b352cd0cfdb7402d091014df309d5206ea38cb3b79"
+      },
+      {
+        "asset": "assets/g1-entry-before.webp",
+        "sha256": "2459750642d06f094a1d6767e4c420dfb533d6518646c2195738657fbdd4f3bc",
+        "bytes": 41980,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g1-entry-before.webp",
+        "sourceSha256": "2459750642d06f094a1d6767e4c420dfb533d6518646c2195738657fbdd4f3bc"
+      },
+      {
+        "asset": "assets/g1-entry-painted.webp",
+        "sha256": "a4eecbd64dd5dd6ef4a5b5555c7f23612a0eb3e9b4066411c63abdfb779f4214",
+        "bytes": 47318,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g1-entry-painted.webp",
+        "sourceSha256": "a4eecbd64dd5dd6ef4a5b5555c7f23612a0eb3e9b4066411c63abdfb779f4214"
+      },
+      {
+        "asset": "assets/g2-gpu-3d.webp",
+        "sha256": "148753fd3c4eff505759f477d6a690746954cb884dcab92c47f17d98386d5098",
+        "bytes": 43362,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g2-gpu-3d.webp",
+        "sourceSha256": "148753fd3c4eff505759f477d6a690746954cb884dcab92c47f17d98386d5098"
+      },
+      {
+        "asset": "assets/g2-gpu-painted.webp",
+        "sha256": "f59d39029873fe82c3ec997f9dce72bec7cdecefd2ab0dc5bafd4a51824edadc",
+        "bytes": 46760,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g2-gpu-painted.webp",
+        "sourceSha256": "f59d39029873fe82c3ec997f9dce72bec7cdecefd2ab0dc5bafd4a51824edadc"
+      },
+      {
+        "asset": "assets/g3-dash-3d.webp",
+        "sha256": "04c3ac042639f45c1f2920411ef47d46203e8828ee5478d1c85c71e09f6fb44e",
+        "bytes": 37824,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g3-dash-3d.webp",
+        "sourceSha256": "04c3ac042639f45c1f2920411ef47d46203e8828ee5478d1c85c71e09f6fb44e"
+      },
+      {
+        "asset": "assets/g3-dash-painted.webp",
+        "sha256": "58d846a1ae16ff0e30bf0739e203fcb0605c6d5de1636332ac51b3ded6aea427",
+        "bytes": 43246,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g3-dash-painted.webp",
+        "sourceSha256": "58d846a1ae16ff0e30bf0739e203fcb0605c6d5de1636332ac51b3ded6aea427"
+      },
+      {
+        "asset": "assets/g4-pulse-3d.webp",
+        "sha256": "11088db1e81ae9650d2eb753808d35124d567572a650a1bd837030ec83613718",
+        "bytes": 43288,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g4-pulse-3d.webp",
+        "sourceSha256": "11088db1e81ae9650d2eb753808d35124d567572a650a1bd837030ec83613718"
+      },
+      {
+        "asset": "assets/g4-pulse-painted.webp",
+        "sha256": "1864307143fb3983e4df918cc79ca1088991f3f5bd50e997c9609aede89884e8",
+        "bytes": 48252,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g4-pulse-painted.webp",
+        "sourceSha256": "1864307143fb3983e4df918cc79ca1088991f3f5bd50e997c9609aede89884e8"
+      },
+      {
+        "asset": "assets/g5-cuda-3d.webp",
+        "sha256": "898cf3c3a81e59f2261228d0fd6e33e0f4369d2b23d87d8cf23e1b5b7a5ce733",
+        "bytes": 53666,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g5-cuda-3d.webp",
+        "sourceSha256": "898cf3c3a81e59f2261228d0fd6e33e0f4369d2b23d87d8cf23e1b5b7a5ce733"
+      },
+      {
+        "asset": "assets/g5-cuda-before.webp",
+        "sha256": "c286bb004f6390192d037095feb80e79143f31a9e50e4a550748d715081dd633",
+        "bytes": 50676,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g5-cuda-before.webp",
+        "sourceSha256": "c286bb004f6390192d037095feb80e79143f31a9e50e4a550748d715081dd633"
+      },
+      {
+        "asset": "assets/g5-cuda-painted.webp",
+        "sha256": "956f2eb80c74f8ba011e4c8013fde6938d54e49417e4ab0168ef8c858965f955",
+        "bytes": 56492,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g5-cuda-painted.webp",
+        "sourceSha256": "956f2eb80c74f8ba011e4c8013fde6938d54e49417e4ab0168ef8c858965f955"
+      },
+      {
+        "asset": "assets/g6-shield-3d.webp",
+        "sha256": "8f7dde4e0921fac43fc010c6565a1a07f70f526334b744834df71e4293c3664c",
+        "bytes": 47506,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g6-shield-3d.webp",
+        "sourceSha256": "8f7dde4e0921fac43fc010c6565a1a07f70f526334b744834df71e4293c3664c"
+      },
+      {
+        "asset": "assets/g6-shield-painted.webp",
+        "sha256": "6e80f1d3fa6d7df2a8175b3bc63a8098098a686e9ed03aa9e3f642ba96a4ab82",
+        "bytes": 52504,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g6-shield-painted.webp",
+        "sourceSha256": "6e80f1d3fa6d7df2a8175b3bc63a8098098a686e9ed03aa9e3f642ba96a4ab82"
+      },
+      {
+        "asset": "assets/g7-thunder-3d.webp",
+        "sha256": "2f992efcbacd1c90397abc4483bfbc204e357a2a272f8c5122f2dcb04614a8b4",
+        "bytes": 47162,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g7-thunder-3d.webp",
+        "sourceSha256": "2f992efcbacd1c90397abc4483bfbc204e357a2a272f8c5122f2dcb04614a8b4"
+      },
+      {
+        "asset": "assets/g7-thunder-before.webp",
+        "sha256": "10ac6d489a8b4a0d29178504717bd6e203703dd66a0d7636448826bdb964ee39",
+        "bytes": 46474,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g7-thunder-before.webp",
+        "sourceSha256": "10ac6d489a8b4a0d29178504717bd6e203703dd66a0d7636448826bdb964ee39"
+      },
+      {
+        "asset": "assets/g7-thunder-painted.webp",
+        "sha256": "ad8cc0f1308e2dfd4e725b75737ae9e0209925c7b041e27306fb1026730dc663",
+        "bytes": 51770,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g7-thunder-painted.webp",
+        "sourceSha256": "ad8cc0f1308e2dfd4e725b75737ae9e0209925c7b041e27306fb1026730dc663"
+      },
+      {
+        "asset": "assets/g8-board-3d.webp",
+        "sha256": "1c534d7c5c5fca6dbc4026162c8104ff0033d81292f80668bf29bbe57c93b308",
+        "bytes": 60016,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g8-board-3d.webp",
+        "sourceSha256": "1c534d7c5c5fca6dbc4026162c8104ff0033d81292f80668bf29bbe57c93b308"
+      },
+      {
+        "asset": "assets/g8-board-before.webp",
+        "sha256": "ca6ec001705ab5ec140d1979f2ef91becedc29b417ebc7b767fc9e07cf7ba1a2",
+        "bytes": 56456,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g8-board-before.webp",
+        "sourceSha256": "ca6ec001705ab5ec140d1979f2ef91becedc29b417ebc7b767fc9e07cf7ba1a2"
+      },
+      {
+        "asset": "assets/g8-board-painted.webp",
+        "sha256": "a11a7d1fac80e156247734a158d1434901baa50741bc409f30762632b8b32a88",
+        "bytes": 63890,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g8-board-painted.webp",
+        "sourceSha256": "a11a7d1fac80e156247734a158d1434901baa50741bc409f30762632b8b32a88"
+      },
+      {
+        "asset": "assets/g8-cast-3d.webp",
+        "sha256": "8edbfa2fb9a80ece62e2fcca9d3bfe9209936e17a9f2b5b01f96d05b7cea5487",
+        "bytes": 55906,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g8-cast-3d.webp",
+        "sourceSha256": "8edbfa2fb9a80ece62e2fcca9d3bfe9209936e17a9f2b5b01f96d05b7cea5487"
+      },
+      {
+        "asset": "assets/g8-cast-painted.webp",
+        "sha256": "a3cb1426e371856a52cca84a0f12ec77699b222b929f90efd32c4f5c1dcbc8a9",
+        "bytes": 58772,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g8-cast-painted.webp",
+        "sourceSha256": "a3cb1426e371856a52cca84a0f12ec77699b222b929f90efd32c4f5c1dcbc8a9"
+      },
+      {
+        "asset": "assets/g8-low-3d.webp",
+        "sha256": "74f1e8fe790ee8bcca8b2e4ae744071106833a46687f5c9baafd16333990a6bc",
+        "bytes": 63594,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g8-low-3d.webp",
+        "sourceSha256": "74f1e8fe790ee8bcca8b2e4ae744071106833a46687f5c9baafd16333990a6bc"
+      },
+      {
+        "asset": "assets/g8-low-painted.webp",
+        "sha256": "c82cbc13731b87123e3b4974e1d22bac0ba348787b32f7ea5e256bd180f6d673",
+        "bytes": 68130,
+        "source": "jensen-combat-polish-r28-20261117/site/assets/g8-low-painted.webp",
+        "sourceSha256": "c82cbc13731b87123e3b4974e1d22bac0ba348787b32f7ea5e256bd180f6d673"
+      }
+    ]
+  },
+  "history": {
+    "R24": {
+      "title": "R24 · Eight-stage runtime slice",
+      "status": "historical-runtime-captures",
+      "summary": "Eight actual captures show four representative growth states: G1, G5, G7 and G8. Each pair shares its combat state; the painted image is a post-process of the same 3D scene, not separate 2D art. These are captures, not proof of a natural full-campaign run.",
+      "source": "jensen-runtime-slices-r24-20261116/site/index.html",
+      "images": [
+        {
+          "id": "g1-entry-three",
+          "asset": "assets/r24-g1-entry-three.webp",
+          "caption": "G1 · 3D render",
+          "alt": "R24 actual runtime capture, G1, 3D render",
+          "sha256": "941da487b9fd77ca44d726fd7dda0eafbdcf6ffba7ba87f17896a3f975ee5b91",
+          "source": "jensen-runtime-slices-r24-20261116/site/assets/g1-entry-three.webp",
+          "sourceSha256": "941da487b9fd77ca44d726fd7dda0eafbdcf6ffba7ba87f17896a3f975ee5b91"
+        },
+        {
+          "id": "g1-entry-painted",
+          "asset": "assets/r24-g1-entry-painted.webp",
+          "caption": "G1 · painted post-process of the same 3D scene",
+          "alt": "R24 actual runtime capture, G1, painted post-process of the same 3D scene",
+          "sha256": "2ca3c76a3da891f7d4c413e9d34650e7d2d506fbf360e75b9c8a924b0f840e72",
+          "source": "jensen-runtime-slices-r24-20261116/site/assets/g1-entry-painted.webp",
+          "sourceSha256": "2ca3c76a3da891f7d4c413e9d34650e7d2d506fbf360e75b9c8a924b0f840e72"
+        },
+        {
+          "id": "g5-cuda-three",
+          "asset": "assets/r24-g5-cuda-three.webp",
+          "caption": "G5 · 3D render",
+          "alt": "R24 actual runtime capture, G5, 3D render",
+          "sha256": "62b60e51ca3b05d7ea096e9ecb23a1b98284a8e5416f20f472926b37d4c4c0b1",
+          "source": "jensen-runtime-slices-r24-20261116/site/assets/g5-cuda-three.webp",
+          "sourceSha256": "62b60e51ca3b05d7ea096e9ecb23a1b98284a8e5416f20f472926b37d4c4c0b1"
+        },
+        {
+          "id": "g5-cuda-painted",
+          "asset": "assets/r24-g5-cuda-painted.webp",
+          "caption": "G5 · painted post-process of the same 3D scene",
+          "alt": "R24 actual runtime capture, G5, painted post-process of the same 3D scene",
+          "sha256": "38b5a16489de8c37087f4170149d2bb27c2ff1abe000f6d6d69b8f53c96316e6",
+          "source": "jensen-runtime-slices-r24-20261116/site/assets/g5-cuda-painted.webp",
+          "sourceSha256": "38b5a16489de8c37087f4170149d2bb27c2ff1abe000f6d6d69b8f53c96316e6"
+        },
+        {
+          "id": "g7-thunder-three",
+          "asset": "assets/r24-g7-thunder-three.webp",
+          "caption": "G7 · 3D render",
+          "alt": "R24 actual runtime capture, G7, 3D render",
+          "sha256": "b8fa89fb4b4cd332706b91215b2f82d2243778b26953160ac5f1bd1d4f599281",
+          "source": "jensen-runtime-slices-r24-20261116/site/assets/g7-thunder-three.webp",
+          "sourceSha256": "b8fa89fb4b4cd332706b91215b2f82d2243778b26953160ac5f1bd1d4f599281"
+        },
+        {
+          "id": "g7-thunder-painted",
+          "asset": "assets/r24-g7-thunder-painted.webp",
+          "caption": "G7 · painted post-process of the same 3D scene",
+          "alt": "R24 actual runtime capture, G7, painted post-process of the same 3D scene",
+          "sha256": "c6dbd32fef5857bf8e0aa2a3b2cfebc94b6fbc68a1ba1a5df3041c266fc783e7",
+          "source": "jensen-runtime-slices-r24-20261116/site/assets/g7-thunder-painted.webp",
+          "sourceSha256": "c6dbd32fef5857bf8e0aa2a3b2cfebc94b6fbc68a1ba1a5df3041c266fc783e7"
+        },
+        {
+          "id": "g8-board-three",
+          "asset": "assets/r24-g8-board-three.webp",
+          "caption": "G8 · 3D render",
+          "alt": "R24 actual runtime capture, G8, 3D render",
+          "sha256": "b18888f5d7f6c081b64f3d872fd5ab587f2d2b83d2e9b036bd19aa18bc274cc7",
+          "source": "jensen-runtime-slices-r24-20261116/site/assets/g8-board-three.webp",
+          "sourceSha256": "b18888f5d7f6c081b64f3d872fd5ab587f2d2b83d2e9b036bd19aa18bc274cc7"
+        },
+        {
+          "id": "g8-board-painted",
+          "asset": "assets/r24-g8-board-painted.webp",
+          "caption": "G8 · painted post-process of the same 3D scene",
+          "alt": "R24 actual runtime capture, G8, painted post-process of the same 3D scene",
+          "sha256": "f7513bbc25dfb5c54ffb9aa8f44a42a6716c47d7b85bea080b951d09960e2584",
+          "source": "jensen-runtime-slices-r24-20261116/site/assets/g8-board-painted.webp",
+          "sourceSha256": "f7513bbc25dfb5c54ffb9aa8f44a42a6716c47d7b85bea080b951d09960e2584"
+        }
+      ]
+    },
+    "R23": {
+      "title": "R23 · First matched scene target",
+      "status": "historical-design-and-runtime-reference",
+      "summary": "One matched 3D/2D scene target beside the actual runtime frame. The art targets were not installed into the game; small composition differences remain disclosed.",
+      "source": "jensen-screen-r23-20261116/site/index.html",
+      "images": [
+        {
+          "id": "screen-3d",
+          "asset": "assets/r23-screen-3d.webp",
+          "caption": "Paired scene target · 3D",
+          "alt": "R23 static 3D art target, not an engine screenshot",
+          "sha256": "9a195553ab1f1f2347b9ef91fc2095ebdc4d432d26eb60aa82aa9d51ee4cd313",
+          "source": "jensen-screen-r23-20261116/site/assets/r23-screen-3d.webp",
+          "sourceSha256": "9a195553ab1f1f2347b9ef91fc2095ebdc4d432d26eb60aa82aa9d51ee4cd313"
+        },
+        {
+          "id": "screen-2d",
+          "asset": "assets/r23-screen-2d.webp",
+          "caption": "Paired scene target · 2D",
+          "alt": "R23 static 2D art target, not a runtime asset",
+          "sha256": "083d73e571e26c0706d6b406960a7574e33afcb2e49cbbf3b20617444058d234",
+          "source": "jensen-screen-r23-20261116/site/assets/r23-screen-2d.webp",
+          "sourceSha256": "083d73e571e26c0706d6b406960a7574e33afcb2e49cbbf3b20617444058d234"
+        },
+        {
+          "id": "engine-base",
+          "asset": "assets/r23-engine-base.webp",
+          "caption": "Actual runtime frame",
+          "alt": "R23 actual engine screenshot used as the paired scene reference",
+          "sha256": "c7fbbc422e9145d3e4178b26cb164bb97ab88e7838e67a5a53dff88e99ed84b9",
+          "source": "jensen-screen-r23-20261116/site/assets/r23-engine-base.webp",
+          "sourceSha256": "c7fbbc422e9145d3e4178b26cb164bb97ab88e7838e67a5a53dff88e99ed84b9"
+        }
+      ]
+    },
+    "R21": {
+      "title": "R21 · Character and roster directions",
+      "status": "historical-design-concepts",
+      "summary": "Eight selected new boards show two visual directions plus hero, Boss, ten-seat, minion and ally coverage. These are design concepts, not installed models or complete character assets.",
+      "source": "jensen-art-r21-20261116/site/index.html",
+      "images": [
+        {
+          "id": "model-a-3d",
+          "asset": "assets/r21-model-a-3d.webp",
+          "caption": "Direction A · 3D hero model",
+          "alt": "R21 concept board: Direction A · 3D hero model; not installed runtime art",
+          "sha256": "82d8c4f438a164c81c077b07de77b187afe37fce351b8c99567f8fdb628c0725",
+          "source": "jensen-art-r21-20261116/site/assets/r21-model-a-3d.webp",
+          "sourceSha256": "82d8c4f438a164c81c077b07de77b187afe37fce351b8c99567f8fdb628c0725"
+        },
+        {
+          "id": "model-a-2d",
+          "asset": "assets/r21-model-a-2d.webp",
+          "caption": "Direction A · painted hero model",
+          "alt": "R21 concept board: Direction A · painted hero model; not installed runtime art",
+          "sha256": "05d29a6e98374896e74fb677cd36e460ed6f90084a06421f4ab797b15012ae16",
+          "source": "jensen-art-r21-20261116/site/assets/r21-model-a-2d.webp",
+          "sourceSha256": "05d29a6e98374896e74fb677cd36e460ed6f90084a06421f4ab797b15012ae16"
+        },
+        {
+          "id": "model-b-3d",
+          "asset": "assets/r21-model-b-3d.webp",
+          "caption": "Direction B · 3D hero model",
+          "alt": "R21 concept board: Direction B · 3D hero model; not installed runtime art",
+          "sha256": "fcedcaa06e8fb3193d0d888819ee19d77e4b56696a7e5203a7cd25d853267abb",
+          "source": "jensen-art-r21-20261116/site/assets/r21-model-b-3d.webp",
+          "sourceSha256": "fcedcaa06e8fb3193d0d888819ee19d77e4b56696a7e5203a7cd25d853267abb"
+        },
+        {
+          "id": "model-b-2d",
+          "asset": "assets/r21-model-b-2d.webp",
+          "caption": "Direction B · painted hero model",
+          "alt": "R21 concept board: Direction B · painted hero model; not installed runtime art",
+          "sha256": "e80626e92fcace054ad0f7ba9722b7214f9be1823dba5113fbadac1bab90f39e",
+          "source": "jensen-art-r21-20261116/site/assets/r21-model-b-2d.webp",
+          "sourceSha256": "e80626e92fcace054ad0f7ba9722b7214f9be1823dba5113fbadac1bab90f39e"
+        },
+        {
+          "id": "hero-pairs",
+          "asset": "assets/r21-hero-pairs.webp",
+          "caption": "Hero growth stages",
+          "alt": "R21 concept board: Hero growth stages; not installed runtime art",
+          "sha256": "02029f51721baf223d7e4596704bc6b915f0ae626ca3ad1bd73b133f089458fd",
+          "source": "jensen-art-r21-20261116/site/assets/r21-hero-pairs.webp",
+          "sourceSha256": "02029f51721baf223d7e4596704bc6b915f0ae626ca3ad1bd73b133f089458fd"
+        },
+        {
+          "id": "boss-pairs",
+          "asset": "assets/r21-boss-pairs.webp",
+          "caption": "Boss roster",
+          "alt": "R21 concept board: Boss roster; not installed runtime art",
+          "sha256": "c8a2fd37f77515650aaef7b8a12b62163aa35d39b2ed8175d0fcc872b42f36e4",
+          "source": "jensen-art-r21-20261116/site/assets/r21-boss-pairs.webp",
+          "sourceSha256": "c8a2fd37f77515650aaef7b8a12b62163aa35d39b2ed8175d0fcc872b42f36e4"
+        },
+        {
+          "id": "board-pairs",
+          "asset": "assets/r21-board-pairs.webp",
+          "caption": "Ten-seat opponents",
+          "alt": "R21 concept board: Ten-seat opponents; not installed runtime art",
+          "sha256": "fc21625f39d31690b0f0deb20820cae1ac38138d97bd01ec57239bba6814c6d9",
+          "source": "jensen-art-r21-20261116/site/assets/r21-board-pairs.webp",
+          "sourceSha256": "fc21625f39d31690b0f0deb20820cae1ac38138d97bd01ec57239bba6814c6d9"
+        },
+        {
+          "id": "minion-pairs",
+          "asset": "assets/r21-minion-pairs.webp",
+          "caption": "Minions and diner allies",
+          "alt": "R21 concept board: Minions and diner allies; not installed runtime art",
+          "sha256": "0f5be3f4fffc4a1daf5f3f7b818b3978c5e83927b9033dc70304cef353a619da",
+          "source": "jensen-art-r21-20261116/site/assets/r21-minion-pairs.webp",
+          "sourceSha256": "0f5be3f4fffc4a1daf5f3f7b818b3978c5e83927b9033dc70304cef353a619da"
+        }
+      ]
+    },
+    "R19": {
+      "title": "R19 · First matched impact pair",
+      "status": "historical-design-direction",
+      "summary": "Revision 5 only: the first selected 3D hammer-impact composition paired with a Fable-inspired painted target. This is a historical design direction, not final user art approval.",
+      "source": "jensen-visual-r19-20261115/revision5/site/index.html",
+      "images": [
+        {
+          "id": "impact-3d",
+          "asset": "assets/r19-impact-3d.webp",
+          "caption": "Revision 5 · 3D hammer impact",
+          "alt": "R19 revision 5 final 3D hammer-impact design target",
+          "sha256": "e2c52e219a1ca1eab4bee7986d68cd3af2fa53ac036b21b29b3bbc3faf9e815f",
+          "source": "jensen-visual-r19-20261115/revision5/site/assets/r5-impact-3d.webp",
+          "sourceSha256": "e2c52e219a1ca1eab4bee7986d68cd3af2fa53ac036b21b29b3bbc3faf9e815f"
+        },
+        {
+          "id": "impact-painted",
+          "asset": "assets/r19-impact-painted.webp",
+          "caption": "Revision 5 · painted counterpart",
+          "alt": "R19 revision 5 painted counterpart, a design target rather than runtime art",
+          "sha256": "3643afe04c409fc06260a529e356e8a345efb6acfcb02d36479cdc4659fa1025",
+          "source": "jensen-visual-r19-20261115/revision5/site/assets/r5-impact-2d.webp",
+          "sourceSha256": "3643afe04c409fc06260a529e356e8a345efb6acfcb02d36479cdc4659fa1025"
+        }
+      ]
+    },
+    "R7": {
+      "title": "R7 · Opening story illustrations",
+      "status": "historical-story-illustrations",
+      "summary": "Eight existing game illustrations. These are story art, not combat art; N01-02 reuses the founders concept. R7 opening-slice work is historical and does not represent the full prototype.",
+      "source": "jensen-a-complete-r7-20261114/art/",
+      "images": [
+        {
+          "id": "N00-01",
+          "asset": "../game/assets/R8-N00-01.jpg",
+          "caption": "N00 · Young hero at the counter",
+          "alt": "Young hero pauses at the counter and looks toward the open floor.",
+          "sha256": "9bf00994eb12e4d1dc42a90f0f5aaba3a977e671baa8d1a16dad33b83a0bcac0",
+          "source": "jensen-a-complete-r7-20261114/art/n00/ILL-N00-01.png",
+          "sourceSha256": "aa68f645228e785de233fd592882040802c74484fb1d30bf4138d0d8234bbf3c"
+        },
+        {
+          "id": "N00-02",
+          "asset": "../game/assets/R8-N00-02.jpg",
+          "caption": "N00 · Friendly invitation",
+          "alt": "The shift lead and bald teammate invite the young hero; pose differs from the original shoulder-check idea.",
+          "sha256": "3cf1d05bed4f920fbd79974881389759bc1ca5a9dd9131334a80b6bcaa036c0a",
+          "source": "jensen-a-complete-r7-20261114/art/n00/ILL-N00-02.png",
+          "sourceSha256": "5cb35eb95e4e25603892f87e7133b1dedc5adaa25ece411f38aa414e66d01180"
+        },
+        {
+          "id": "N00-03",
+          "asset": "../game/assets/R8-N00-03.jpg",
+          "caption": "N00 · Tray on the table",
+          "alt": "One ordinary tray rests within reach; the hero has not gained equipment.",
+          "sha256": "16c36192b156e17113d4a62d72fb072c4c20b0686290bffa173a7023a18096fa",
+          "source": "jensen-a-complete-r7-20261114/art/n00/ILL-N00-03.png",
+          "sourceSha256": "2716a476ed4824b8c120d9b87bbdc6dceb3f9cccca751ab501ee50a697e58fa7"
+        },
+        {
+          "id": "N00-04",
+          "asset": "../game/assets/R8-N00-04.jpg",
+          "caption": "N00 · Ready to move",
+          "alt": "The hero crouches with an open hand, ready to move sideways.",
+          "sha256": "0e10065b2d375af971bfcba24fe679e33d32e83cd67c1b660394246d76efd2c1",
+          "source": "jensen-a-complete-r7-20261114/art/n00/ILL-N00-04.png",
+          "sourceSha256": "27857c496eb06c77f67d0b95ad001e1a4c4e7fa01a0c35b3318356eda23e81b7"
+        },
+        {
+          "id": "N01-01",
+          "asset": "../game/assets/ILL-N01-01.jpg",
+          "caption": "N01 · Years later",
+          "alt": "The story transitions from the restaurant opening to the adult founders.",
+          "sha256": "b2b4ef4db1d479cb019d882c30960bc6fec263a92cdabb43d778edb0061fa63b",
+          "source": "jensen-a-complete-r7-20261114/art/n01/ILL-N01-01.png",
+          "sourceSha256": "4785897b04237bf72102699950b7160c2f52bbff2871d35f1d339aa4a0e0fb3f"
+        },
+        {
+          "id": "N01-02",
+          "asset": "../game/assets/ILL-N01-02.jpg",
+          "caption": "N01 · Founders at Denny’s, 1993",
+          "alt": "A reused founders concept marks the 1993 Denny’s scene.",
+          "sha256": "c8fb2814da176c6c2d9ae6fd449f172271b2caa54460c8d2307fbba2f3fc76e8",
+          "source": "jensen-a-complete-r7-20261114/art/n01/ILL-N01-02.png",
+          "sourceSha256": "7a59bfc8af7e4a005c675a08dc17698e0adc23e2db3741f4b880048c60f1d2b3"
+        },
+        {
+          "id": "N01-03",
+          "asset": "../game/assets/ILL-N01-03.jpg",
+          "caption": "N01 · RIVA era, 1997",
+          "alt": "The story moves into the 1997 RIVA era.",
+          "sha256": "1859c37d33bb76ea93a6925702b1b68b45898cd26c0855b9336e40f7d0bd7b72",
+          "source": "jensen-a-complete-r7-20261114/art/n01/ILL-N01-03.png",
+          "sourceSha256": "1d9ecee8c273b8b61ac428ba15786e545ce7bb6369deee09f87ca1790988501e"
+        },
+        {
+          "id": "N01-04",
+          "asset": "../game/assets/ILL-N01-04.jpg",
+          "caption": "N01 · Arcade champion invitation",
+          "alt": "An original arcade champion invites the hero onward.",
+          "sha256": "1de9b044ee0f6004dc32feccfb4dbd69b6363b328d060031ea741ace526fd31b",
+          "source": "jensen-a-complete-r7-20261114/art/n01/ILL-N01-04.png",
+          "sourceSha256": "4835bf33c1ad39fc0902da4aaf29b75ed3866bd66c01a55d29c5a85f384a814f"
+        }
+      ]
+    }
+  }
+}

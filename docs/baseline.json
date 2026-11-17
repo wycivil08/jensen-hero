@@ -1,0 +1,416 @@
+{
+  "purpose": "R29 reviewed extraction source/asset baseline; update affected hashes after reviewed changes",
+  "contract": "JEN-CONTRACT-021",
+  "files": [
+    {
+      "path": "combat/campaign-data.js",
+      "sha256": "c6786b54c8d62a3171acfb8ad863285e15c28ed2109afc355aadeb22548ce2c8",
+      "source": "collaboration/tasks/jensen-combat-polish-r28-20261117/runtime/campaign-data.js"
+    },
+    {
+      "path": "combat/game.js",
+      "sha256": "47b1faa077fc8add4f476a90e16fc36241437ab72481955c938672e9ea6c2615",
+      "source": "collaboration/tasks/jensen-combat-polish-r28-20261117/runtime/game.js"
+    },
+    {
+      "path": "combat/index.html",
+      "sha256": "9db8e7861c7329de35d31ad89f4b60b34d4d42fb98a1f6fe15e97dde106121cd",
+      "source": "collaboration/tasks/jensen-combat-polish-r28-20261117/runtime/index.html"
+    },
+    {
+      "path": "combat/models.js",
+      "sha256": "dca823c2ccce7ac3b70b180cadf65c10d72a7dfc3775a5c757a07df3c8d9067d",
+      "source": "collaboration/tasks/jensen-combat-polish-r28-20261117/runtime/models.js"
+    },
+    {
+      "path": "combat/render-style.js",
+      "sha256": "060b42133e4f87303ac7b3a97e7cfdc8c32c2d507dfb8864d418ef3ab5f439b8",
+      "source": "collaboration/tasks/jensen-combat-polish-r28-20261117/runtime/render-style.js"
+    },
+    {
+      "path": "combat/vendor/HavokPhysics.wasm",
+      "sha256": "026917766f534c156286f07975850978dabf17c42e742bbfaaebbcb2215e4e11",
+      "source": "collaboration/tasks/jensen-cozy-r20-20261115/runtime/vendor/HavokPhysics.wasm"
+    },
+    {
+      "path": "combat/vendor/HavokPhysics_umd.js",
+      "sha256": "8ffcf3b71f434e489275699abda074baa841c50c4fbcdf18a7fa94cdb998e590",
+      "source": "collaboration/tasks/jensen-cozy-r20-20261115/runtime/vendor/HavokPhysics_umd.js"
+    },
+    {
+      "path": "combat/vendor/LICENSE.babylon.md",
+      "sha256": "9362ea9ea17cb221a20cbbd63f404710834cc273d2a9a7b60314fd68ab702cd6",
+      "source": "collaboration/tasks/jensen-cozy-r20-20261115/runtime/vendor/LICENSE.babylon.md"
+    },
+    {
+      "path": "combat/vendor/LICENSE.havok",
+      "sha256": "d8b00cac49e55c3e93840e02868989c73520e50a865dfbd25b9d20d35397ccf0",
+      "source": "collaboration/tasks/jensen-cozy-r20-20261115/runtime/vendor/LICENSE.havok"
+    },
+    {
+      "path": "combat/vendor/SOURCE.json",
+      "sha256": "03e76195c40a84e46a3676d571568133252c74a4f5e1fe485da3a19f0f8ff51f",
+      "source": "collaboration/tasks/jensen-cozy-r20-20261115/runtime/vendor/SOURCE.json"
+    },
+    {
+      "path": "combat/vendor/babylon.js",
+      "sha256": "7edf5405501eee0ea55e31d7501f4ac17c7ca87dfc8e3227bb3cd99499309dbc",
+      "source": "collaboration/tasks/jensen-cozy-r20-20261115/runtime/vendor/babylon.js"
+    },
+    {
+      "path": "game/assets/ILL-N01-01.jpg",
+      "sha256": "b2b4ef4db1d479cb019d882c30960bc6fec263a92cdabb43d778edb0061fa63b",
+      "source": "collaboration/tasks/jensen-engine-ab-r17-20261115/engine-a/assets/r9/ILL-N01-01.jpg"
+    },
+    {
+      "path": "game/assets/ILL-N01-02.jpg",
+      "sha256": "c8fb2814da176c6c2d9ae6fd449f172271b2caa54460c8d2307fbba2f3fc76e8",
+      "source": "collaboration/tasks/jensen-engine-ab-r17-20261115/engine-a/assets/r9/ILL-N01-02.jpg"
+    },
+    {
+      "path": "game/assets/ILL-N01-03.jpg",
+      "sha256": "1859c37d33bb76ea93a6925702b1b68b45898cd26c0855b9336e40f7d0bd7b72",
+      "source": "collaboration/tasks/jensen-engine-ab-r17-20261115/engine-a/assets/r9/ILL-N01-03.jpg"
+    },
+    {
+      "path": "game/assets/ILL-N01-04.jpg",
+      "sha256": "1de9b044ee0f6004dc32feccfb4dbd69b6363b328d060031ea741ace526fd31b",
+      "source": "collaboration/tasks/jensen-engine-ab-r17-20261115/engine-a/assets/r9/ILL-N01-04.jpg"
+    },
+    {
+      "path": "game/assets/R8-N00-01.jpg",
+      "sha256": "9bf00994eb12e4d1dc42a90f0f5aaba3a977e671baa8d1a16dad33b83a0bcac0",
+      "source": "collaboration/tasks/jensen-engine-ab-r17-20261115/engine-a/assets/r9/R8-N00-01.jpg"
+    },
+    {
+      "path": "game/assets/R8-N00-02.jpg",
+      "sha256": "3cf1d05bed4f920fbd79974881389759bc1ca5a9dd9131334a80b6bcaa036c0a",
+      "source": "collaboration/tasks/jensen-engine-ab-r17-20261115/engine-a/assets/r9/R8-N00-02.jpg"
+    },
+    {
+      "path": "game/assets/R8-N00-03.jpg",
+      "sha256": "16c36192b156e17113d4a62d72fb072c4c20b0686290bffa173a7023a18096fa",
+      "source": "collaboration/tasks/jensen-engine-ab-r17-20261115/engine-a/assets/r9/R8-N00-03.jpg"
+    },
+    {
+      "path": "game/assets/R8-N00-04.jpg",
+      "sha256": "0e10065b2d375af971bfcba24fe679e33d32e83cd67c1b660394246d76efd2c1",
+      "source": "collaboration/tasks/jensen-engine-ab-r17-20261115/engine-a/assets/r9/R8-N00-04.jpg"
+    },
+    {
+      "path": "game/assets/diner-floor-v1.jpg",
+      "sha256": "4abd0702bf6111fb2657542a681272b82ac29f717f78d79e7019766372d258f9",
+      "source": "collaboration/tasks/jensen-engine-ab-r17-20261115/engine-a/assets/r9/diner-floor-v1.jpg"
+    },
+    {
+      "path": "game/combat-actions.js",
+      "sha256": "6a747e05e596ed44ee1066b1374dc72e52e167c0a2b577aad3c44f2bacfa417c",
+      "source": "src/jensen/combat-actions.js"
+    },
+    {
+      "path": "game/combat-data.js",
+      "sha256": "fd4a20909c3369afa72ff4401af9d0a1f7fdf4e06507d31f45a3d6c682caa8dc",
+      "source": "src/jensen/combat-data.js"
+    },
+    {
+      "path": "game/combat-enemies.js",
+      "sha256": "f6674edaa403c35e163106ffbd55e176dbd3d5529f672653859fbe56fbeeb214",
+      "source": "src/jensen/combat-enemies.js"
+    },
+    {
+      "path": "game/index.template.html",
+      "sha256": "150633c3c9bc32521ae585cb8d61f9080698d0733d84887f5e877e236eb999fb",
+      "source": "src/jensen/index.template.html"
+    },
+    {
+      "path": "game/lab.js",
+      "sha256": "513f8b2049e2b4bdf13f2534b7df9bfccad4c41dbd350b3d0d255f1f06bb023a",
+      "source": "src/jensen/lab.js"
+    },
+    {
+      "path": "game/runtime.js",
+      "sha256": "3b9f24feeb45893132ba4447df722132296b06185686aa5cc509b1f5fbd9da63",
+      "source": "src/jensen/runtime.js"
+    },
+    {
+      "path": "game/store.js",
+      "sha256": "b1c619bb9f3094f10f93f3ddbbd250b2614b266fb93e53f916c1e2e25ccd9d67",
+      "source": "src/jensen/store.js"
+    },
+    {
+      "path": "game/story.js",
+      "sha256": "1a1655a893661a4d8696767c2ddc2dc90075ffbdc25f55da9ea8ef4e00214487",
+      "source": "src/jensen/story.js"
+    },
+    {
+      "path": "game/ui.css",
+      "sha256": "b456d8c415d96ca6fcb6bbecee6ba2ffc761af54eb2ca755a3dcf7246329b1be",
+      "source": "src/jensen/ui.css"
+    },
+    {
+      "path": "game/ui.html",
+      "sha256": "e478d028e5dc4fe7b355e9d76da209f09a03dd12fa696de09f7549c3eec1a535",
+      "source": "src/jensen/ui.html"
+    },
+    {
+      "path": "warrior/audio/battle.mp3",
+      "sha256": "f03c833c137abbc79afd375fd4c617f03a77c201838ea8f377f4d606899b7def",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "warrior/audio/interface.mp3",
+      "sha256": "0b8d0b62e47550fc61ab6919b13c4bbfd752a0552b3b394a551643291b5214b5",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "warrior/four.html",
+      "sha256": "d4141221880315fabd048882b06ce932e6112e07feb14580648dfd69e5242546",
+      "source": "collaboration/tasks/expedition-trial-input-fix-20261112/build/patch/games/expedition.html"
+    },
+    {
+      "path": "warrior/index.html",
+      "sha256": "e937476a5132922a81011fe2664c1350990d030fc72bbe22efdb02375cef6163",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "warrior/six.html",
+      "sha256": "579cf76c26fac1240269a9d9b6d56cade3e8faf41936b41b435d55a3df7bf675",
+      "source": "public/games/v0.2.html"
+    },
+    {
+      "path": "art/assets/g1-entry-3d.webp",
+      "sha256": "b05298bafd3177089d2590b352cd0cfdb7402d091014df309d5206ea38cb3b79",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/g1-entry-before.webp",
+      "sha256": "2459750642d06f094a1d6767e4c420dfb533d6518646c2195738657fbdd4f3bc",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/g1-entry-painted.webp",
+      "sha256": "a4eecbd64dd5dd6ef4a5b5555c7f23612a0eb3e9b4066411c63abdfb779f4214",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/g2-gpu-3d.webp",
+      "sha256": "148753fd3c4eff505759f477d6a690746954cb884dcab92c47f17d98386d5098",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/g2-gpu-painted.webp",
+      "sha256": "f59d39029873fe82c3ec997f9dce72bec7cdecefd2ab0dc5bafd4a51824edadc",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/g3-dash-3d.webp",
+      "sha256": "04c3ac042639f45c1f2920411ef47d46203e8828ee5478d1c85c71e09f6fb44e",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/g3-dash-painted.webp",
+      "sha256": "58d846a1ae16ff0e30bf0739e203fcb0605c6d5de1636332ac51b3ded6aea427",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/g4-pulse-3d.webp",
+      "sha256": "11088db1e81ae9650d2eb753808d35124d567572a650a1bd837030ec83613718",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/g4-pulse-painted.webp",
+      "sha256": "1864307143fb3983e4df918cc79ca1088991f3f5bd50e997c9609aede89884e8",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/g5-cuda-3d.webp",
+      "sha256": "898cf3c3a81e59f2261228d0fd6e33e0f4369d2b23d87d8cf23e1b5b7a5ce733",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/g5-cuda-before.webp",
+      "sha256": "c286bb004f6390192d037095feb80e79143f31a9e50e4a550748d715081dd633",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/g5-cuda-painted.webp",
+      "sha256": "956f2eb80c74f8ba011e4c8013fde6938d54e49417e4ab0168ef8c858965f955",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/g6-shield-3d.webp",
+      "sha256": "8f7dde4e0921fac43fc010c6565a1a07f70f526334b744834df71e4293c3664c",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/g6-shield-painted.webp",
+      "sha256": "6e80f1d3fa6d7df2a8175b3bc63a8098098a686e9ed03aa9e3f642ba96a4ab82",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/g7-thunder-3d.webp",
+      "sha256": "2f992efcbacd1c90397abc4483bfbc204e357a2a272f8c5122f2dcb04614a8b4",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/g7-thunder-before.webp",
+      "sha256": "10ac6d489a8b4a0d29178504717bd6e203703dd66a0d7636448826bdb964ee39",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/g7-thunder-painted.webp",
+      "sha256": "ad8cc0f1308e2dfd4e725b75737ae9e0209925c7b041e27306fb1026730dc663",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/g8-board-3d.webp",
+      "sha256": "1c534d7c5c5fca6dbc4026162c8104ff0033d81292f80668bf29bbe57c93b308",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/g8-board-before.webp",
+      "sha256": "ca6ec001705ab5ec140d1979f2ef91becedc29b417ebc7b767fc9e07cf7ba1a2",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/g8-board-painted.webp",
+      "sha256": "a11a7d1fac80e156247734a158d1434901baa50741bc409f30762632b8b32a88",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/g8-cast-3d.webp",
+      "sha256": "8edbfa2fb9a80ece62e2fcca9d3bfe9209936e17a9f2b5b01f96d05b7cea5487",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/g8-cast-painted.webp",
+      "sha256": "a3cb1426e371856a52cca84a0f12ec77699b222b929f90efd32c4f5c1dcbc8a9",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/g8-low-3d.webp",
+      "sha256": "74f1e8fe790ee8bcca8b2e4ae744071106833a46687f5c9baafd16333990a6bc",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/g8-low-painted.webp",
+      "sha256": "c82cbc13731b87123e3b4974e1d22bac0ba348787b32f7ea5e256bd180f6d673",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/r19-impact-3d.webp",
+      "sha256": "e2c52e219a1ca1eab4bee7986d68cd3af2fa53ac036b21b29b3bbc3faf9e815f",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/r19-impact-painted.webp",
+      "sha256": "3643afe04c409fc06260a529e356e8a345efb6acfcb02d36479cdc4659fa1025",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/r21-board-pairs.webp",
+      "sha256": "fc21625f39d31690b0f0deb20820cae1ac38138d97bd01ec57239bba6814c6d9",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/r21-boss-pairs.webp",
+      "sha256": "c8a2fd37f77515650aaef7b8a12b62163aa35d39b2ed8175d0fcc872b42f36e4",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/r21-hero-pairs.webp",
+      "sha256": "02029f51721baf223d7e4596704bc6b915f0ae626ca3ad1bd73b133f089458fd",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/r21-minion-pairs.webp",
+      "sha256": "0f5be3f4fffc4a1daf5f3f7b818b3978c5e83927b9033dc70304cef353a619da",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/r21-model-a-2d.webp",
+      "sha256": "05d29a6e98374896e74fb677cd36e460ed6f90084a06421f4ab797b15012ae16",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/r21-model-a-3d.webp",
+      "sha256": "82d8c4f438a164c81c077b07de77b187afe37fce351b8c99567f8fdb628c0725",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/r21-model-b-2d.webp",
+      "sha256": "e80626e92fcace054ad0f7ba9722b7214f9be1823dba5113fbadac1bab90f39e",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/r21-model-b-3d.webp",
+      "sha256": "fcedcaa06e8fb3193d0d888819ee19d77e4b56696a7e5203a7cd25d853267abb",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/r23-engine-base.webp",
+      "sha256": "c7fbbc422e9145d3e4178b26cb164bb97ab88e7838e67a5a53dff88e99ed84b9",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/r23-screen-2d.webp",
+      "sha256": "083d73e571e26c0706d6b406960a7574e33afcb2e49cbbf3b20617444058d234",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/r23-screen-3d.webp",
+      "sha256": "9a195553ab1f1f2347b9ef91fc2095ebdc4d432d26eb60aa82aa9d51ee4cd313",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/r24-g1-entry-painted.webp",
+      "sha256": "2ca3c76a3da891f7d4c413e9d34650e7d2d506fbf360e75b9c8a924b0f840e72",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/r24-g1-entry-three.webp",
+      "sha256": "941da487b9fd77ca44d726fd7dda0eafbdcf6ffba7ba87f17896a3f975ee5b91",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/r24-g5-cuda-painted.webp",
+      "sha256": "38b5a16489de8c37087f4170149d2bb27c2ff1abe000f6d6d69b8f53c96316e6",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/r24-g5-cuda-three.webp",
+      "sha256": "62b60e51ca3b05d7ea096e9ecb23a1b98284a8e5416f20f472926b37d4c4c0b1",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/r24-g7-thunder-painted.webp",
+      "sha256": "c6dbd32fef5857bf8e0aa2a3b2cfebc94b6fbc68a1ba1a5df3041c266fc783e7",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/r24-g7-thunder-three.webp",
+      "sha256": "b8fa89fb4b4cd332706b91215b2f82d2243778b26953160ac5f1bd1d4f599281",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/r24-g8-board-painted.webp",
+      "sha256": "f7513bbc25dfb5c54ffb9aa8f44a42a6716c47d7b85bea080b951d09960e2584",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/assets/r24-g8-board-three.webp",
+      "sha256": "b18888f5d7f6c081b64f3d872fd5ab587f2d2b83d2e9b036bd19aa18bc274cc7",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/history.json",
+      "sha256": "c5b994246d414d878528c7ceb20bf4efa6acd45c1bab4c67c70c48f5fa82fd12",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    },
+    {
+      "path": "art/index.html",
+      "sha256": "a5ca7355d7dd5ac54eb17093d207104baa02da9b4b8e8403c455cabe68bc8e06",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+    }
+  ]
+}
