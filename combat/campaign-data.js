@@ -448,6 +448,23 @@
       }
     }
   };
+  // The standalone fantasy encounter has its own tuning and fictional seat titles.
+  data.finale = {
+    hp: 3800, comboGrace: 2.5, cycle: 0.43, heavyCycle: 0.70, heavyWindup: 0.24, heavyMultiplier: 2,
+    theme: {floor:"#889d9a",wall:"#718889"},
+    seats: {
+      seat_01: {label:"Vanguard", hp:42000, x:-3.5, z:0.4, range:6, damage:950, windup:0.95, end:1.55, duration:2.95, cycle:4.5, punishMultiplier:1.5},
+      seat_02: {label:"West Gunner", hp:30000, x:-7.1, z:-1.0},
+      seat_03: {label:"Cinder", hp:30000, x:-4.8, z:-3.1, range:8.2, damage:420, windup:1.12, end:1.14, duration:2.55, cycle:4.0, ground:{shape:"mortar",radius:1.45}},
+      seat_04: {label:"Gatekeeper", hp:42000, x:0, z:0.2, action:"shieldBash", range:2.5},
+      seat_05: {label:"Deadeye", hp:36000, x:-2.8, z:-4.7, lockBeforeRelease:0.48, punishRange:3.2, punishMultiplier:1.4},
+      seat_06: {label:"Lifeline", hp:36000, x:2.8, z:-4.7},
+      seat_07: {label:"Outrider", hp:36000, x:3.8, z:0.2},
+      seat_08: {label:"Scattershot", hp:36000, x:6.7, z:-2.2, action:"volley", cycle:3.4},
+      seat_09: {label:"Ashfall", hp:30000, x:4.2, z:-2.7, range:4.3, damage:340, windup:1.16, end:1.18, duration:2.15, cycle:3.65, ground:{shape:"annulus",innerRadius:2.3,radius:4.3}},
+      seat_10: {label:"Reclaimer", hp:30000, x:0.1, z:-2.7, action:"disc", range:5.7, damage:255, windup:0.96, end:0.98, duration:3.18, cycle:3.65, projectile:{outboundDistance:5.5,outboundSpeed:5,returnSpeed:6.5,life:2.25,radius:0.18}}
+    }
+  };
   const assert = (ok, message) => { if (!ok) throw new Error('R24Data: '+message); };
   assert(data.stages.length===8 && Object.keys(data.types).length===29, 'expected 8 stages and 29 types');
   assert(data.stages.reduce((sum,s)=>sum+s.budget,0)===360, 'combat budget must total 360 seconds');

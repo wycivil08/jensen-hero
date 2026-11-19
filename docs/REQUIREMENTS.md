@@ -1,4 +1,33 @@
-# Current requirements — JEN-CONTRACT-021
+# Current requirements — JEN-CONTRACT-024
+
+## Latest user direction — 2026-11-18 (takes precedence)
+
+The user requests a new GPT-6.2 Astra conversation to take over coordination and independently rethink the smallest compelling game, orchestration, design and any justified refactor. Start with assessment and a reviewable proposal, not an automatic implementation rewrite. The prior 38 entries below are retained as traceable history; product details that conflict with this renewed brief are open to redesign.
+
+| Priority | Current requirement |
+|---|---|
+| CORE-1 | Jensen Huang's heroic life: transform meaningful personal and NVIDIA events into a coherent playable fight-and-grow journey. This is a topical game for fans, employees, shareholders and interested players; real-life references must improve comprehension and fun. Verify the triggering news before asserting real events. Fictional combat is not a claim that real people committed misconduct. |
+| CORE-2 | 2D versus 3D and the final art direction remain undecided. Current images and Babylon implementation are evidence and reusable work, not a locked aesthetic or mandatory engine. |
+| CORE-3 | A vertical slice must show a feasible actual game view: coherent camera, scale, assets, actions, HUD and real combat effects that agents can implement. Explain a concept diagram as a diagram; never present it as a running game screenshot. Prefer engine-rendered matched evidence. |
+| CORE-4 | The finale must pit the hero against ten independent board-member bosses. Level count is open; eight levels are not a requirement. Recognizable competitors such as Lisa Su are candidate bosses, with understandable roles and counterplay. Distinct board opponents must matter tactically rather than becoming ten cosmetic health bars. |
+| CORE-5 | Emphasize individual heroism, toughness and a one-against-ten fantasy. A warrior-like tank plus high-damage fighter is the user's preferred direction. Design the basic attack, control, survivability, enemy reactions and encounter rhythm around that feeling. |
+| CORE-6 | Final-stage easter-egg appearance: shield plus thunder hammer, echoing the CES moment. Existing character-right shield / character-left hammer is the continuity default. The event reference and fantasy extension must be distinguished. |
+
+### Combat presentation direction — 2026-11-18
+
+| Priority | Current requirement |
+|---|---|
+| CORE-7 | Refine the playable finale toward a tougher dark action/MOBA presentation. Study official Brawl Stars, Squad Busters and dark action references. Improve material and silhouette contrast, enemy health and numbers, damage-text placement and motion, readable projectiles and actual player-hit feedback. Assess the result in live combat on this same map. Human appraisal of feel remains open. |
+| CORE-8 | On the same ten-seat map, distinguish several backline bosses by weapon shape, stance and attack motion. The player should be able to infer who is attacking, how to evade and how to fight back without relying on names. Show the behavior in real combat. |
+
+### What can be reconsidered
+
+Fixed eight chapters/eight growth states, detailed intermediate equipment, exact skill lists and numeric scale, the ten-minute target, 40/60 story/combat split, mandatory paired 2D/3D production, specific cozy/painted treatments, mobile scope, social sharing, and elaborate debug options are design hypotheses or prior preferences to assess, not reasons to inflate the new minimum. Recommend keep/change/defer/remove with rationale and migration cost; do not silently implement removals. Existing desktop mouse-first input, at-most-two actives, English new copy, minimal UI and saved progress remain useful starting preferences, with any proposed changes clearly identified for review.
+
+Engineering/privacy/authorization rules remain binding: preserve dirty work and history, one writer per file, truthful evidence, no secrets, no destructive migration or publication inferred from a design review. This turn grants research, local design/handoff documents and necessary browser evaluation, not a new blanket Git push or production rewrite. The new coordinator owns the next proposal and may use bounded independent agents; older model-lane choices must be reviewed rather than automatically forcing a paid external call.
+
+## Previous detailed contract — retained for comparison, subject to the direction above
+
 
 Portable edition of the coordinator-owned contract. Requirement IDs and current requirement text are preserved; old implementation-status tables and dead archive links are omitted. Source contract SHA256: `13f4242264a39f2d8fa793787bd99988f4ea1ced01bc5b35f89939c9e1419aac`.
 

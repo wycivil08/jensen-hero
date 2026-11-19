@@ -1,12 +1,12 @@
 # Jensen Hero
 
-Three entry points, one small static project. No backend, install step or paid service is required to run it.
+Start with **[The Ten Seats](combat/?mode=finale)**, the standalone desktop finale, or explore the story and practice together from the portal.
 
 | Module | Purpose | Current scope |
 |---|---|---|
 | `art/` | Art direction and vertical slices | Latest actual gameplay frames first; expandable, labelled design history. Concept art is not a shipped screenshot. |
-| `combat/` | Developer-driven combat lab | R28 Babylon/Havok, eight growth states, bosses/minions, editable practice settings and two active slots. |
-| `game/` | Player-facing story + battle | Existing R17 2D opening, two encounters, illustrations, progression and career save. The complete eight-chapter story is unfinished. |
+| `combat/` | Finale and developer combat lab | One Babylon/Havok runtime. The finale has ten opponents, a transferable heavy swing and a high-damage rush that leaves the boss exposed if it misses. The lab retains eight practice states. |
+| `game/` | Player-facing story + battle | R17 2D opening, two encounters, illustrations, progression and career save. |
 
 `warrior/` preserves the original four- and six-skill feel references. Their controls and extra skill slots are historical, not the current Jensen specification. The 3D lab and 2D story prototype are deliberately distinct; merging their progression is future gameplay work, not part of this packaging change.
 
@@ -22,6 +22,8 @@ npm run preview
 Open `http://127.0.0.1:8900`. `npm run build` creates only `dist/`, which is ignored by Git. Edit source modules, never generated output. `npm test` builds and runs asset/link, actual native combat/lifecycle and VM player-state regressions; it does not certify GPU visuals, sound or natural full-game completion.
 
 Desktop landscape is primary: click ground to move, click an enemy to approach/attack, use **1** and **2** for active skills. The lab's **Debug** panel selects stage, enemy and practice settings. Player mode hides that development workflow. The historical player interface still contains Chinese copy; complete English localization is pending.
+
+For offline desktop play, run `python3 scripts/build.py --standalone` and open `dist/ten-seats.html` in a WebGL 2 browser. The file includes the battle, physics library, arena texture, HUD font and license notices. Pause with **Esc** to hide boss labels, reduce impact effects or mute sound. In the back line, read the mortar’s marked ground, the staff’s safe eye, the rifle’s aim lock and the throwing disc’s return. The finale is a separate encounter with no career rewards.
 
 ## Build and deploy
 

@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'self' blob:">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob:; worker-src 'self' blob:">
 <link rel="icon" href="data:,">
-<title>Jensen · R28 Combat Laboratory</title>
+<title>Jensen Hero · Combat</title>
 <style>
 :root{color-scheme:dark;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#f4f2ec;background:#a7ad94}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}
@@ -62,20 +62,94 @@ progress{width:100%;height:7px;margin-top:15px;accent-color:#bac89d}
 @media(max-aspect-ratio:1/1),(pointer:coarse){#notice{display:block}}
 @media(max-width:900px){#health{left:10px;top:13px;width:215px;height:28px}#hp{top:5px;font-size:10px}#training{font-size:21px;top:10px;padding:7px 15px}details{top:12px;right:10px;width:270px}.skill{width:74px;height:72px}#skills{bottom:15px}#hint{bottom:94px;font-size:11px}}
 @media(prefers-reduced-motion:reduce){#hpFill,#hint{transition:none}}
+@font-face{font-family:"Barlow Condensed";src:url("./assets/BarlowCondensed-Bold.ttf") format("truetype");font-weight:700;font-display:swap}
+#hurtEdge,#comboPips,.finale-name{display:none}
+.finale{--ink:#0e151a;--brass:#d9a75f;--ivory:#fff4dc;--display:"Barlow Condensed","Arial Narrow",sans-serif}
+.finale #overlay{z-index:2}
+.finale #boot,.finale #pause{z-index:4}
+.finale #hurtEdge{display:block;position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 51%,rgba(104,8,21,.36) 79%,rgba(179,23,37,.88) 100%);z-index:0}
+.finale #debugDetails,.finale #notice{display:none}
+.finale #health{top:13px;left:18px;width:clamp(185px,22vw,268px);height:42px;padding:24px 9px 6px 11px;border-radius:0;background:linear-gradient(95deg,#0c151a 55%,#152229ed);border-left:3px solid #d7b176;box-shadow:0 1px 0 #74634c,0 3px 8px #0008}
+.finale .finale-name{display:block;position:absolute;top:2px;left:11px;color:#f0e5cf;font:700 16px/20px var(--display);letter-spacing:.075em;text-transform:uppercase}
+.finale #health .track,.finale #hpFill{border-radius:0}
+.finale #health .track{background:#313237}
+.finale #hpFill{background:linear-gradient(90deg,#548d83,#a0d7bc);border-top:1px solid #d4e5cd}
+.finale #hp{top:3px;right:9px;left:auto;width:auto;color:#fff7e6;font:700 16px/18px var(--display);text-shadow:0 1px 2px #000;font-variant-numeric:tabular-nums}
+.finale #health[data-low="true"]{border-color:#ef7663;box-shadow:0 0 0 1px #aa534b}
+.finale #health[data-low="true"] #hpFill{background:#c45e50}
+.finale #comboPips{position:absolute;top:calc(100% + 3px);left:-3px;display:flex;align-items:center;gap:4px;padding:2px 7px 2px 12px;background:#0d181bde;color:#d9dfd9;font:700 12px/15px var(--display);letter-spacing:.03em}
+#comboPips i{width:8px;height:8px;transform:skewX(-14deg);background:#243136;border:1px solid #82908c}
+#comboPips span{margin-left:3px}
+#comboPips[data-charge="1"] i:first-child,#comboPips[data-charge="2"] i{background:#ffd285;border-color:#fff2c4}
+#comboPips .ready,#comboPips[data-charge="2"] .charging{display:none}
+#comboPips[data-charge="2"] .ready{display:inline;color:#ffe4a4}
+.finale #training{top:10px;padding:5px 24px 8px;background:linear-gradient(#172128,#10171bcf);color:#fff5de;border:0;border-top:2px solid #a27f4f;border-radius:0;clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,10px 100%);box-shadow:none;font:700 clamp(17px,1.8vw,25px)/1 var(--display);text-transform:uppercase;letter-spacing:.045em;white-space:nowrap}
+.finale #target{top:13px;left:auto;right:18px;transform:none;border-right:3px solid #d5a15c;padding:5px 10px;color:#fce0a8;background:#10191eeb;border-radius:0;font:700 clamp(14px,1.35vw,20px)/1.1 var(--display);letter-spacing:.035em}
+.finale #status{top:48px;color:#fff0cf;background:#141b20;padding:3px 9px;border-radius:1px;font:700 clamp(13px,1.2vw,17px)/1.15 var(--display);letter-spacing:.025em;text-shadow:0 1px #111}
+.finale #status:empty{display:none}
+.finale #hint{bottom:74px;color:#e4e8df;font-size:11px;text-shadow:0 1px 3px #081116,0 0 4px #081116}
+.finale #skills{bottom:14px;gap:6px}
+.finale .skill{width:143px;height:51px;padding:4px 7px 4px 30px;display:grid;grid-template-columns:32px 1fr;gap:4px;align-items:center;border:1px solid #897855;border-top:2px solid #d3b585;border-radius:2px;background:linear-gradient(125deg,#263238,#101a1f 72%);color:#ffe7af;box-shadow:0 4px 9px #0007}
+.finale .skill kbd{top:6px;left:5px;padding:1px 5px;background:#d1b487;color:#171a1b;font:700 14px/16px var(--display)}
+.finale .skill .icon{grid-column:1;grid-row:1}
+.finale .skill svg{width:31px;height:32px;margin:0}
+.finale .skill .sr{position:static;grid-column:2;grid-row:1;justify-self:start;width:auto;height:auto;clip:auto;margin:0;overflow:visible;white-space:normal;text-align:left;font:700 16px/15px var(--display);text-transform:uppercase;letter-spacing:.025em}
+.finale .skill:disabled{color:#a5adab;border-color:#505f5f}
+.finale .skill:disabled kbd{background:#56636a;color:#f1e4cd}
+.finale .skill .cooldown{left:3px;bottom:5px;width:23px;font:700 11px/12px var(--display);color:#f5d19e}
+.finale .bossBar.seat{height:9px;width:80px;padding:2px;background:#19151a;border:0;border-radius:1px;box-shadow:0 0 0 1px #05090caa}
+.finale .bossBar.seat .fill{border-radius:0;background:linear-gradient(90deg,#a34444,#e37b66);box-shadow:inset 0 1px #ffa894aa}
+.finale .bossBar.seat small{bottom:11px;color:#f6e0d0;background:#181c20ed;min-width:0;font:700 14px/14px var(--display);padding:2px 4px;border-radius:1px;letter-spacing:.015em}
+.finale .bossBar.seat[data-selected="false"][data-threatening="false"]:not(.healer):not([data-seat="1"]):not([data-seat="5"]) small{display:none}
+.finale .bossBar.seat[data-selected="true"]{outline:2px solid #f3cc84;outline-offset:1px}
+.finale .bossBar.seat[data-threatening="true"] small{background:#612e29;color:#fff0d8;opacity:1}
+.finale .bossBar.seat[data-casting="true"] small{background:#773957;color:#fff1f6;opacity:1}
+.finale .bossBar.seat[data-exposed="true"]{outline:2px dashed #9ae2d8;outline-offset:2px}
+.finale .bossBar.seat[data-exposed="true"] small{display:block;color:#e1fff6;background:#194148;opacity:1}
+.finale .bossBar.seat:is([data-selected="true"],[data-threatening="true"],[data-casting="true"],[data-exposed="true"])::before{content:attr(data-hp);position:absolute;top:10px;left:50%;transform:translateX(-50%);padding:0 4px;background:#15171bd9;color:#fff5e4;font:700 14px/15px var(--display);font-variant-numeric:tabular-nums;white-space:nowrap;text-shadow:0 1px 1px #080a0c}
+.finale .damageFloat{font:700 26px/1 var(--display);font-variant-numeric:tabular-nums;letter-spacing:0;white-space:nowrap;paint-order:stroke fill;-webkit-text-stroke:3px #211b19;color:#f9ead2;text-shadow:0 2px 1px #100c0c}
+.finale .damageFloat.critical,.finale .damageFloat.heavy{color:#ffd087;font-size:35px}
+.finale .damageFloat.heavy.critical{color:#fff1b4;font-size:38px}
+.finale .damageFloat.cuda{color:#a7e5ed;font-size:21px}
+.finale .damageFloat.incoming{color:#ff998c;font-size:29px}
+.finale .damageFloat.heal{color:#c8f0b2;font-size:23px}
+.finale .damageFloat.heal[data-side="seat"]{color:#f2bfe0}
+.finale .damageFloat.block{color:#d5e8f6;font-size:20px}
+.finale .floatLeader{height:1px}
+.finale .floatLeader::before{width:4px;height:4px;top:-1.5px}
+@media(max-height:600px){.finale #training{top:5px;padding:3px 16px 5px}.finale #status{top:33px;padding:1px 7px 2px}}
+@media(max-width:760px){.finale #target{top:60px;right:7px;max-width:35vw}.finale #health{left:7px;width:155px}.finale #status{max-width:44vw}.finale .skill{width:128px;height:44px;padding-left:27px;grid-template-columns:26px 1fr}.finale .skill svg{width:26px;height:26px}.finale .skill .sr{font-size:15px}.finale #skills{bottom:8px}.finale #hint{bottom:58px}}
+.finale-prefs{display:none}.finale .finale-prefs{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px;font-size:14px}
+.finale:has(#finaleNoNames:checked) :is(.bossBar.seat small,#target,#status){display:none}
+.finale .finale-prefs label{cursor:pointer}
+.finale-panel{position:fixed;inset:0;z-index:3;display:flex;align-items:center;pointer-events:auto;background:linear-gradient(90deg,#071216f2 0%,#0d1b23e8 22%,#101c219c 41%,#101c2118 68%);padding:clamp(22px,6vw,96px);box-sizing:border-box;color:var(--ivory)}
+.finale-panel .card{max-width:min(30em,62vw)}
+.finale-panel h1,.finale-panel h2{font:700 clamp(48px,7.5vw,106px)/.9 var(--display);text-transform:uppercase;letter-spacing:-.015em;margin:0 0 20px;text-wrap:balance}
+.finale-panel p{margin:10px 0;color:#f2e7d0;line-height:1.5;font-size:clamp(14px,1.2vw,18px);max-width:30em}
+.finale-panel .controls{margin:20px 0;color:#d5dfdc;font-size:14px}
+.finale-panel button{border:1px solid #fbe5a8;border-radius:5px;background:var(--brass);color:var(--ink);font-weight:750;padding:12px 22px;min-height:44px}
+.finale-panel button:hover{background:#f2d495}
+.finale-panel button:focus-visible{outline:3px solid white;outline-offset:4px}
+.finale:has(.finale-panel:not([hidden])) #overlay,.finale:has(.finale-panel:not([hidden])) #bossBars,.finale:has(.finale-panel:not([hidden])) #floats{visibility:hidden}
+@media(max-width:680px){.finale-panel{background:#0a161be0}.finale-panel .card{max-width:100%}.finale-panel h1,.finale-panel h2{margin-bottom:12px}}
 </style>
 <script>
 window.engineCBootFailure=function(message){
   var box=document.getElementById("boot"),text=document.getElementById("bootText"),bar=document.getElementById("progress");
-  if(box)box.hidden=false;if(text)text.textContent="Unable to start the combat laboratory: "+message;if(bar)bar.hidden=true;
+  if(box)box.hidden=false;if(text)text.textContent="Unable to start combat: "+message;if(bar)bar.hidden=true;
 };
 </script>
 </head>
 <body>
+<img id="finaleFloor" data-src="./assets/wafer-floor.webp" hidden alt="">
 <canvas id="view" tabindex="0" aria-label="3D combat laboratory: click ground to move, enemies to attack; use 1 and 2 for unlocked skills"></canvas>
 <div id="overlay">
+  <div id="hurtEdge" aria-hidden="true" hidden></div>
   <div id="lowHealth" aria-hidden="true" hidden></div>
   <div id="heroCue" aria-hidden="true" hidden><svg viewBox="0 0 24 17"><path d="m3 4 9 9 9-9" fill="none" stroke="#203e43" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="m3 4 9 9 9-9" fill="none" stroke="#c2fff2" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-  <section id="health" aria-label="Hero health"><div class="track"><div id="hpFill"></div></div><div id="hp">100 / 100</div></section>
+  <section id="health" aria-label="Hero health"><span class="finale-name" aria-hidden="true">Jensen</span><div class="track"><div id="hpFill"></div></div><div id="hp">100 / 100</div>
+    <div id="comboPips" role="meter" aria-label="Hammer charge" aria-valuemin="0" aria-valuemax="2" aria-valuenow="0" data-charge="0"><i aria-hidden="true"></i><i aria-hidden="true"></i><span class="charging" aria-hidden="true">Hammer charge</span><span class="ready" aria-hidden="true">Heavy swing ready</span></div>
+  </section>
   <div id="training"><span id="stageLabel">G1 · 1/2</span></div>
   <div id="target"></div><div id="status" role="status" aria-live="polite"></div>
   <div id="gainCue" role="status" aria-live="polite" hidden></div>
@@ -109,8 +183,20 @@ window.engineCBootFailure=function(message){
   <div id="notice">Desktop mouse first. Mobile controls are outside this review.</div>
 </div>
 <div id="bossBars"></div><div id="floats"></div>
-<div id="boot" role="status"><div class="title">JENSEN · R28</div><div id="bootText">Loading local engine…</div><progress id="progress" value="0" max="100"></progress></div>
-<div id="pause" hidden><div>Paused</div><small>Resume continues the scene without issuing a move order</small><button id="resume" type="button">Resume · Enter</button></div>
+<section class="finale-panel" id="finaleIntro" aria-labelledby="finaleName" hidden>
+  <div class="card">
+    <h1 id="finaleName">The Ten Seats</h1>
+    <p>At CES, Jensen held out his hand. This time the hammer answers.</p>
+    <p>Ten rivals stand in this fictional boardroom. Step out of Vanguard’s charge, then turn and strike while his shield is down.</p>
+    <p class="controls">Click the floor to move or a rival to attack. Land two swings to prime a heavy third. Press <b>1</b> for Shield Rush, <b>2</b> for Thunder Slam, <b>Esc</b> to pause.</p>
+    <button id="finaleStart" type="button">Enter the boardroom</button>
+  </div>
+</section>
+<section class="finale-panel" id="finaleResult" aria-labelledby="finaleTitle" hidden>
+  <div class="card"><h2 id="finaleTitle"></h2><button id="finaleRetry" type="button">Fight again</button></div>
+</section>
+<div id="boot" role="status"><div class="title">Jensen Hero</div><div id="bootText">Loading local engine…</div><progress id="progress" value="0" max="100"></progress></div>
+<div id="pause" hidden><div>Paused</div><div class="finale-prefs"><label><input id="finaleMute" type="checkbox"> Mute sound</label><label><input id="finaleReduced" type="checkbox"> Reduce impact effects</label><label><input id="finaleNoNames" type="checkbox"> Hide boss labels</label></div><small>Resume continues the scene without issuing a move order</small><button id="resume" type="button">Resume · Enter</button></div>
 <noscript>Enable JavaScript to use this laboratory.</noscript>
 <script defer src="./vendor/babylon.js" onerror="engineCBootFailure('Missing ./vendor/babylon.js')"></script>
 <script defer src="./vendor/HavokPhysics_umd.js" onerror="engineCBootFailure('Missing Havok UMD')"></script>

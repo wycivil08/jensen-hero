@@ -1,26 +1,30 @@
 {
-  "purpose": "R29 reviewed extraction source/asset baseline; update affected hashes after reviewed changes",
-  "contract": "JEN-CONTRACT-021",
+  "purpose": "Maintained source and asset hashes; source paths identify the R29 extraction, with original digests retained for revised rows.",
+  "contract": "JEN-CONTRACT-024",
   "files": [
     {
       "path": "combat/campaign-data.js",
-      "sha256": "c6786b54c8d62a3171acfb8ad863285e15c28ed2109afc355aadeb22548ce2c8",
-      "source": "collaboration/tasks/jensen-combat-polish-r28-20261117/runtime/campaign-data.js"
+      "sha256": "591904cf7a876183a85a028bca04d343ce4b49e4f0a13e3d106d818761e89d13",
+      "source": "collaboration/tasks/jensen-combat-polish-r28-20261117/runtime/campaign-data.js",
+      "extraction_sha256": "c6786b54c8d62a3171acfb8ad863285e15c28ed2109afc355aadeb22548ce2c8"
     },
     {
       "path": "combat/game.js",
-      "sha256": "47b1faa077fc8add4f476a90e16fc36241437ab72481955c938672e9ea6c2615",
-      "source": "collaboration/tasks/jensen-combat-polish-r28-20261117/runtime/game.js"
+      "sha256": "16c7b5fc18b6c7a74857b9173d548d04faf366f486f11981fca137dbb26cca4c",
+      "source": "collaboration/tasks/jensen-combat-polish-r28-20261117/runtime/game.js",
+      "extraction_sha256": "47b1faa077fc8add4f476a90e16fc36241437ab72481955c938672e9ea6c2615"
     },
     {
       "path": "combat/index.html",
-      "sha256": "9db8e7861c7329de35d31ad89f4b60b34d4d42fb98a1f6fe15e97dde106121cd",
-      "source": "collaboration/tasks/jensen-combat-polish-r28-20261117/runtime/index.html"
+      "sha256": "eb824df4f5eb28d69f1f5ee8152cdfa465dc9854927b11f4815cedbcd606e3cf",
+      "source": "collaboration/tasks/jensen-combat-polish-r28-20261117/runtime/index.html",
+      "extraction_sha256": "9db8e7861c7329de35d31ad89f4b60b34d4d42fb98a1f6fe15e97dde106121cd"
     },
     {
       "path": "combat/models.js",
-      "sha256": "dca823c2ccce7ac3b70b180cadf65c10d72a7dfc3775a5c757a07df3c8d9067d",
-      "source": "collaboration/tasks/jensen-combat-polish-r28-20261117/runtime/models.js"
+      "sha256": "5c821b2c0a6b6546065c361b36fc49bd33e5d63f1bb2177fbde3f63818e6de90",
+      "source": "collaboration/tasks/jensen-combat-polish-r28-20261117/runtime/models.js",
+      "extraction_sha256": "dca823c2ccce7ac3b70b180cadf65c10d72a7dfc3775a5c757a07df3c8d9067d"
     },
     {
       "path": "combat/render-style.js",
@@ -409,8 +413,44 @@
     },
     {
       "path": "art/index.html",
-      "sha256": "a5ca7355d7dd5ac54eb17093d207104baa02da9b4b8e8403c455cabe68bc8e06",
-      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+      "sha256": "cfff5e62ff0657e116a07f841fe172bb7f5af7562388724ccc543bf15cdcea7c",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance",
+      "extraction_sha256": "a5ca7355d7dd5ac54eb17093d207104baa02da9b4b8e8403c455cabe68bc8e06"
+    },
+    {
+      "path": "art/assets/ten-seats-finale.png",
+      "sha256": "54457414a2cd58c095aea54c136c01ad9e34a706c4962665ccc285ddb631b8dd",
+      "source": "R31 guided offline mouse/keyboard playthrough at 1280x720, 8 seats left, 0:06. Package SHA-256 1adac65b51014319a6ebfd9392f88a6148227f8f06c7178245eb55ac356d4f6c."
+    },
+    {
+      "path": "art/assets/vanguard-counter.png",
+      "sha256": "23e28a361e1a47caf8dbef82066cbe1ad2b4bc740a137a3d642e5ce7463cc446",
+      "source": "R32 desktop Chrome playthrough with guided mouse and keyboard inputs. 1280x720 unedited frame after a 18000-damage Thunder Slam during the missed rush recovery. Standalone SHA-256 ca46c3ec7b5178d76f55ce0556d351407bcc88ed11af7258315576162d788340."
+    },
+    {
+      "path": "combat/assets/BarlowCondensed-Bold.ttf",
+      "sha256": "e476562ec9c1e16cf16475895b511f08c804f438cc9a9f80a44ea50a0eeb5b65",
+      "source": "Unmodified Barlow Condensed Bold from the Google Fonts Barlow Condensed family. https://github.com/google/fonts/tree/main/ofl/barlowcondensed"
+    },
+    {
+      "path": "combat/assets/BarlowCondensed-LICENSE.txt",
+      "sha256": "186d750eb496a4c17a76385f82be6aea2ac1cf2de074a811d63786cf374ea73f",
+      "source": "SIL Open Font License 1.1 distributed with the Barlow Condensed family, included in the offline credits."
+    },
+    {
+      "path": "combat/assets/wafer-floor.webp",
+      "sha256": "f048d0be5c789d91f4c5631403c0399c34c4f289fef1da0d8ef4e36833123821",
+      "source": "Original generated graphite and bronze wafer-floor color texture for the R33 finale. Encoded locally as WebP; no third-party game artwork."
+    },
+    {
+      "path": "art/assets/vanguard-impact.webp",
+      "sha256": "8bbbd44756270f6701bf4f6cc450242af21c1fe6d322cdaf5cfcb71a8f0f5604",
+      "source": "Lossless WebP of an actual R33 1280x720 offline Chrome frame following the 950-point Vanguard hit. HTML SHA-256 917e0c9349f1e31cd59c4dd541f2e0bb99d76227cb63945ba5ab701bbe83d890."
+    },
+    {
+      "path": "art/assets/backline-eye-counter.webp",
+      "sha256": "43cd2d57d0a8dc493cc29bdb1cc9b163fc7414e97527cde8e97e467aa9a76ad8",
+      "source": "Lossless WebP of an unannotated frame extracted from a desktop Chrome tab recording of the R34 finale. The player attacked Ashfall in the safe eye with Hide boss labels enabled. Offline standalone SHA-256 1f26ee25ef7fc53f0f866bd8072042c40b58ad73d02fbb70eb9f3124be14d714."
     }
   ]
 }
