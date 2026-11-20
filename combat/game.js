@@ -26,10 +26,10 @@ const ui={};for(const id of ["view","boot","bootText","progress","pause","resume
 const seatRole=a=>a.fantasyTitle||(a.kind===R.heal.type?"HEALER":({guardCharge:"GUARD",sniper:"SNIPER",shoot:"GUNNER",heat:"ZONE"}[TYPES[a.kind]?.action]||"BOSS"));
 let app=null,fatal="";
 function immutable(x){const y=JSON.parse(JSON.stringify(x));const f=o=>{if(o&&typeof o==="object"){Object.values(o).forEach(f);Object.freeze(o);}return o;};return f(y);}
-function fail(e){fatal=e instanceof Error?e.message:String(e);if(app){app.failed=true;app.ready=false;app.engine.stopRenderLoop();}window.engineCBootFailure(fatal);console.error(e);}
+function fail(e){const panel=$("journeyPanel");if(panel)panel.hidden=true;fatal=e instanceof Error?e.message:String(e);if(app){app.failed=true;app.ready=false;app.engine.stopRenderLoop();}window.engineCBootFailure(fatal);console.error(e);}
 function stageRow(n){if(!Number.isInteger(n))throw new RangeError("Stage must be an integer");const row=DATA?.stages?.find(s=>s.stage===n);if(!row)throw new RangeError("Stage must be 1–8");return row;}
 function waveNumber(stage,index){if(!Number.isInteger(index)||index<0||index>=stage.waves.length)throw new RangeError("Unknown wave in this stage");return index;}
-function queryOptions(search){const p=new URLSearchParams(search);if(p.get("mode")==="finale")return{stage:8,style:"3d",lab:false,finale:true};const raw=p.get("stage"),style=p.get("style")===null?"3d":p.get("style");if(p.getAll("stage").length>1||p.getAll("style").length>1||raw!==null&&!/^[1-8]$/.test(raw))throw new RangeError("Invalid ?stage; use one integer 1–8");if(!["3d","painted"].includes(style))throw new RangeError("Invalid ?style; use 3d or painted");return{stage:raw===null?DATA.stages[0].stage:Number(raw),style,lab:raw!==null};}
+function queryOptions(search){const p=new URLSearchParams(search);if(p.get("mode")==="story"||p.get("mode")==="challenge")return{stage:1,style:"3d",lab:false,journeyMode:p.get("mode")};if(p.get("mode")==="finale")return{stage:8,style:"3d",lab:false,finale:true};const raw=p.get("stage"),style=p.get("style")===null?"3d":p.get("style");if(p.getAll("stage").length>1||p.getAll("style").length>1||raw!==null&&!/^[1-8]$/.test(raw))throw new RangeError("Invalid ?stage; use one integer 1–8");if(!["3d","painted"].includes(style))throw new RangeError("Invalid ?style; use 3d or painted");return{stage:raw===null?DATA.stages[0].stage:Number(raw),style,lab:raw!==null};}
 function validateData(){
   if(!DATA||!Array.isArray(DATA.stages)||DATA.stages.length!==8||Object.keys(TYPES).length!==29||!R.basic||!R.heal||!R.projectiles)throw new Error("Missing or incompatible campaign-data.js");
   for(const [i,s]of DATA.stages.entries()){
@@ -40,14 +40,14 @@ function validateData(){
 }
 window.engineC=Object.freeze({config:immutable(C),nativeEnemies:immutable(TYPES),
   snapshot:()=>app?app.snapshot():immutable({ready:false,error:fatal}),
-  reset:()=>{if(!app?.ready||app.finale)return false;app.reset();return true;},
-  scenario:name=>{if(!SCENARIOS.includes(name))throw new RangeError("Unknown scenario");if(!app?.ready||app.finale)return false;app.settings.scenario=name;ui.scenario.value=name;app.reset();return true;},
-  stage:(n,waveIndex=0)=>{const row=stageRow(n);waveNumber(row,waveIndex);return app?.ready&&!app.finale?app.selectStage(n,waveIndex):false;},
-  style:mode=>{if(!["3d","painted"].includes(mode))throw new RangeError("Unknown style");return app?.ready&&!app.finale?app.setStyle(mode):false;},
-  freeze:value=>{if(typeof value!=="boolean")throw new TypeError("freeze needs a boolean");return app?.ready&&!app.finale?app.freeze(value):false;},
-  captureContact:()=>app?.ready&&!app.finale?app.captureContact():false,
-  attackAt:(x,z,slot=0)=>app?.ready&&!app.finale?app.testAttack(x,z,slot):false,
-  moveTo:(x,z)=>app?.ready&&!app.finale?app.testMove(x,z):false
+  reset:()=>{if(!app?.ready||app.finale||app.journey)return false;app.reset();return true;},
+  scenario:name=>{if(!SCENARIOS.includes(name))throw new RangeError("Unknown scenario");if(!app?.ready||app.finale||app.journey)return false;app.settings.scenario=name;ui.scenario.value=name;app.reset();return true;},
+  stage:(n,waveIndex=0)=>{const row=stageRow(n);waveNumber(row,waveIndex);return app?.ready&&!app.finale&&!app.journey?app.selectStage(n,waveIndex):false;},
+  style:mode=>{if(!["3d","painted"].includes(mode))throw new RangeError("Unknown style");return app?.ready&&!app.finale&&!app.journey?app.setStyle(mode):false;},
+  freeze:value=>{if(typeof value!=="boolean")throw new TypeError("freeze needs a boolean");return app?.ready&&!app.finale&&!app.journey?app.freeze(value):false;},
+  captureContact:()=>app?.ready&&!app.finale&&!app.journey?app.captureContact():false,
+  attackAt:(x,z,slot=0)=>app?.ready&&!app.finale&&!app.journey?app.testAttack(x,z,slot):false,
+  moveTo:(x,z)=>app?.ready&&!app.finale&&!app.journey?app.testMove(x,z):false
 });
 class Sound {
   constructor() { this.ctx = null; this.noise = null; this.muted = false; this.voices = 0; this.state = "locked"; }
@@ -129,9 +129,9 @@ class Training {
   constructor(engine,scene,plugin,options={stage:DATA.stages[0].stage,style:"3d",lab:false}){
     this.engine=engine;this.scene=scene;this.plugin=plugin;this.physics=scene.getPhysicsEngine();
     this.ready=false;this.failed=false;this.paused=false;this.qaFrozen=false;this.ended=false;this.capture=null;
-    this.finale=!!options.finale;this.finaleState=this.finale?"intro":null;
-    this.stageData=this.finale?{...stageRow(8),hp:DATA.finale.hp,cycle:DATA.finale.cycle,theme:DATA.finale.theme}:stageRow(options.stage);this.stageIndex=options.stage;this.waveIndex=0;this.startWave=0;this.styleMode=options.style;this.lab=options.lab;
-    this.settings={scenario:"all",D:this.stageData.D,hp:this.stageData.hp,crit:R.crit.chance,heroOverride:false,override:false,enemyHP:160000,immortal:!this.finale,reduced:false};
+    this.journey=options.chapter||null;this.journeyMode=options.journeyMode||null;this.seatsDown=[];this.finale=!!options.finale;this.finaleState=this.finale||this.journey?"intro":null;
+    this.stageData=this.finale?{...stageRow(8),hp:DATA.finale.hp,cycle:DATA.finale.cycle,theme:DATA.finale.theme}:this.journey?{...stageRow(options.stage),...DATA.journey[this.journey]}:stageRow(options.stage);this.stageIndex=options.stage;this.waveIndex=0;this.startWave=0;this.styleMode=options.style;this.lab=options.lab;
+    this.settings={scenario:"all",D:this.stageData.D,hp:this.stageData.hp,crit:R.crit.chance,heroOverride:false,override:false,enemyHP:160000,immortal:!this.finale&&!this.journey,reduced:false};
     this.sound=new Sound();this.actors=[];this.props=[];this.staticProps=[];this.staticBodies=[];this.solids=new Set();this.obstacles=[];this.objects=new Map();
     this.projectiles=[];this.zones=[];this.beams=[];this.particles=[];this.lines=[];this.waves=[];this.floats=[];
     this.damageEvents=[];this.cudaEvents=[];this.lightningEvents=[];this.blockEvents=[];this.healEvents=[];this.impulseEvents=[];this.progressEvents=[];this.pickupEvents=[];
@@ -244,7 +244,7 @@ class Training {
     const [id,kind,x,z,scale]=row,rig=M.createActor(this.scene,kind,id,this.p,{stage:this.stageIndex,tray:this.tray,seat:TYPES[kind]?.seat||0,finale:this.finale});
     if(!rig?.sockets?.weapon||typeof rig.pose!=="function"||typeof rig.dispose!=="function"||kind==="hero"&&typeof rig.setForm!=="function")throw new Error("models.js does not implement the frozen R24 actor/setForm/socket interface");
     if(kind==="hero")rig.setForm(this.stageIndex,this.tray);
-    const seat=this.finale&&DATA.finale.seats[kind],native=seat?{...TYPES[kind],...seat}:TYPES[kind],special=elite?(R.elite.byType[kind]||{}):{};
+    const seat=this.finale&&DATA.finale.seats[kind],native=seat?{...TYPES[kind],...seat}:TYPES[kind]?{...TYPES[kind],...(this.journey?this.stageData.enemyTuning?.[kind]:null)}:null,special=elite?(R.elite.byType[kind]||{}):{};
     const spec=native?{...native,windup:native.windup+(special.windupAdd||0),end:native.end+(special.windupAdd||0),duration:native.duration+(special.windupAdd||0)+(special.recoveryAdd||0),cycle:native.cycle+(special.windupAdd||0)+(special.recoveryAdd||0),...special}:null;
     const hp=kind==="hero"?this.settings.hp:friendly?1:dummy?Math.max(500000,this.settings.override?this.settings.enemyHP:0):this.settings.override?this.settings.enemyHP:elite?R.elite.hpInStageD*this.stageData.D:native.hp;
     const a={id,kind,spec,fantasyTitle:seat?.label,elite,friendly,seat:native?.seat||0,boss:!!native?.boss,dummy,rig,root:rig.root,scale,hp,maxHP:hp,dead:false,retired:false,deathAge:0,yaw:0,velocity:V(),recoil:V(),actualSpeed:0,travel:0,turnVelocity:0,reactAge:99,stun:0,controlUntil:0,protected:false,action:null,cooldowns:[0,0],nextAttack:this.simTime+1.1+this.actors.length*.16,ammo:3,pattern:0,healAttempts:0,nextHeal:this.simTime+R.heal.firstAfter,path:[],pathAge:99,pathGoal:null,blockedAge:0,previousFeet:V(x,.015,z),previousWeapon:V(),stepTravel:0};
@@ -274,7 +274,7 @@ class Training {
       a.emitterCue=B.MeshBuilder.CreateTorus(id+"-emitter-ignition",{diameter:.39,thickness:.065,tessellation:24},this.scene);
       a.emitterCue.parent=rig.sockets.muzzle;a.emitterCue.material=this.fx.boltCore;a.emitterCue.isPickable=false;a.emitterCue.setEnabled(false);
     }
-    if(a.boss||dummy||elite){const bar=document.createElement("div");bar.className="bossBar"+(a.seat||elite?" named":"")+(a.seat?" seat":"")+(kind===R.heal.type?" healer":"");bar.innerHTML='<div class="fill"></div><small></small>';bar.lastElementChild.textContent=a.seat?seatRole(a)+" · "+String(a.seat).padStart(2,"0"):elite?"Elite · "+native.label:native?.label||"Training Dummy";bar.title=native?.label||"Training Dummy";if(seat)bar.dataset.seat=String(a.seat);ui.bossBars.appendChild(bar);a.bar=bar;}
+    if(a.boss||dummy||elite||this.journey&&!friendly&&kind!=="hero"){const bar=document.createElement("div");bar.className="bossBar"+(a.seat||elite?" named":"")+(a.seat?" seat":"")+(kind===R.heal.type?" healer":"");bar.innerHTML='<div class="fill"></div><small></small>';bar.lastElementChild.textContent=a.seat?seatRole(a)+" · "+String(a.seat).padStart(2,"0"):elite?"Elite · "+native.label:native?.label||"Training Dummy";bar.title=native?.label||"Training Dummy";if(seat)bar.dataset.seat=String(a.seat);ui.bossBars.appendChild(bar);a.bar=bar;}
     this.pose(a);a.previousWeapon.copyFrom(this.weapon(a));this.actors.push(a);this.objects.set(id,{id,kind,root:a.root,category:"actor",actor:a});return a;
   }
   createDiscTell(id){
@@ -392,7 +392,7 @@ class Training {
     for(const list of [this.damageEvents,this.cudaEvents,this.lightningEvents,this.blockEvents,this.healEvents,this.impulseEvents,this.progressEvents,this.pickupEvents])list.length=0;
     this.lastHealSniperStart=-Infinity;this.run++;this.resetCount++;this.rng=C.seed;this.sequence=0;this.simTime=0;this.nextCUDA=0;this.nextRegen=0;this.ended=false;this.completedStages=[];this.aiCursor=0;this.stageStarted=0;this.waveStarted=0;this.gainUntil=0;
     this.measures.steps=0;this.measures.droppedSeconds=0;this.measures.hitstopSeconds=0;
-    this.tray=false;this.waveIndex=this.startWave;this.makeProps();this.applyTheme();this.hero=this.makeActor(["hero","hero",0,3.0,C.heroScale]);
+    this.seatsDown=[];this.tray=false;this.waveIndex=this.startWave;this.makeProps();this.applyTheme();this.hero=this.makeActor(["hero","hero",0,3.0,C.heroScale]);
     this.hero.yaw=Math.PI;this.hero.root.rotation.y=this.hero.yaw;this.pose(this.hero);this.hero.previousWeapon.copyFrom(this.weapon(this.hero));
     this.makeFriendlyStaff();this.makeTray();this.spawnWave();this.aim.copyFrom(V(0,0,-2));this.paused=document.hidden&&this.finaleState!=="intro";ui.pause.hidden=!this.paused;ui.status.textContent="";ui.gainCue.hidden=true;
     this.marker.setEnabled(false);this.selection.setEnabled(false);this.lastTime=performance.now();this.cameraView();this.syncDebug();this.setStyle(this.styleMode);this.hud();
@@ -409,10 +409,10 @@ class Training {
         if(event.detail===0)this.sound.unlock(event);
         this.beginFinale(button===ui.finaleRetry);
       });
-    }else this.setupLabUI();
-    ui.view.addEventListener("pointermove",e=>{if(this.ready&&!this.paused&&!this.qaFrozen&&!this.ended&&this.finaleState!=="intro")this.aim.copyFrom(this.groundAt(e));});
+    }else if(!this.journey)this.setupLabUI();
+    ui.view.addEventListener("pointermove",e=>{if(this.journey&&e.pointerType==="touch"&&!e.isPrimary)return;if(this.ready&&!this.paused&&!this.qaFrozen&&!this.ended&&this.finaleState!=="intro")this.aim.copyFrom(this.groundAt(e));});
     ui.view.addEventListener("pointerdown",e=>{
-      if(e.button!==0||e.pointerType==="touch"||!this.ready||this.finaleState==="intro"||this.finale&&this.ended)return;e.preventDefault();ui.view.focus();if(this.paused){this.resumeGame();return;}if(this.qaFrozen||this.hero.dead||this.ended)return;
+      if(e.button!==0||e.pointerType==="touch"&&(!this.journey||!e.isPrimary)||!this.ready||this.finaleState==="intro"||this.finale&&this.ended)return;e.preventDefault();ui.view.focus();if(this.paused){this.resumeGame();return;}if(this.qaFrozen||this.hero.dead||this.ended)return;
       const ray=this.pointerRay(e);let chosen=null,best=Infinity;
       for(const a of this.actors){if(!this.isHostile(a))continue;const p=a.root.position,r=Math.max(a.m.hurtRadius,.36),hit=boxRay(ray.origin,ray.direction,p.add(V(-r,.03,-r)),p.add(V(r,a.m.height,r)));if(hit!==null&&hit<best){chosen=a;best=hit;}}
       this.pendingSkill=null;
@@ -442,29 +442,49 @@ class Training {
     ui.mute.addEventListener("change",()=>{this.sound.muted=ui.mute.checked;});ui.reduced.addEventListener("change",()=>{this.settings.reduced=ui.reduced.checked;});
   }
   beginFinale(retry=false){
-    if(!this.ready||document.hidden||(retry?!["won","lost"].includes(this.finaleState):this.finaleState!=="intro"))return false;
+    if(this.journey||!this.ready||document.hidden||(retry?!["won","lost"].includes(this.finaleState):this.finaleState!=="intro"))return false;
     this.finaleState="playing";
     if(retry)this.reset();
     ui.finaleResult.hidden=true;ui.finaleIntro.hidden=true;ui.pause.hidden=true;
     this.paused=false;this.lastTime=performance.now();this.accumulator=0;ui.view.focus();return true;
   }
   endFinale(won){
+    if(this.journey){this.endJourney(won);return;}
     if(this.finaleState!=="playing")return;
     this.clearHurt();this.finaleState=won?"won":"lost";this.ended=true;this.order=null;this.selectedID=null;this.pendingSkill=null;
     this.progressEvents.push({type:won?"finale-victory":"finale-defeat",stage:8,time:this.simTime});
     ui.status.textContent="";ui.finaleTitle.textContent=won?"All ten seats defeated":"Jensen falls";
     ui.finaleResult.hidden=false;ui.finaleRetry.focus();
   }
+  beginJourney(event){
+    if(!this.ready||this.finaleState!=="intro"||document.hidden)return false;
+    if(event)this.sound.unlock(event);
+    this.finaleState="playing";this.paused=false;this.accumulator=0;this.lastTime=performance.now();
+    ui.finaleIntro.hidden=true;ui.finaleResult.hidden=true;ui.pause.hidden=true;ui.view.focus();return true;
+  }
+  retryJourney(event){
+    if(!this.journey||this.finaleState!=="lost"&&!(this.journeyMode==="challenge"&&this.finaleState==="won"))return false;
+    this.reset();this.finaleState="intro";this.paused=true;return this.beginJourney(event);
+  }
+  endJourney(won){
+    if(this.finaleState!=="playing"||this.ended)return;
+    this.finaleState=won?"won":"lost";this.ended=true;this.clearTransient();
+    for(const a of this.actors){this.cancel(a,"journey-end",true);a.velocity.setAll(0);a.recoil.setAll(0);a.path.length=0;a.controller?.setVelocity(V());}
+    ui.finaleIntro.hidden=true;ui.finaleResult.hidden=true;ui.pause.hidden=true;ui.status.textContent="";
+    this.progressEvents.push({type:won?"journey-victory":"journey-defeat",chapter:this.journey,time:this.simTime});
+    if(won)window.JourneySetpiece?.cleared(this.journey);
+    Promise.resolve(window.JensenJourney.finish({won,hp:Math.max(0,this.hero.hp),seatsDown:[...this.seatsDown]})).catch(fail);
+  }
   pointerRay(e){const r=ui.view.getBoundingClientRect();return this.scene.createPickingRay(e.clientX-r.left,e.clientY-r.top,B.Matrix.Identity(),this.camera);}
   groundAt(e){const ray=this.pointerRay(e),pick=this.scene.pickWithRay(ray,m=>m===this.floor,false);const p=pick?.hit?pick.pickedPoint.clone():Math.abs(ray.direction.y)>1e-6?ray.origin.add(ray.direction.scale(-ray.origin.y/ray.direction.y)):this.aim.clone();return V(clamp(p.x,-C.arenaX,C.arenaX),0,clamp(p.z,-C.arenaZ,C.arenaZ));}
   requestSkill(slot){if(this.finale&&this.simTime<.45||!Number.isInteger(slot)||!this.slotAvailable(slot)||!this.ready||this.finaleState==="intro"||this.paused||this.qaFrozen||this.ended||this.hero.dead||this.pendingSkill!==null)return false;const a=this.hero;if(a.stun>0||a.cooldowns[slot]>this.simTime||a.action&&(a.action.type!=="basic"||a.action.finisher))return false;this.pendingSkill=slot;return true;}
-  testAttack(x,z,slot){if(this.finaleState==="intro"||![x,z].every(Number.isFinite)||![0,1,2].includes(slot)||this.paused||this.qaFrozen||this.hero.dead||this.ended)return false;this.aim.set(clamp(x,-C.arenaX,C.arenaX),0,clamp(z,-C.arenaZ,C.arenaZ));if(slot)return this.requestSkill(slot-1);if(this.hero.action||this.simTime<this.hero.nextAttack||this.hero.stun>0)return false;this.order=null;const d=this.aim.subtract(this.hero.root.position);this.start(this.hero,"basic",Math.atan2(d.x,d.z));return true;}
-  testMove(x,z){if(this.finaleState==="intro"||![x,z].every(Number.isFinite)||this.paused||this.qaFrozen||this.hero.dead||this.ended)return false;this.selectedID=null;this.pendingSkill=null;this.order={type:"move",point:V(clamp(x,-C.arenaX,C.arenaX),0,clamp(z,-C.arenaZ,C.arenaZ))};if(this.hero.action?.type==="basic"&&!this.hero.action.finisher)this.cancel(this.hero,"move-api");this.hero.pathAge=99;return true;}
-  pauseGame(){if(!this.ready||this.paused||this.finale&&this.finaleState!=="playing")return;if(this.finale)this.clearHurt();this.paused=true;this.accumulator=0;this.hitstop=0;this.pendingSkill=null;this.order=null;
+  testAttack(x,z,slot){if(this.journey||this.finaleState==="intro"||![x,z].every(Number.isFinite)||![0,1,2].includes(slot)||this.paused||this.qaFrozen||this.hero.dead||this.ended)return false;this.aim.set(clamp(x,-C.arenaX,C.arenaX),0,clamp(z,-C.arenaZ,C.arenaZ));if(slot)return this.requestSkill(slot-1);if(this.hero.action||this.simTime<this.hero.nextAttack||this.hero.stun>0)return false;this.order=null;const d=this.aim.subtract(this.hero.root.position);this.start(this.hero,"basic",Math.atan2(d.x,d.z));return true;}
+  testMove(x,z){if(this.journey||this.finaleState==="intro"||![x,z].every(Number.isFinite)||this.paused||this.qaFrozen||this.hero.dead||this.ended)return false;this.selectedID=null;this.pendingSkill=null;this.order={type:"move",point:V(clamp(x,-C.arenaX,C.arenaX),0,clamp(z,-C.arenaZ,C.arenaZ))};if(this.hero.action?.type==="basic"&&!this.hero.action.finisher)this.cancel(this.hero,"move-api");this.hero.pathAge=99;return true;}
+  pauseGame(){if(this.journey&&this.finaleState!=="playing"||!this.ready||this.paused||this.finale&&this.finaleState!=="playing")return;if(this.finale)this.clearHurt();this.paused=true;this.accumulator=0;this.hitstop=0;this.pendingSkill=null;this.order=null;
     for(const a of this.actors){if(!a.dead)this.cancel(a,"pause",true);a.velocity.setAll(0);a.recoil.setAll(0);a.path.length=0;if(a.controller)a.controller.setVelocity(V());}
     for(const r of this.pendingRoots){r.cudaResolved=true;r.discarded=true;}this.pendingRoots.clear();this.cudaQueue.length=0;this.healQueue.length=0;this.pruneDanger();ui.pause.hidden=false;
   }
-  resumeGame(){if(document.hidden||!this.ready||this.finale&&this.finaleState!=="playing")return;this.paused=false;this.pendingSkill=null;this.order=null;this.accumulator=0;this.lastTime=performance.now();ui.pause.hidden=true;ui.status.textContent=this.qaFrozen?"QA frozen · unfreeze in Debug":"";for(const a of this.actors)a.previousWeapon.copyFrom(this.weapon(a));}
+  resumeGame(){if(this.journey&&this.finaleState!=="playing"||document.hidden||!this.ready||this.finale&&this.finaleState!=="playing")return;this.paused=false;this.pendingSkill=null;this.order=null;this.accumulator=0;this.lastTime=performance.now();ui.pause.hidden=true;ui.status.textContent=this.qaFrozen?"QA frozen · unfreeze in Debug":"";for(const a of this.actors)a.previousWeapon.copyFrom(this.weapon(a));}
   captureContact(){if(!this.ready||this.paused||this.qaFrozen||this.hero.dead)return false;this.capture={wait:true,frozen:false,since:this.simTime};ui.status.textContent="Waiting for a real direct hit · live positions and enemies";return true;}
   obstacleBoxes(a){return [...this.obstacles,...this.props.map(p=>p.mesh)].map(mesh=>{mesh.computeWorldMatrix(true);const b=mesh.getBoundingInfo().boundingBox,pad=a.ctrlRadius+.07;return {min:V(b.minimumWorld.x-pad,-10,b.minimumWorld.z-pad),max:V(b.maximumWorld.x+pad,10,b.maximumWorld.z+pad)};});}
   pathTo(a,goal){
@@ -529,7 +549,7 @@ class Training {
   solidHit(from,to,ignore=null,pad=0){let first=null;const d=to.subtract(from);for(const mesh of this.solids){if(mesh===ignore)continue;mesh.computeWorldMatrix(true);const inv=B.Matrix.Invert(mesh.getWorldMatrix()),p=B.Vector3.TransformCoordinates(from,inv),q=B.Vector3.TransformCoordinates(to,inv),box=mesh.getBoundingInfo().boundingBox,min=box.minimum.subtract(V(pad,pad,pad)),max=box.maximum.add(V(pad,pad,pad)),t=boxRay(p,q.subtract(p),min,max,1);if(t!==null&&t<.999&&(first===null||t<first.t))first={mesh,t,point:from.add(d.scale(t))};}return first;}
   blocked(from,to,ignore=null){return this.solidHit(from,to,ignore)!==null;}
   tick(dt){
-    if(this.finale&&this.finaleState!=="playing")return;
+    if(this.journey&&(this.finaleState!=="playing"||this.paused||this.ended)||this.finale&&this.finaleState!=="playing")return;
     this.simTime+=dt;if(this.combo&&this.simTime>=this.comboUntil)this.combo=0;this.measures.steps++;this.pruneDanger();
     if(this.pendingSkill!==null&&this.hero.action?.type==="basic")this.cancel(this.hero,"skill-input");
     const active=this.actors.filter(a=>!a.retired),enemies=active.filter(a=>a!==this.hero),rotation=this.aiCursor++%Math.max(1,enemies.length),ordered=[this.hero,...enemies.slice(rotation),...enemies.slice(0,rotation)];
@@ -577,12 +597,13 @@ class Training {
         }
       }
       if(r&&r.age+1e-9>=r.duration){if(r.punishOpen)r.punishOpen=false;if(r.type==="reload")a.ammo=3;if(a!==this.hero&&r.protectedWindup)a.protected=false;if(a===this.hero)this.finalizeRoot(r);a.action=null;}
-      if(a.dead&&!a.retired&&a.deathAge>C.bodyRetire){if(a===this.hero){if(this.finale)this.endFinale(false);else this.ended=true;}else{a.retired=true;a.root.setEnabled(false);if(a.bar)a.bar.hidden=true;}}
+      if(a.dead&&!a.retired&&a.deathAge>C.bodyRetire){if(a===this.hero){if(this.journey)this.endJourney(false);else if(this.finale)this.endFinale(false);else this.ended=true;}else{a.retired=true;a.root.setEnabled(false);if(a.bar)a.bar.hidden=true;}}
     }
     this.pruneDanger();this.updatePickups();this.updateEffects(dt);
     // Released packets keep their roots, but dead actors/controllers/DOM do not accumulate.
     for(const a of [...this.actors])if(a!==this.hero&&a.retired){this.disposeActor(a);this.actors.splice(this.actors.indexOf(a),1);}
     if(this.capture?.wait&&this.damageEvents.some(e=>e.source===this.hero.id&&e.time>this.capture.since&&e.channel==="direct"&&e.actual>0)){this.capture={wait:false,frozen:true,rootId:this.damageEvents.findLast(e=>e.source===this.hero.id&&e.time>this.capture.since&&e.channel==="direct"&&e.actual>0)?.rootId};this.freeze(true);ui.status.textContent="Real contact frame · QA frozen";}
+    if(this.journey&&this.hero.dead)this.endJourney(false);
     this.checkProgress();this.cameraView();
   }
   contacts(a){
@@ -677,13 +698,13 @@ class Training {
     event.reason=event.edges.length?"linked":"no-extra-target";finish();
   }
   die(a){
-    if(a.dead)return;a.dead=true;a.deathAge=0;if(a.action)this.cancel(a,"death",true);a.velocity.setAll(0);a.recoil.setAll(0);a.tell.setEnabled(false);a.tellBands.forEach(e=>e.mesh.setEnabled(false));
+    if(a.dead)return;if(this.journey&&a.seat)this.seatsDown.push(a.seat);a.dead=true;a.deathAge=0;if(a.action)this.cancel(a,"death",true);a.velocity.setAll(0);a.recoil.setAll(0);a.tell.setEnabled(false);a.tellBands.forEach(e=>e.mesh.setEnabled(false));
     if(a.controller){a.controller.dispose();a.controller=null;}if(this.selectedID===a.id){this.selectedID=null;this.order=null;}
     if(this.finale&&a.seat){
       for(const pool of [this.projectiles,this.zones,this.beams])for(const effect of pool)if(effect.root?.owner===a.id){effect.root=null;effect.life=0;effect.mesh.setEnabled(false);}
       this.pruneDanger();
     }
-    if(a===this.hero){this.pendingSkill=null;this.order=null;for(const r of this.pendingRoots){r.cudaResolved=true;r.discarded=true;}this.pendingRoots.clear();this.cudaQueue.length=0;this.healQueue.length=0;ui.status.textContent=this.finale?"":"Defeated · reset this stage in Debug";for(const e of this.actors)if(!e.dead)this.cancel(e,"hero-death",true);}
+    if(a===this.hero){this.pendingSkill=null;this.order=null;for(const r of this.pendingRoots){r.cudaResolved=true;r.discarded=true;}this.pendingRoots.clear();this.cudaQueue.length=0;this.healQueue.length=0;ui.status.textContent=this.finale||this.journey?"":"Defeated · reset this stage in Debug";for(const e of this.actors)if(!e.dead)this.cancel(e,"hero-death",true);}
   }
   shotDirection(muzzle,aim,offset,discRange=0){
     const delta=aim.subtract(muzzle),horizontal=Math.max(.1,Math.hypot(delta.x,delta.z)),yaw=Math.atan2(delta.x,delta.z);
@@ -887,7 +908,7 @@ class Training {
       ui.hurtEdge.hidden=this.hurtStrength===0||this.settings.reduced;ui.hurtEdge.style.opacity=String(this.hurtStrength);
     }
     if(this.finale&&ui.comboPips.dataset.charge!==String(this.combo)){ui.comboPips.dataset.charge=String(this.combo);ui.comboPips.setAttribute("aria-valuenow",String(this.combo));ui.comboPips.setAttribute("aria-valuetext",["No charge","One hit charged","Heavy swing ready"][this.combo]);}
-    ui.stageLabel.textContent=this.finale?`${this.actors.filter(e=>this.isHostile(e)).length} seats left · ${Math.floor(this.simTime/60)}:${String(Math.floor(this.simTime)%60).padStart(2,"0")}`:`G${this.stageIndex} · ${this.waveIndex+1}/${this.stageData.waves.length}`;ui.stageLabel.parentElement.title=this.stageData.title+" · "+this.stageData.waves[this.waveIndex].name;
+    ui.stageLabel.textContent=this.journey&&!this.finale?`${this.stageData.title} · ${this.waveIndex+1}/${this.stageData.waves.length}`:this.finale?`${this.actors.filter(e=>this.isHostile(e)).length} seats left · ${Math.floor(this.simTime/60)}:${String(Math.floor(this.simTime)%60).padStart(2,"0")}`:`G${this.stageIndex} · ${this.waveIndex+1}/${this.stageData.waves.length}`;ui.stageLabel.parentElement.title=this.stageData.title+" · "+this.stageData.waves[this.waveIndex].name;
     const t=this.actors.find(t=>t.id===this.selectedID&&this.isHostile(t));ui.target.textContent=t&&this.finale?`${t.fantasyTitle} · ${hpFormat.format(t.hp)} / ${hpFormat.format(t.maxHP)}`:t?"Target · "+(t.seat?seatRole(t)+" "+String(t.seat).padStart(2,"0")+" · ":"")+(TYPES[t.kind]?.label||t.kind)+"  "+Math.ceil(t.hp)+" / "+t.maxHP:"";
     const head=this.project(a.root.position.add(V(0,a.m.height+.24,0))),feet=this.project(a.root.position),bodyWidth=Math.abs(this.project(a.root.position.add(V(a.m.hurtRadius+.3,0,0))).x-feet.x);
     ui.heroCue.hidden=a.dead||!head.visible;ui.heroCue.style.transform=`translate(${head.x}px,${head.y}px) translate(-50%,-100%)`;
@@ -969,7 +990,7 @@ class Training {
       castTargets:a.action?.castTargets||[],healAttempts:a.healAttempts,nextHeal:a.nextHeal,protectedWindup:a.protected,pose:{driver:"parent-child joints",weapon:this.weapon(a).asArray(),shield:a.rig.sockets.shield?.getAbsolutePosition().asArray()||null,anatomicalRight:"-X local",anatomicalLeft:"+X local",hand:a.action?.hand||null},velocity:a.controller?a.controller.getVelocity().asArray():[0,0,0],dead:a.dead,retired:a.retired});
     const p=this.hero?this.activeProfile():null;
     return immutable({ready:this.ready,error:fatal,version:C.version,dataVersion:DATA.version,form:"G"+this.stageIndex,stage:this.stageIndex,stageTitle:this.stageData.title,wave:this.waveIndex,waveName:this.stageData.waves[this.waveIndex].name,engineVersion:B.Engine.Version,renderer:"WebGL"+this.engine.webGLVersion,style:this.styleMode,styleApplied:STYLE.applied(this.scene),styleReady:STYLE.ready(this.scene),physicsEnabled:!!this.physics,physicsDriver:"HavokPlugin.executeStep fixed120Hz",animationDriver:"R24Models parent-child joint poses",paused:this.paused,qaFrozen:this.qaFrozen,controlledCapture:this.capture,ended:this.ended,time:this.simTime,run:this.run,seed:C.seed,rngState:this.rng,settings:this.settings,nativeEnemies:TYPES,
-      finaleState:this.finaleState,hammerCharge:this.combo,chargeRemaining:this.combo?Math.max(0,this.comboUntil-this.simTime):0,progression:{mode:this.finale?"finale":this.settings.scenario==="all"?"campaign-combat":"isolated-lab",labEntry:this.lab,stageStarted:this.stageStarted,waveStarted:this.waveStarted,spawnAt:this.spawnAt,transition:this.transition,completedStages:this.completedStages,budgetIsInformational:true,saveWrites:false},
+      finaleState:this.finaleState,journeyChapter:this.journey,journeyMode:this.journeyMode,seatsDown:this.seatsDown,hammerCharge:this.combo,chargeRemaining:this.combo?Math.max(0,this.comboUntil-this.simTime):0,progression:{mode:this.journey?this.journeyMode:this.finale?"finale":this.settings.scenario==="all"?"campaign-combat":"isolated-lab",labEntry:this.lab,stageStarted:this.stageStarted,waveStarted:this.waveStarted,spawnAt:this.spawnAt,transition:this.transition,completedStages:this.completedStages,budgetIsInformational:true,saveWrites:false},
       actualNumbers:{...p,maxHP:this.hero?.maxHP||this.settings.hp,skill1:this.stageData.slot1?R.slot1.damageMultiplier*p.D:null,skill2:this.stageData.slot2?R.slot2.damageMultiplier*p.D:null,CUDA:this.stageData.cuda?R.cuda.factor*p.D:0,CUDAAllowedTypes:R.cuda.allowedTypes,CUDASeedDamage:false,CUDADistances:{hop:R.cuda.hop,seedRange:R.cuda.seedRange,units:"3D world metres"},critChance:this.settings.crit,critMultiplier:R.crit.multiplier,shieldChance:this.stageData.shield?R.shield.chance:0,legacyFrontMultiplier:1},
       gear:{stage:this.stageIndex,tray:this.tray,fists:this.stageIndex<R.hammer.fromStage,shield:this.stageData.shield,hammer:this.stageIndex>=R.hammer.fromStage,slot1:this.stageData.slot1,slot2:this.stageData.slot2,passives:{cuda:this.stageData.cuda,shield:this.stageData.shield,regen:this.stageData.regen},nextCUDA:this.nextCUDA,nextRegen:this.nextRegen},
       hero:this.hero?actor(this.hero):null,enemies:this.actors.filter(a=>a!==this.hero&&!a.friendly).map(actor),friendlies:this.actors.filter(a=>a.friendly).map(actor),selectedID:this.selectedID,
@@ -1021,6 +1042,7 @@ class Training {
     return points;
   }
   placementForWave(entries){
+    if(this.journey&&!this.finale)return this.stageData.positions[this.waveIndex].map(([x,z])=>V(x,0,z));
     const out=this.spawnPositions(entries.length);if(entries.length===1)return[V(0,0,-1.1)];
     const seats={seat_01:[-2.2,-.2],seat_04:[0,.1],seat_07:[2.2,-.2],seat_02:[-4,-2],seat_03:[-2,-2.4],seat_05:[-1.2,-4],seat_06:[1.2,-4],seat_08:[4,-2],seat_09:[2,-2.4],seat_10:[0,-2]};
     let guns=0,guards=0,shields=0,rear=0,rushers=0,arcs=0,creatures=0,needles=0,heats=0;
@@ -1078,6 +1100,7 @@ class Training {
     if(this.actors.some(a=>this.isHostile(a)||a!==this.hero&&!a.friendly&&!a.retired)||this.hasHazards())return;
     for(const r of this.pendingRoots)this.finalizeRoot(r,true);this.pendingRoots.clear();
     if(this.finale){this.endFinale(true);return;}
+    if(this.journey&&this.waveIndex+1===this.stageData.waves.length){this.endJourney(true);return;}
     if(this.waveIndex+1<this.stageData.waves.length){this.transition={type:"wave",at:this.simTime+C.breather};ui.status.textContent="Wave clear · next wave incoming";}
     else if(this.stageIndex<DATA.stages.at(-1).stage){const next=stageRow(this.stageIndex+1);this.completedStages.push(this.stageIndex);this.progressEvents.push({type:"stage-victory",stage:this.stageIndex,time:this.simTime});this.transition={type:"stage",at:this.simTime+C.stageCue};ui.gainCue.textContent=next.gain;ui.gainCue.hidden=false;this.gainUntil=this.simTime+C.stageCue;}
     else {this.completedStages.push(this.stageIndex);this.ended=true;this.order=null;this.pendingSkill=null;ui.status.textContent="All ten seats defeated · campaign complete";this.progressEvents.push({type:"campaign-complete",stage:this.stageIndex,time:this.simTime});this.trimLog(this.progressEvents);}
@@ -1263,11 +1286,16 @@ class Training {
       const texture=this.floor.material.albedoTexture,size=texture.getSize();
       texture.getContext().drawImage(image,0,0,size.width,size.height);texture.update(false);
     }
-    this.reset();await this.scene.whenReadyAsync();this.ready=true;ui.boot.hidden=true;if(this.finale){ui.finaleIntro.hidden=false;ui.finaleStart.focus();}ui.progress.value=100;this.lastTime=performance.now();}
+    this.reset();await this.scene.whenReadyAsync();this.ready=true;ui.boot.hidden=true;if(this.journey){this.paused=true;ui.pause.hidden=true;ui.finaleIntro.hidden=true;ui.finaleResult.hidden=true;window.JourneySetpiece?.stage(this.scene,this.journey);window.JensenJourney.ready(event=>this.beginJourney(event),event=>this.retryJourney(event));}else if(this.finale){ui.finaleIntro.hidden=false;ui.finaleStart.focus();}ui.progress.value=100;this.lastTime=performance.now();}
 }
 (async()=>{
   if(!B||!M||!STYLE||!B.PhysicsCharacterController||typeof window.HavokPhysics!=="function")throw new Error("Missing local Babylon, Havok, models.js or render-style.js");
-  validateData();const options=queryOptions(window.location.search||(document.documentElement.dataset.mode==="finale"?"?mode=finale":""));
+  validateData();const options=queryOptions(window.location.search||(["finale","story"].includes(document.documentElement.dataset.mode)?"?mode="+document.documentElement.dataset.mode:""));
+  if(options.journeyMode){
+    const chapter=await window.JensenJourney.open(options.journeyMode);if(chapter===null)return;
+    if(!["diner","arcade","cuda","seats"].includes(chapter))throw new Error("Unknown journey chapter");
+    options.chapter=chapter;options.stage=chapter==="diner"?1:chapter==="seats"?8:2;options.finale=chapter==="seats";
+  }
   if(options.finale){document.body.classList.add("finale");ui.view.setAttribute("aria-label","Boardroom finale. Click the floor to move or a seat to attack. Use 1 for Shield Rush and 2 for Thunder Slam.");}
   if(B.Engine.Version!==C.engine)throw new Error("Requires Babylon "+C.engine+"; found "+B.Engine.Version);
   ui.bootText.textContent="Initializing WebGL and local Havok WASM…";ui.progress.value=10;

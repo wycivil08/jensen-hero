@@ -465,6 +465,21 @@
       seat_10: {label:"Reclaimer", hp:30000, x:0.1, z:-2.7, action:"disc", range:5.7, damage:255, windup:0.96, end:0.98, duration:3.18, cycle:3.65, projectile:{outboundDistance:5.5,outboundSpeed:5,returnSpeed:6.5,life:2.25,radius:0.18}}
     }
   };
+  // Story encounters share native attacks, controls and physics; only layout and difficulty differ from the lab.
+  data.journey = {
+    diner: {title:"Diner · clear the aisle",hp:160,activeCap:4,
+      enemyTuning:{troublemaker_boss:{hp:220}},
+      waves:[{name:"Clear the aisle",kind:"mob",enemies:[{kind:"troublemaker_customer",count:3}]},{name:"The ringleader",kind:"boss",enemies:[{kind:"troublemaker_boss",count:1},{kind:"troublemaker_customer",count:1}]}],
+      positions:[[[-1.5,0],[0,-.5],[1.5,0]],[[0,-1.8],[1.5,-.5]]]},
+    arcade: {title:"1993 · twin GPU gauntlets",hp:300,activeCap:4,
+      enemyTuning:{rusher:{damage:12},gunner:{damage:12,cycle:2.4}},
+      waves:[{name:"One at a time",kind:"mob",enemies:[{kind:"gunner",count:1},{kind:"rusher",count:3}]}],
+      positions:[[[-4,-2],[.8,-.4],[2,-.4],[3.2,-.4]]]},
+    cuda: {title:"2006 · parallel breakthrough",hp:420,cuda:true,activeCap:6,
+      enemyTuning:{rusher:{damage:12,hp:180},gunner:{damage:12,cycle:2.4},champion:{hp:900,damage:38,cycle:2.5}},
+      waves:[{name:"Let the current jump",kind:"mob",enemies:[{kind:"gunner",count:1},{kind:"rusher",count:4}]},{name:"Light the arcade",kind:"boss",enemies:[{kind:"champion",count:1},{kind:"rusher",count:3}]}],
+      positions:[[[-4,-2],[.8,-.4],[2,-.4],[3.2,-.4],[2,-1.7]],[[0,-3.5],[-1.2,-1.7],[0,-1.7],[1.2,-1.7]]]}
+  };
   const assert = (ok, message) => { if (!ok) throw new Error('R24Data: '+message); };
   assert(data.stages.length===8 && Object.keys(data.types).length===29, 'expected 8 stages and 29 types');
   assert(data.stages.reduce((sum,s)=>sum+s.budget,0)===360, 'combat budget must total 360 seconds');

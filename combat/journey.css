@@ -1,0 +1,38 @@
+.journey #debugDetails,.journey #notice,.journey:not(.finale) #skills,.journey:not(.finale) #actions{display:none}
+.journey:not(.finale) #training{border-radius:2px;background:#151b1de8;color:#fff0d2;border-bottom:2px solid #bf9667;font:700 clamp(16px,2vw,25px)/1.25 "Barlow Condensed",sans-serif}
+.journey:has(#journeyPanel:not([hidden])) :is(#overlay,#bossBars,#floats,#pause){visibility:hidden}
+#journeyPanel{--paper:#fff0d8;--gold:#edbd7d;position:fixed;inset:0;z-index:4;display:flex;align-items:flex-end;overflow:auto;isolation:isolate;color:var(--paper);background:#18191b;line-height:1.4}
+.journeyArt{position:absolute;inset:0;z-index:-1;background-position:center 36%;background-size:cover;background-repeat:no-repeat}
+.journeyArt:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(13,17,20,.96) 0%,rgba(16,19,20,.82) 29%,rgba(17,18,18,.26) 61%,transparent 87%),linear-gradient(0deg,rgba(12,15,17,.82),transparent 65%)}
+#journeyPanel[data-art="diner"] .journeyArt{background-image:url("../game/assets/R8-N00-01.jpg");background-position:center 40%}
+#journeyPanel[data-art="arcade"] .journeyArt{background-image:url("../game/assets/ILL-N01-02.jpg")}
+#journeyPanel[data-art="cuda"] .journeyArt{background-image:url("../game/assets/ILL-N01-03.jpg")}
+#journeyPanel[data-art="ending"] .journeyArt{background-image:url("./assets/last-booth.webp");background-position:65% center}
+#journeyPanel[data-art="seats"],#journeyPanel[data-art="field"]{background:transparent}
+#journeyPanel[data-art="seats"] .journeyArt{background-image:linear-gradient(90deg,#101719cf,transparent 85%)}
+#journeyPanel[data-art="field"]{align-items:flex-end}
+#journeyPanel[data-art="field"] .journeyArt:after{background:linear-gradient(0deg,#0d171beb,transparent 53%)}
+.journeyPage{width:min(620px,95%);margin:clamp(16px,6vh,78px) clamp(20px,6vw,94px);text-shadow:0 2px 9px #090d10}
+#journeyPanel p{margin:0}
+#journeyPanel #journeyPlace{font:700 clamp(12px,1.1vw,16px)/1.25 "Barlow Condensed",sans-serif;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+#journeyTitle{font:700 clamp(47px,7vw,104px)/.95 "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:-.025em;text-transform:uppercase;margin:0 0 16px;max-width:12em;text-wrap:balance}
+#journeyStory{font:500 clamp(15px,1.45vw,21px)/1.45 system-ui;max-width:37ch;text-wrap:pretty}
+#journeyPanel #journeyControls{font-size:clamp(12px,1.1vw,15px);color:#e9e2d7;max-width:54ch;margin-top:12px}
+#journeyControls:empty,#journeyNotice:empty{display:none}
+.journeyActions{display:flex;align-items:center;flex-wrap:wrap;gap:9px 12px;margin-top:20px}
+.journeyActions button,.journeyActions a{min-height:42px;padding:10px 18px;border:1px solid #e6bb77;border-radius:4px;color:#172021;background:#ecc189;font:700 16px/1.2 "Barlow Condensed",sans-serif;letter-spacing:.035em;cursor:pointer;text-decoration:none;text-shadow:none}
+.journeyActions button:disabled{opacity:.65;cursor:wait}
+.journeyActions #journeyShare,.journeyActions a{background:#10191cc9;color:var(--paper);border-color:#cbb28b9c}
+.journeyActions :focus-visible,#journeyText:focus-visible{outline:3px solid white;outline-offset:3px}
+#journeyPanel #journeyNotice,#journeyManual{margin:12px 0 0;font-size:13px}
+#journeyText{display:block;width:min(40em,100%);padding:8px;color:#101416;background:#fff2de}
+#journeySeats{list-style:none;display:flex;gap:clamp(4px,.6vw,9px);padding:0;margin:19px 0 7px}
+#journeySeats li{display:grid;align-items:center;text-align:center;height:26px;width:clamp(20px,2.8vw,34px);border:1px solid #d7c6a3;border-bottom:4px double #f2dfb5;border-radius:4px 4px 0 0;font:700 15px/1 "Barlow Condensed",sans-serif}
+#journeySeats li.down{background:#dfb279;color:#172023;border-color:#dfb279}
+#journeySeats li.first{outline:2px solid white;outline-offset:2px}
+#journeyRecord{font:700 clamp(14px,1.3vw,20px)/1.4 "Barlow Condensed",sans-serif;color:#ffdfaa}
+.journeyRecordLine{display:flex;align-items:center;gap:8px}
+#journeyWeapon{width:31px;height:24px;fill:#dab47b;flex:none}
+#journeyPanel[data-art="field"] #journeyTitle{font-size:clamp(32px,4.8vw,66px);margin-bottom:7px}
+@media(max-height:570px){.journeyPage{margin-block:16px}#journeyTitle{font-size:clamp(36px,7vw,60px)}.journeyActions{margin-top:10px}#journeySeats{margin-top:9px}}
+@media(max-width:600px){.journeyArt:after{background:linear-gradient(0deg,#121619 5%,#14181be8 34%,#15181926 83%)}.journeyArt{background-position:60% top}.journeyPage{width:100%;margin:22px 18px}.journeyActions{gap:7px}.journeyActions button,.journeyActions a{padding-inline:11px}#journeyTitle{font-size:clamp(39px,12vw,68px)}}

@@ -133,6 +133,7 @@ progress{width:100%;height:7px;margin-top:15px;accent-color:#bac89d}
 .finale:has(.finale-panel:not([hidden])) #overlay,.finale:has(.finale-panel:not([hidden])) #bossBars,.finale:has(.finale-panel:not([hidden])) #floats{visibility:hidden}
 @media(max-width:680px){.finale-panel{background:#0a161be0}.finale-panel .card{max-width:100%}.finale-panel h1,.finale-panel h2{margin-bottom:12px}}
 </style>
+<link rel="stylesheet" href="./journey.css">
 <script>
 window.engineCBootFailure=function(message){
   var box=document.getElementById("boot"),text=document.getElementById("bootText"),bar=document.getElementById("progress");
@@ -183,6 +184,23 @@ window.engineCBootFailure=function(message){
   <div id="notice">Desktop mouse first. Mobile controls are outside this review.</div>
 </div>
 <div id="bossBars"></div><div id="floats"></div>
+<section id="journeyPanel" aria-labelledby="journeyTitle" hidden>
+  <div class="journeyArt" aria-hidden="true"></div>
+  <div class="journeyPage">
+    <p id="journeyPlace"></p>
+    <h1 id="journeyTitle"></h1>
+    <p id="journeyStory"></p>
+    <p id="journeyControls"></p>
+    <div id="journeyScore" hidden><ol id="journeySeats" aria-label="Seats defeated"></ol><div class="journeyRecordLine"><svg id="journeyWeapon" viewBox="0 0 32 24" aria-hidden="true"><path></path></svg><p id="journeyRecord"></p></div></div>
+    <div class="journeyActions">
+      <button type="button" id="journeyAction"></button>
+      <button type="button" id="journeyShare" hidden>Copy challenge</button>
+      <a id="journeyOther" hidden></a>
+    </div>
+    <label id="journeyManual" hidden>Copy this challenge <textarea id="journeyText" readonly rows="3"></textarea></label>
+    <p id="journeyNotice" role="status"></p>
+  </div>
+</section>
 <section class="finale-panel" id="finaleIntro" aria-labelledby="finaleName" hidden>
   <div class="card">
     <h1 id="finaleName">The Ten Seats</h1>
@@ -203,6 +221,9 @@ window.engineCBootFailure=function(message){
 <script defer src="./models.js" onerror="engineCBootFailure('Missing ./models.js')"></script>
 <script defer src="./campaign-data.js" onerror="engineCBootFailure('Missing ./campaign-data.js')"></script>
 <script defer src="./render-style.js" onerror="engineCBootFailure('Missing ./render-style.js')"></script>
+<script defer src="../game/store.js"></script>
+<script defer src="./journey-setpiece.js"></script>
+<script defer src="./journey.js"></script>
 <script defer src="./game.js" onerror="engineCBootFailure('Missing ./game.js')"></script>
 </body>
 </html>

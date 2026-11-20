@@ -1,4 +1,12 @@
-# Current scope — R34 backline combat / 2026-11-18
+# Current scope — R35 three-act playable V0 / 2026-11-20
+
+Contract 026, CORE-10. The portal starts a career at the diner. Each victory carries earned equipment or abilities into the next encounter. The arcade has a gauntlet fight and a CUDA fight. The existing R34 encounter closes the story, followed by a return to the diner booth. A versioned friend challenge uses the same ten seats and full loadout without reading or writing career progress. The result records the actual first opponent defeated, seats down and remaining HP.
+
+- A desktop Chrome rehearsal played all three acts with ordinary mouse and skill inputs. Closing the tab after the diner and opening the portal again resumed the arcade. The finale ended with all ten seats down and 2,270 HP. A fresh browser context opened the copied invitation, lost, retried and won with 3,312.5 HP. Its career storage stayed empty. The final scenery pass adjusts the arcade lighting and floor contrast.
+- The original two-encounter career records remain readable. The same save key and revision checks protect the old GPU reward, new chapter rewards and first ending. A live hero can have half a hit point after shield regeneration. Combat, storage and the scorecard retain that value.
+- Maintenance choice: keep one 3D combat runtime for story, practice and the R34 finale. The new chapter screens own progression and invitations. The original 2D prototype remains accessible. Real touch input was checked in a browser-emulated mobile viewport. Unaided first-play duration, physical phones and voluntary sharing with another person still need playtests.
+
+## R34 backline combat / 2026-11-18
 
 Contract 024, CORE-8. Four seats in the existing ten-rival finale now teach different responses through their equipment, posture and actual attack. **Esc → Hide boss labels** hides nameplates and the named target/warning panels while leaving health tracks, input and combat intact.
 

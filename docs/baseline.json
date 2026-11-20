@@ -1,24 +1,27 @@
 {
   "purpose": "Maintained source and asset hashes; source paths identify the R29 extraction, with original digests retained for revised rows.",
-  "contract": "JEN-CONTRACT-024",
+  "contract": "JEN-CONTRACT-026",
   "files": [
     {
       "path": "combat/campaign-data.js",
-      "sha256": "591904cf7a876183a85a028bca04d343ce4b49e4f0a13e3d106d818761e89d13",
+      "sha256": "0c18f2d9867c511088f85c32a656437911bb221f8801e04f3e5027de7adc9f23",
       "source": "collaboration/tasks/jensen-combat-polish-r28-20261117/runtime/campaign-data.js",
-      "extraction_sha256": "c6786b54c8d62a3171acfb8ad863285e15c28ed2109afc355aadeb22548ce2c8"
+      "extraction_sha256": "c6786b54c8d62a3171acfb8ad863285e15c28ed2109afc355aadeb22548ce2c8",
+      "revision": "R35 journey encounter variants; original practice and R34 finale data retained."
     },
     {
       "path": "combat/game.js",
-      "sha256": "16c7b5fc18b6c7a74857b9173d548d04faf366f486f11981fca137dbb26cca4c",
+      "sha256": "a748c28e5d4f2d461b6368ee23463cb59098558208db06a947a2bebeb0864211",
       "source": "collaboration/tasks/jensen-combat-polish-r28-20261117/runtime/game.js",
-      "extraction_sha256": "47b1faa077fc8add4f476a90e16fc36241437ab72481955c938672e9ea6c2615"
+      "extraction_sha256": "47b1faa077fc8add4f476a90e16fc36241437ab72481955c938672e9ea6c2615",
+      "revision": "R35 integrates the chapter lifecycle and real seat-death order into native combat."
     },
     {
       "path": "combat/index.html",
-      "sha256": "eb824df4f5eb28d69f1f5ee8152cdfa465dc9854927b11f4815cedbcd606e3cf",
+      "sha256": "17c8cc98fc67424fb36ddda8838507d9c2aae91237ab6d00737392b1dddb4cd2",
       "source": "collaboration/tasks/jensen-combat-polish-r28-20261117/runtime/index.html",
-      "extraction_sha256": "9db8e7861c7329de35d31ad89f4b60b34d4d42fb98a1f6fe15e97dde106121cd"
+      "extraction_sha256": "9db8e7861c7329de35d31ad89f4b60b34d4d42fb98a1f6fe15e97dde106121cd",
+      "revision": "R35 journey briefings, career endings and friend scorecard UI."
     },
     {
       "path": "combat/models.js",
@@ -138,8 +141,9 @@
     },
     {
       "path": "game/store.js",
-      "sha256": "b1c619bb9f3094f10f93f3ddbbd250b2614b266fb93e53f916c1e2e25ccd9d67",
-      "source": "src/jensen/store.js"
+      "sha256": "9d32c9e1452bbab92251789e0529cee7816b174d48e057295e535dfdac210af3",
+      "source": "src/jensen/store.js",
+      "revision": "R35 compatible checkpoints and ordered victory result on the existing career key."
     },
     {
       "path": "game/story.js",
@@ -451,6 +455,30 @@
       "path": "art/assets/backline-eye-counter.webp",
       "sha256": "43cd2d57d0a8dc493cc29bdb1cc9b163fc7414e97527cde8e97e467aa9a76ad8",
       "source": "Lossless WebP of an unannotated frame extracted from a desktop Chrome tab recording of the R34 finale. The player attacked Ashfall in the safe eye with Hide boss labels enabled. Offline standalone SHA-256 1f26ee25ef7fc53f0f866bd8072042c40b58ad73d02fbb70eb9f3124be14d714."
+    },
+    {
+      "path": "combat/journey.js",
+      "sha256": "415c5d700de3180937f90f7c422cfcda111c179470969c8b5736a983bd8c2946",
+      "source": "R35 career navigation, chapter text, score and versioned friend invitation.",
+      "revision": "R35 career navigation, chapter text, score and versioned friend invitation."
+    },
+    {
+      "path": "combat/journey.css",
+      "sha256": "2842c0c7eae5cc7290d48dabb26e30845c897dec5678c361fc1b6a923ac30ba8",
+      "source": "R35 story presentation and scorecard layout.",
+      "revision": "R35 story presentation and scorecard layout."
+    },
+    {
+      "path": "combat/journey-setpiece.js",
+      "sha256": "161abdc437f2b969c06f920f3274d4c534a5e24acf5e0c3dbfb66c0c41db32e1",
+      "source": "R35 original procedural diner and arcade scenery and victory animations.",
+      "revision": "R35 original procedural diner and arcade scenery and victory animations."
+    },
+    {
+      "path": "combat/assets/last-booth.webp",
+      "sha256": "39787f142254edeb972b87d14b0493ed331b7130d7f75807efe2fa8673121f51",
+      "source": "R35 original local 1600x900 Blender render of the worn serving tray and wafer shield in the diner booth.",
+      "revision": "R35 original local 1600x900 Blender render of the worn serving tray and wafer shield in the diner booth."
     }
   ]
 }

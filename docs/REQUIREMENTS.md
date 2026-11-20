@@ -1,6 +1,14 @@
-# Current requirements — JEN-CONTRACT-024
+# Current requirements — JEN-CONTRACT-026
 
-## Latest user direction — 2026-11-18 (takes precedence)
+## Three-act playable V0 — 2026-11-20
+
+**CORE-10.** Implement the approved diner, arcade and Ten Seats journey from a fresh start to an ending. Make growth, checkpoint resume and a separate fixed-loadout friend challenge playable. Preserve the R34 battle feel. Demonstrate the implemented journey with actual player inputs. The six-minute pacing and sharing uptake remain playtest hypotheses.
+
+## Whole-game review — 2026-11-20
+
+**CORE-9.** The user provisionally accepts the R34 battle as combat V0. Shift the current design review to the whole playable game. Define whom it serves, the level sequence, first-play duration, how story and combat share the player's time, what would motivate sharing and what a recipient can play. Distinguish the existing slice and combat prototype from a complete first-to-last player journey. The audience, timings, chapter count and sharing features in the [campaign proposal](CAMPAIGN-V0.md) are recommendations for review.
+
+## Prior product direction — 2026-11-18
 
 The user requests a new GPT-6.2 Astra conversation to take over coordination and independently rethink the smallest compelling game, orchestration, design and any justified refactor. Start with assessment and a reviewable proposal, not an automatic implementation rewrite. The prior 38 entries below are retained as traceable history; product details that conflict with this renewed brief are open to redesign.
 
