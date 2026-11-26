@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "python3 scripts/build.py",
-    "test": "npm run build && python3 scripts/check.py && node tests/combat/runtime.cjs && node tests/combat/journey-engine.cjs && node tests/combat/style-readiness.cjs && node tests/game/journey-save.cjs && node tests/game/growth-aim.cjs && node tests/game/r17-feel.cjs && node tests/game/touch.cjs && node tests/game/immersion.cjs && node tests/game/motion.cjs",
+    "test": "npm run build && python3 scripts/check.py && node tests/combat/runtime.cjs && node tests/combat/journey-engine.cjs && node tests/combat/survivor-skills.cjs && node tests/combat/reflection.cjs && node tests/combat/hero-appearance.cjs && node tests/combat/style-readiness.cjs && node tests/game/journey-save.cjs && node tests/game/relay.cjs && node tests/game/growth-aim.cjs && node tests/game/r17-feel.cjs && node tests/game/touch.cjs && node tests/game/immersion.cjs && node tests/game/motion.cjs",
     "preview": "python3 -m http.server 8900 --bind 127.0.0.1 --directory dist"
   },
   "engines": { "node": ">=18" }

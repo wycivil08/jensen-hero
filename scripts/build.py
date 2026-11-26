@@ -1,4 +1,4 @@
-"""Build a relocatable static site from the four maintained source directories."""
+"""Build a relocatable static site from the Jensen modules and frozen comparison assets."""
 from pathlib import Path
 import argparse
 import base64
@@ -6,15 +6,17 @@ import re
 import shutil
 
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument('--standalone', action='store_true', help='also export the offline journey and finale')
+parser.add_argument('--standalone', action='store_true', help='also export the offline journey, finale and reflection practice')
 args = parser.parse_args()
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / 'dist'
 if OUT.exists():
     shutil.rmtree(OUT)
 OUT.mkdir()
-for name in ('art', 'combat', 'warrior'):
+for name in ('art', 'combat'):
     shutil.copytree(ROOT / name, OUT / name)
+# Preserve the published /warrior/ bookmarks with the fixed comparison edition.
+shutil.copytree(ROOT / 'references/warrior', OUT / 'warrior')
 game = ROOT / 'game'
 html = (game / 'index.template.html').read_text()
 for name in ('combat-data.js', 'combat-actions.js', 'combat-enemies.js', 'runtime.js',
@@ -32,7 +34,14 @@ shutil.copy2(ROOT / 'index.html', OUT / 'index.html')
 # Keep the existing public lab bookmark while the source has one canonical name.
 (OUT / 'cozy').mkdir()
 (OUT / 'cozy/index.html').write_text('<!doctype html><meta charset="utf-8"><title>Combat lab</title><script>location.replace("../combat/"+location.search+location.hash)</script><a href="../combat/">Open combat lab</a>')
-print('Built dist/: art, combat, player prototype and warrior reference')
+# The reflection is already a complete, independently playable encounter.
+(OUT / 'vertical-slice').mkdir()
+(OUT / 'vertical-slice/index.html').write_text(
+    '<!doctype html><html lang="en"><meta charset="utf-8"><title>The Reflection</title>'
+    '<meta http-equiv="refresh" content="0; url=../combat/?mode=reflection">'
+    '<a href="../combat/?mode=reflection">Play The Reflection</a></html>'
+)
+print('Built dist/: playable story, combat, reflection, art and warrior reference')
 
 if args.standalone:
     combat = OUT / 'combat'
@@ -62,6 +71,6 @@ if args.standalone:
 
     page, count = re.subn(r'<script defer src="([^"]+)"[^>]*></script>', inline_script, page)
     assert count and '<script defer src=' not in page
-    for filename, mode in [('ten-seats.html', 'finale'), ('from-tray-to-thunder.html', 'story')]:
+    for filename, mode in [('ten-seats.html', 'finale'), ('from-tray-to-thunder.html', 'story'), ('the-reflection.html', 'reflection')]:
         (OUT / filename).write_text(page.replace('<html lang="en">', f'<html lang="en" data-mode="{mode}" data-public-combat="https://wycivil08.github.io/jensen-hero/combat/">', 1))
         print('Built dist/' + filename + ' for offline desktop play')

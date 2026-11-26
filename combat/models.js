@@ -35,6 +35,11 @@ function createPalette(scene,finale=false) {
     for(const [name,[hex,rough,metal]]of Object.entries(finishes)){p[name].albedoColor=B.Color3.FromHexString(hex).toLinearSpace();p[name].roughness=rough;p[name].metallic=metal;}
     p.wire.emissiveColor=B.Color3.FromHexString("#315e40");
   }
+  add("jacketCollar","#273033",.48,.02);add("brushedSilver","#d0d2cd",.62,.08);
+  add("pcb","#176247",.62,.15);add("copperTrace","#a5bf67",.52,.35);
+  add("waferGold","#c9a75d",.28,.62);add("waferScribe","#aa905d",.37,.55);
+  p.waferGold.iridescence.isEnabled=true;p.waferGold.iridescence.intensity=.45;
+  p.waferGold.iridescence.minimumThickness=120;p.waferGold.iridescence.maximumThickness=310;
   return p;
 }
 function node(scene,name,parent,pos) {
@@ -120,13 +125,14 @@ function compact(root) {
     }
   }
 }
-function glasses(scene,parent,p,narrow=false) {
+function glasses(scene,parent,p,narrow=false,halfRim=false) {
   for(const sign of [-1,1]){
     const x=sign*(narrow?.108:.117),w=narrow?.082:.09,h=narrow?.048:.058,r=.018,pts=[];
     for(const [cx,cy,start] of [[x+w-r,h-r,0],[x-w+r,h-r,90],[x-w+r,-h+r,180],[x+w-r,-h+r,270]]){
       for(let i=0;i<=3;i++){const a=(start+i*30)*Math.PI/180;pts.push(V(cx+Math.cos(a)*r,cy+Math.sin(a)*r,.292));}
     }
-    pts.push(pts[0]);tube(scene,"glasses-rim",pts,narrow?.009:.012,p.eye,parent);
+    pts.push(pts[0]);tube(scene,"glasses-rim",pts,halfRim?.005:narrow?.009:.012,halfRim?p.steel:p.eye,parent);
+    if(halfRim)tube(scene,"glasses-dark-browline",[V(x-w,.031,.292),V(x-w+.018,.051,.292),V(x+w-.018,.051,.292),V(x+w,.030,.292)],.009,p.eye,parent);
     tube(scene,"glasses-temple",[V(sign*.20,.025,.29),V(sign*.255,.025,.09)],.011,p.eye,parent);
   }
   tube(scene,"glasses-bridge",[V(-.028,.012,.294),V(0,.025,.305),V(.028,.012,.294)],.011,p.eye,parent);
@@ -226,44 +232,76 @@ function head(scene,parent,p,mature,lisa,angular=false,seat=0) {
     egg(scene,"brown-fringe",[.53,.24,.40],V(-.035,.16,.11),hair,parent).rotation.z=-.12;
   }
 }
+function heroHead(scene,parent,p,age){
+  const mature=age==="mature",young=age==="young",hair=mature?p.brushedSilver:p.hairBlack;
+  // A broad cheek/jaw, high forehead and low rectangular frames carry the likeness at arena scale.
+  sculpted(scene,"jensen-cheek-jaw-forehead",[[-.29,.14,.13,.035],[-.235,.215,.17,.035],[-.12,.27,.205,.015],[.025,.285,.225,0],[.21,.265,.20,-.025],[.32,.18,.14,-.035]],V(),p.skin,parent,16);
+  for(const sign of[-1,1]){
+    egg(scene,"jensen-ear",[.10,.16,.11],V(sign*.29,-.015,0),p.skin,parent);
+    egg(scene,"jensen-narrow-eye",[.052,.027,.022],V(sign*.12,-.018,.225),p.eye,parent);
+    tube(scene,"jensen-straight-brow",[V(sign*.075,.046,.224),V(sign*.13,.052,.224),V(sign*.168,.041,.217)],.006,mature?p.hairShade:p.hairBlack,parent);
+    egg(scene,"jensen-cheek-plane",[.17,.12,.065],V(sign*.155,-.10,.194),p.skin,parent);
+    if(mature)tube(scene,"jensen-smile-fold",[V(sign*.088,-.105,.231),V(sign*.132,-.164,.207)],.005,p.nose,parent);
+  }
+  tailoredBlock(scene,"jensen-nose-bridge",[.077,.115,.084],V(0,-.065,.245),p.nose,parent,.78,.016);
+  egg(scene,"jensen-broad-nose-tip",[.094,.061,.072],V(0,-.105,.274),p.skin,parent);
+  tube(scene,"jensen-wide-smile",[V(-.108,-.161,.205),V(-.053,-.181,.228),V(.045,-.181,.23),V(.109,-.158,.205)],.007,p.nose,parent);
+  sculpted(scene,"jensen-hair-scalp",[[mature?.16:.10,.275,.225,-.045],[.25,.275,.23,-.045],[.34,.215,.18,-.055],[.38,.065,.06,-.07]],V(),mature?p.hair:hair,parent,16);
+  const xs=mature?[-.24,-.18,-.12,-.06,0,.06,.12,.18,.24]:[-.23,-.13,-.025,.085,.19];
+  xs.forEach((x,i)=>{
+    const rise=(mature?.055:.015)*Math.sin(i/(xs.length-1)*Math.PI);
+    sweptLock(scene,"jensen-"+(mature?"silver-brushed-lock-":"dark-side-part-")+i,[V(x,mature?.23:.15,.17),V(x-(mature?.10:.07),.30+rise,.115),V(x-(mature?.025:-.025),.36+rise,-.06),V(x+.055,.19,-.235)],mature?.037:.068,mature?.014:.035,mature&&i%3===0?p.hair:hair,parent);
+  });
+  for(const sign of[-1,1])box(scene,"jensen-close-temple",[.055,mature?.16:.20,.155],V(sign*.27,.025,-.055),mature?p.hairShade:hair,parent,.024);
+  if(!young)glasses(scene,parent,p,false,true);
+  if(young)parent.scaling.set(.95,.97,.96);
+}
 function shield(scene,hand,p,finale=false) {
   const n=node(scene,"anatomical-right-wafer-shield",hand,V(-.12,.02,-.025));
   n.rotation.set(-.10,-.72,.04);
-  const rim=cylinder(scene,"silver-wafer-rim",1.03,.095,V(),p.edge,n,finale?16:48);rim.rotation.x=Math.PI/2;
-  const disk=cylinder(scene,"carbon-wafer",.95,.105,V(0,0,.014),p.wafer,n,48);disk.rotation.x=Math.PI/2;
-  for(let row=-2;row<=2;row++)for(let col=-2;col<=2;col++){
-    const x=col*.16,y=row*.16;if(Math.hypot(x,y)>.37)continue;
-    box(scene,"pale-gold-die",[.145,.145,.012],V(x,y,.072),finale?p.steel:p.gold,n,.008);
+  const ring=[V(-.035,-.513),V(0,-.473),V(.035,-.513)];
+  for(let i=0;i<=88;i++){const a=-Math.PI/2+.07+i/88*(Math.PI*2-.14);ring.push(V(Math.cos(a)*.515,Math.sin(a)*.515));}
+  const positions=[],indices=[],normals=[],uvs=[],count=ring.length;
+  for(const z of[-.022,.022]){positions.push(0,0,z);uvs.push(.5,.5);for(const v of ring){positions.push(v.x,v.y,z);uvs.push(v.x+.5,v.y+.5);}}
+  for(let i=0;i<count;i++){const a=i+1,b=(i+1)%count+1,c=count+1;indices.push(0,b,a,c,c+a,c+b,a,b,c+b,a,c+b,c+a);}
+  B.VertexData.ComputeNormals(positions,indices,normals);const disk=new B.Mesh("golden-notched-semiconductor-wafer",scene),data=new B.VertexData();
+  data.positions=positions;data.indices=indices;data.normals=normals;data.uvs=uvs;data.applyToMesh(disk);disk.parent=n;disk.material=p.waferGold;disk.isPickable=false;disk.receiveShadows=true;
+  for(let i=-5;i<=5;i++){
+    const lane=i*.088,end=Math.sqrt(.499**2-lane**2);
+    tube(scene,"wafer-thin-horizontal-scribe",[V(-end,lane,.023),V(end,lane,.023)],.0017,p.waferScribe,n);
+    tube(scene,"wafer-thin-vertical-scribe",[V(lane,-end,.023),V(lane,end,.023)],.0017,p.waferScribe,n);
   }
-  if(finale){
-    for(const sign of[-1,1]){const slash=box(scene,"wafer-green-chevron",[.42,.075,.035],V(sign*.13,.02,.098),p.wire,n,.008);slash.rotation.z=sign*.50;}
-    box(scene,"wafer-green-core",[.13,.21,.04],V(0,-.08,.105),p.wire,n,.008);
-  }
-  box(scene,"wafer-center-channel",[.87,.026,.014],V(0,0,.081),p.wafer,n,.005);
-  box(scene,"shield-real-grip",[.27,.07,.09],V(0,0,-.09),p.shoe,n,.025);
+  box(scene,"shield-real-grip",[.27,.07,.09],V(0,0,-.065),p.shoe,n,.025);
   return n;
 }
 function hammer(scene,hand,p,finale=false) {
   const grip=node(scene,"anatomical-left-thor-hammer",hand);
   const shaft=cylinder(scene,"hammer-grip",.080,.46,V(0,-.20,0),p.shoe,grip,12);
-  for(const y of [-.02,-.10,-.18,-.26,-.34])cylinder(scene,"grip-wrap",.086,.017,V(0,y,0),p.steel,grip,12);
-  // A deeper beveled head reads edge-on without moving the actual contact socket.
-  if(finale)tailoredBlock(scene,"forged-hammer-head",[.70,.38,.45],V(0,-.45,0),p.steel,grip,.87,.018);
-  else box(scene,"short-silver-hammer",[.62,.36,.43],V(0,-.45,0),p.steel,grip,.055);
-  for(const sign of [-1,1])box(scene,"hammer-faced-end",[.04,.31,.39],V(sign*.312,-.45,0),p.edge,grip,.02);
-  box(scene,"hammer-head-band",[.085,.37,.44],V(0,-.45,0),p.dark,grip,.025);
-  if(finale)for(const sign of[-1,1])box(scene,"hammer-charged-seam",[.21,.055,.025],V(sign*.19,-.45,.237),p.wire,grip,.005);
+  for(const y of [-.02,-.065,-.11,-.155,-.20,-.245,-.29]){const wrap=cylinder(scene,"hammer-leather-grip-wrap",.09,.015,V(0,y,0),p.woodEdge,grip,12);wrap.rotation.z=.12;}
+  box(scene,"forged-flat-block-hammer",[.68,.36,.43],V(0,-.45,0),p.steel,grip,.035);
+  for(const sign of [-1,1]){
+    box(scene,"hammer-beveled-striking-end",[.055,.30,.37],V(sign*.329,-.45,0),p.edge,grip,.025);
+    for(const z of[-.219,.219]){const bevel=box(scene,"hammer-forged-edge-channel",[.027,.23,.006],V(sign*.27,-.45,z),p.dark,grip,.002);bevel.rotation.z=sign*.10;}
+  }
+  cylinder(scene,"hammer-silver-pommel",.105,.045,V(0,.04,0),p.edge,grip,12);
+  const loop=B.MeshBuilder.CreateTorus("hammer-leather-butt-loop",{diameter:.15,thickness:.018,tessellation:20},scene);loop.parent=grip;loop.position.set(0,.13,0);loop.rotation.x=Math.PI/2;loop.material=p.woodEdge;loop.isPickable=false;
   const contact=node(scene,"hammer-contact",grip,V(0,-.45,0));
   return {grip,contact,shaft};
 }
 function gpu(scene,hand,p) {
   const root=node(scene,"gpu-gauntlet",hand,V(0,-.035,.025));
-  box(scene,"gpu-continuous-cuff",[.28,.26,.30],V(0,-.035,0),p.gpu,root,.07);
-  box(scene,"gpu-knuckle",[.30,.12,.21],V(0,-.175,.03),p.steel,root,.045);
-  for(const x of [-.075,.075]){
-    const fan=cylinder(scene,"gpu-cooling-fan",.115,.018,V(x,-.025,.16),p.shoe,root,12);fan.rotation.x=Math.PI/2;
-    const hub=cylinder(scene,"gpu-fan-hub",.035,.025,V(x,-.025,.172),p.steel,root,8);hub.rotation.x=Math.PI/2;
-  }
+  box(scene,"gpu-leather-wrist-strap",[.23,.20,.23],V(0,-.015,0),p.leather,root,.035);
+  box(scene,"geforce256-exposed-green-pcb",[.32,.37,.028],V(0,-.04,.14),p.pcb,root,.009);
+  box(scene,"gpu-knuckle",[.30,.09,.19],V(0,-.175,.03),p.steel,root,.025);
+  for(const x of[-.112,.112])for(const y of[-.15,-.055,.055])box(scene,"period-discrete-memory-chip",[.065,.068,.022],V(x,y,.167),p.dark,root,.004);
+  for(const x of[-.075,-.025,.025,.075])box(scene,"pcb-gold-edge-contact",[.025,.035,.005],V(x,.15,.16),p.gold,root,.002);
+  for(const sign of[-1,1])tube(scene,"pcb-parallel-copper-lane",[V(sign*.045,.135,.158),V(sign*.045,.07,.158),V(sign*.077,.04,.158),V(sign*.077,-.13,.158)],.003,p.copperTrace,root);
+  box(scene,"period-square-heatsink",[.16,.16,.035],V(0,-.035,.174),p.steel,root,.008);
+  const fan=cylinder(scene,"period-small-single-cooling-fan",.137,.025,V(0,-.035,.202),p.shoe,root,16);fan.rotation.x=Math.PI/2;
+  for(let i=0;i<5;i++){const a=i*Math.PI*2/5,blade=box(scene,"period-fan-blade",[.051,.022,.007],V(Math.cos(a)*.035,-.035+Math.sin(a)*.035,.219),p.steel,root,.004);blade.rotation.z=a+.45;}
+  const hub=cylinder(scene,"period-small-fan-hub",.035,.01,V(0,-.035,.224),p.dark,root,12);hub.rotation.x=Math.PI/2;
+  box(scene,"period-port-metal-bracket",[.035,.40,.065],V(-.182,-.04,.13),p.edge,root,.005);
+  box(scene,"period-vga-port",[.055,.12,.063],V(-.205,-.075,.14),p.teal,root,.009);
   return root;
 }
 function combatShield(scene,hand,p,name="guard-shield"){
@@ -369,8 +407,8 @@ function human(scene,kind,id,p,options={}) {
   let stage=8,tray=false;const seat=options.seat||0;
   const root=node(scene,id),pelvis=node(scene,id+"-pelvis",root,V(0,.68,0));
   const torso=node(scene,id+"-torso",pelvis,V(0,.30,0)),headNode=node(scene,id+"-head",torso,V(0,.55,0));
-  const cloth=hero?p.leather:director?p.suit:ally?(kind==="manager"?p.teal:p.red):brute?p.redTrim:casual?p.shirt:p.red,trim=hero?p.lapel:director?p.suitLight:brute?p.shirt:casual?p.woodEdge:p.redTrim;
-  if(finale)sculpted(scene,"sculpted-shoulder-chest-and-waist",[[-.34,.25,.18],[-.19,.27,.19],[-.02,.32,.225],[.16,hero?.38:.35,.23],[.29,hero?.35:.32,.19],[.35,.22,.16]],V(0,.08,0),cloth,torso,12);
+  const cloth=hero?p.leather:director?p.suit:ally?(kind==="manager"?p.teal:p.red):brute?p.redTrim:casual?p.shirt:p.red,trim=hero?p.jacketCollar:director?p.suitLight:brute?p.shirt:casual?p.woodEdge:p.redTrim;
+  if(finale||hero)sculpted(scene,"sculpted-shoulder-chest-and-waist",[[-.34,.25,.18],[-.19,.27,.19],[-.02,.32,.225],[.16,hero?.38:.35,.23],[.29,hero?.35:.32,.19],[.35,.22,.16]],V(0,.08,0),cloth,torso,12);
   else box(scene,"tailored-jacket-body",[.65,.65,.42],V(0,.08,0),cloth,torso,.15);
   if(finale)sculpted(scene,"shaped-jacket-hem",[[-.095,.25,.175],[0,.28,.19],[.095,.27,.185]],V(0,-.19,0),trim,torso);
   else box(scene,"jacket-hem",[.58,.19,.39],V(0,-.19,0),trim,torso,.085);
@@ -378,14 +416,14 @@ function human(scene,kind,id,p,options={}) {
   else egg(scene,"hip-trousers",[.50,.24,.36],V(0,-.035,-.01),p.pants,pelvis);
   box(scene,"undershirt",[.13,.39,.025],V(0,.05,.212),p.shoe,torso,.012);
   for(const sign of [-1,1]){
-    const lapel=box(scene,"folded-lapel",finale?[.15,.35,.055]:[.12,.31,.055],V(sign*.115,.17,.216),trim,torso,finale?.008:.024);lapel.rotation.z=sign*.30;
+    const lapel=box(scene,"folded-lapel",hero?[.125,.17,.05]:finale?[.15,.35,.055]:[.12,.31,.055],V(sign*.115,hero?.27:.17,.216),trim,torso,finale?.008:.024);lapel.rotation.z=sign*.30;
     const collar=box(scene,"standing-collar",[.145,.13,.20],V(sign*.105,.35,.035),trim,torso,finale?.009:.035);collar.rotation.z=-sign*.20;
     const pocket=box(scene,"jacket-pocket",[.16,.027,.025],V(sign*.18,-.09,.217),trim,torso,.01);pocket.rotation.z=-sign*.15;
   }
   box(scene,"jacket-zipper",[.015,.33,.013],V(0,.005,.238),p.seam,torso,.004);
   const teenHead=hero?node(scene,"young-head-form",headNode):null,founderHead=hero?node(scene,"founder-head-form",headNode):null,matureHead=hero?node(scene,"mature-head-form",headNode):headNode;
-  if(hero){head(scene,teenHead,{...p,hairDark:p.hairBlack},false,false);head(scene,founderHead,{...p,hair:p.hairBlack,hairShade:p.hairBlack},true,false);}
-  head(scene,matureHead,p,hero||lisa||director&&seat===6,lisa,finale,seat);
+  if(hero){heroHead(scene,teenHead,p,"young");heroHead(scene,founderHead,p,"founder");heroHead(scene,matureHead,p,"mature");}
+  else head(scene,matureHead,p,lisa||director&&seat===6,lisa,finale,seat);
   if(female&&!lisa){if(finale)tailoredBlock(scene,"angular-tied-back-hair",[.17,.35,.20],V(.08,.10,-.28),p.hairDark,headNode,.60,.025);else egg(scene,"tied-back-ponytail",[.20,.38,.24],V(.08,.12,-.30),p.hairDark,headNode);}
   if(brute){torso.scaling.x=1.28;headNode.scaling.x=.9;box(scene,"brute-square-jaw",[.49,.18,.34],V(0,-.18,.06),p.skin,headNode,.06);}
   const apron=node(scene,"restaurant-apron",torso);
@@ -449,7 +487,7 @@ function human(scene,kind,id,p,options={}) {
     if(guard)box(scene,"charging-forearm-guard",[.30,.32,.30],V(0,-.13,.035),p.steel,a.elbow,.075);
     if(finale&&hero){
       sculpted(scene,"warrior-shaped-pauldron",[[-.13,.15,.17],[-.04,.20,.215],[.09,.18,.19],[.15,.09,.11]],V(sign*.035,-.02,0),p.leather,a.shoulder,10);
-      sculpted(scene,"warrior-forearm-bracer",[[-.095,.10,.105],[0,.145,.15],[.095,.12,.13]],V(0,-.18,.01),p.lapel,a.elbow,10);
+      sculpted(scene,"warrior-forearm-bracer",[[-.095,.10,.105],[0,.145,.15],[.095,.12,.13]],V(0,-.18,.01),p.jacketCollar,a.elbow,10);
       sculpted(scene,"warrior-shaped-boot-cuff",[[-.12,.115,.12],[0,.15,.16],[.12,.13,.14]],V(0,-.13,.01),p.leather,a.knee,10);
     }
   }
@@ -598,7 +636,7 @@ function human(scene,kind,id,p,options={}) {
     teenHead.setEnabled(stage===1);founderHead.setEnabled(stage>=2&&stage<=5);matureHead.setEnabled(stage>=6);apron.setEnabled(stage===1);
     equipment.hammer.setEnabled(stage>=7);equipment.shield.setEnabled(stage>=6);equipment.leftGPU.setEnabled(stage>=2&&stage<=6);equipment.rightGPU.setEnabled(stage>=2&&stage<=5);equipment.tray.setEnabled(tray);equipment.wires.setEnabled(stage>=5&&stage<=6);
     for(const m of clothMeshes)m.material=stage===1?p.shirt:stage<=5?p.founder:p.leather;
-    for(const m of trimMeshes)m.material=stage===1?p.woodEdge:stage<=5?p.founder:p.lapel;
+    for(const m of trimMeshes)m.material=stage===1?p.woodEdge:stage<=5?p.founder:p.jacketCollar;
     sockets.shield=stage>=6?shieldMount:null;
     sockets.weapon.parent=limbs.l.hand;sockets.weapon.position.set(0,stage>=7?-.45:tray?-.12:stage>=2?-.205:-.10,tray?.10:stage>=7?0:.025);
     model.metrics.weaponRadius=stage>=7?.28:tray?.30:stage>=2?.19:.12;

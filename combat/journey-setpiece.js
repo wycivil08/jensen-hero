@@ -14,10 +14,11 @@ function stage(scene,chapter){
   };
   const cream=mat("porcelain","#e6d5b4"),red=mat("diner-vinyl","#9f3c36"),dark=mat("charcoal","#202b2e"),steel=mat("chrome","#94a6a6"),gold=mat("warm-brass","#bd9559");
   const green=mat("startup-green","#4b7e18",true),off=mat("screen-off","#172325"),on=mat("screen-on","#54ce91",true);
-  const box=(name,size,x,y,z,material,parent=root)=>{
+  const scenery=new B.TransformNode("journey-perimeter-scenery",scene);scenery.parent=root;
+  const box=(name,size,x,y,z,material,parent=scenery)=>{
     const mesh=M.roundedBox(scene,"journey-"+name,size,.035,material,parent);mesh.position.set(x,y,z);mesh.isPickable=false;return mesh;
   };
-  const state=current={scene,chapter,root,materials,screens:[],pixels:[],staff:null,age:0,won:false,observer:null};
+  const state=current={scene,chapter,root,materials,screens:[],pixels:[],circuits:[],staff:null,age:0,serialAge:null,won:false,observer:null};
   const floor=scene.getMeshByName("floor");
   if(floor){
     const texture=new B.DynamicTexture("journey-floor-pattern",{width:1024,height:640},scene,false),ctx=texture.getContext();
@@ -40,6 +41,11 @@ function stage(scene,chapter){
     texture.update(false);
     const surface=mat("floor-surface","#ffffff");surface.diffuseTexture=texture;surface.useAlphaFromDiffuseTexture=true;surface.transparencyMode=B.Material.MATERIAL_ALPHABLEND;
     const size=floor.getBoundingInfo().boundingBox.extendSizeWorld.scale(2);
+    // Keep perimeter furniture outside the solid north wall on either field.
+    scenery.position.z=-(size.z-15.66)/2;
+    if(size.z>25){
+      texture.wrapU=texture.wrapV=B.Texture.WRAP_ADDRESSMODE;texture.uScale=2;texture.vScale=2;
+    }
     const overlay=B.MeshBuilder.CreateGround("journey-floor-overlay",{width:size.x-.45,height:size.z-.45},scene);
     overlay.parent=root;overlay.position.y=.012;overlay.material=surface;overlay.isPickable=false;overlay.receiveShadows=true;
   }
@@ -61,7 +67,7 @@ function stage(scene,chapter){
     box("kitchen-pass",[5.95,.23,.65],5.2,2.3,-8.65,cream);
     for(const x of [3.2,4.3,5.4])for(let i=0;i<3;i++){
       const plate=B.MeshBuilder.CreateCylinder("journey-counter-plate",{diameter:.48,height:.035,tessellation:20},scene);
-      plate.parent=root;plate.position.set(x,1.12+i*.04,-8.03);plate.material=cream;plate.isPickable=false;
+      plate.parent=scenery;plate.position.set(x,1.12+i*.04,-8.03);plate.material=cream;plate.isPickable=false;
     }
     for(const id of ["server_ne","server_sw"]){
       const prop=scene.getTransformNodeByName(id);if(!prop)continue;
@@ -94,6 +100,9 @@ function stage(scene,chapter){
         const pixel=box("parallel-screen-pixel",[.16,.12,.015],x+dx,1.31+dy,-7.63,on);pixel.setEnabled(false);state.pixels.push(pixel);
       }
     }
+    if(chapter==="cuda")for(const x of [-8,-4,0,4,8]){
+      state.circuits.push(box("parallel-floor-circuit",[.085,.025,2.0],x,.035,-6.2,off));
+    }
     // Existing server solids already carry the close-up arcade dressing in the training scene.
     for(const id of ["server_ne","server_sw"]){
       const prop=scene.getTransformNodeByName(id);if(!prop)continue;
@@ -105,6 +114,10 @@ function stage(scene,chapter){
     }
   }
   state.observer=scene.onBeforeRenderObservable.add(()=>{
+    if(state.serialAge!==null){
+      state.serialAge+=Math.min(scene.getEngine().getDeltaTime()/1000,.05);
+      if(state.serialAge>=.55){state.screens[0].material=off;state.serialAge=null;}
+    }
     if(!state.won||!state.staff)return;
     state.age+=Math.min(scene.getEngine().getDeltaTime()/1000,.05);
     const t=Math.min(state.age/5,1);state.staff.root.position.x=-5+t*10;state.staff.root.rotation.y=Math.PI/2;
@@ -114,13 +127,18 @@ function stage(scene,chapter){
     }
   });
 }
+function lesson(progress){
+  const state=current;if(!state||state.chapter!=="cuda"||!progress)return;
+  const on=state.materials.find(m=>m.name==="journey-screen-on"),off=state.materials.find(m=>m.name==="journey-screen-off");
+  const parallel=progress.phase==="parallel",serial=progress.phase==="ready";state.serialAge=serial?0:null;
+  state.screens.forEach((mesh,i)=>mesh.material=parallel||serial&&i===0?on:off);
+  state.pixels.forEach(mesh=>mesh.setEnabled(parallel));
+  state.circuits.forEach(mesh=>mesh.material=parallel?on:off);
+}
 function cleared(chapter){
   const state=current;if(!state||key(chapter)!==state.chapter||state.won)return;
   state.won=true;
   if(state.staff)state.staff.root.setEnabled(true);
-  if(state.chapter==="cuda"){
-    const on=state.materials.find(m=>m.name==="journey-screen-on");state.screens.forEach(m=>m.material=on);state.pixels.forEach(m=>m.setEnabled(true));
-  }
 }
-window.JourneySetpiece=Object.freeze({stage,cleared});
+window.JourneySetpiece=Object.freeze({stage,lesson,cleared});
 })();

@@ -447,7 +447,7 @@ const R7=(()=>{
       ctx.restore();
     }
     };
-    CharacterRenderer.drawCharacter(ctx,s,level===1?'jensen-young':'jensen-founder',{shadow:false,drawProp:false,drawEquipment});
+    CharacterRenderer.drawCharacter(ctx,s,level===1?'jensen-young':level>=7?'jensen-system':level>=5?'jensen-platform':'jensen-founder',{shadow:false,drawProp:false,drawEquipment});
     if(level===1&&!labMode){ctx.save();ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.fillStyle='#e4f2bb';ctx.fillText('Jensen · 少年',h.x,h.y-47);ctx.restore();}
   }
   function metal(ctx,points,base,light){
@@ -456,20 +456,27 @@ const R7=(()=>{
   }
   function drawShield(ctx,point,angle){
     ctx.save();ctx.translate(point.x,point.y);ctx.rotate(angle);
-    metal(ctx,[[-6,-19],[1,-23],[8,-19],[12,-9],[13,7],[8,20],[1,23],[-6,18]],'#344237','#b9bd91');
-    ctx.beginPath();ctx.ellipse(2,0,7,18,0,0,TAU);ctx.fillStyle='#4d6150';ctx.fill();ctx.strokeStyle='#101b18';ctx.lineWidth=1.1;ctx.stroke();
-    ctx.save();ctx.clip();ctx.strokeStyle='#899974';ctx.lineWidth=.6;for(let y=-12;y<=12;y+=6){ctx.beginPath();ctx.moveTo(-5,y);ctx.lineTo(11,y);ctx.stroke();}for(const x of[-2,3,8]){ctx.beginPath();ctx.moveTo(x,-19);ctx.lineTo(x,19);ctx.stroke();}ctx.restore();ctx.beginPath();ctx.ellipse(3,-3,3.5,5,0,0,TAU);ctx.fillStyle='#bac998';ctx.fill();ctx.restore();
+    ctx.beginPath();ctx.ellipse(2,0,10,21,0,0,TAU);ctx.fillStyle='#b99b58';ctx.fill();ctx.strokeStyle='#4b423a';ctx.lineWidth=1.3;ctx.stroke();
+    ctx.save();ctx.clip();
+    const tones=['#d2b06c','#a48656','#998d79','#bd986e'];
+    for(let row=0;row<9;row++)for(let col=0;col<5;col++){
+      ctx.fillStyle=tones[(row+col)%4];ctx.fillRect(-9+col*4.6,-21+row*4.8,4.1,4.3);
+    }
+    ctx.restore();ctx.beginPath();ctx.moveTo(0,20);ctx.lineTo(2,18.1);ctx.lineTo(4,20);ctx.strokeStyle='#53483c';ctx.stroke();ctx.restore();
   }
   function drawHammer(ctx,point,angle){
     ctx.save();ctx.translate(point.x,point.y);ctx.rotate(angle);ctx.lineCap='round';ctx.strokeStyle='#0a090b';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(-5,0);ctx.lineTo(15,0);ctx.stroke();ctx.strokeStyle='#725438';ctx.lineWidth=3.5;ctx.stroke();ctx.strokeStyle='#c0a779';ctx.lineWidth=.65;for(let x=-3;x<9;x+=3){ctx.beginPath();ctx.moveTo(x,-1.5);ctx.lineTo(x+2,1.5);ctx.stroke();}
+    ctx.beginPath();ctx.ellipse(-8,1.8,3.2,2.6,.6,0,TAU);ctx.strokeStyle='#8d6c50';ctx.lineWidth=1.2;ctx.stroke();
     metal(ctx,[[7,-8],[11,-12],[21,-9],[23,-5],[23,8],[19,12],[9,9],[7,5]],'#7e8988','#d8dbca');metal(ctx,[[10,-8],[17,-7],[17,8],[10,7]],'#abb5ad','#ece5ce');ctx.strokeStyle='#343e3b';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(12,-4);ctx.lineTo(15,-1);ctx.lineTo(12,2);ctx.lineTo(15,5);ctx.stroke();ctx.restore();
   }
   function drawGauntlet(ctx,point,angle){
     ctx.save();ctx.translate(point.x,point.y);ctx.rotate(angle);
-    metal(ctx,[[-11,-5],[-7,-9],[4,-9],[10,-5],[11,3],[7,8],[-6,9],[-10,5]],'#47523e','#bcc4a5');
-    ctx.beginPath();ctx.ellipse(-5,0,4,6,0,0,TAU);ctx.fillStyle='#697569';ctx.fill();ctx.strokeStyle='#151c1a';ctx.lineWidth=1;ctx.stroke();
-    for(const y of[-3,3]){ctx.beginPath();ctx.ellipse(2,y,3.6,2.5,0,0,TAU);ctx.fillStyle='#252d27';ctx.fill();ctx.strokeStyle='#90a076';ctx.lineWidth=.7;ctx.stroke();ctx.beginPath();ctx.moveTo(-.5,y);ctx.lineTo(4.5,y);ctx.moveTo(2,y-1.5);ctx.lineTo(2,y+1.5);ctx.stroke();}
-    ctx.strokeStyle='#bcc68e';ctx.lineWidth=1.1;ctx.beginPath();ctx.moveTo(7,-4);ctx.lineTo(9,-2);ctx.moveTo(7,1);ctx.lineTo(9,3);ctx.stroke();ctx.restore();
+    metal(ctx,[[-10,-7],[9,-7],[10,6],[-9,7]],'#244c39','#8eaa7a');
+    ctx.fillStyle='#192326';for(const x of [-6,-2,2,6])ctx.fillRect(x,-5,2.3,1.9);
+    ctx.fillStyle='#ac955a';ctx.fillRect(-6,5,12,1.2);ctx.fillStyle='#b7bec1';ctx.fillRect(8,-8,1.8,15);
+    ctx.beginPath();ctx.arc(-2,0,3.9,0,TAU);ctx.fillStyle='#1a2224';ctx.fill();ctx.strokeStyle='#87969a';ctx.lineWidth=.65;ctx.stroke();
+    ctx.translate(-2,0);for(let i=0;i<5;i++){ctx.rotate(TAU/5);ctx.beginPath();ctx.moveTo(.6,0);ctx.lineTo(2.9,-.8);ctx.lineTo(2.4,.65);ctx.fillStyle='#6d797a';ctx.fill();}
+    ctx.restore();
   }
   function drawImpact(ctx,f){
     const q=clamp(f.age/f.life,0,1);ctx.save();ctx.globalCompositeOperation='source-over';ctx.translate(f.x,f.y);ctx.globalAlpha=1-q;ctx.lineCap='round';ctx.lineJoin='round';

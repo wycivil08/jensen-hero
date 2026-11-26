@@ -1,4 +1,4 @@
-.journey #debugDetails,.journey #notice,.journey:not(.finale) #skills,.journey:not(.finale) #actions{display:none}
+.journey #debugDetails,.journey #notice,.journey:not(.finale) #actions{display:none}
 .journey:not(.finale) #training{border-radius:2px;background:#151b1de8;color:#fff0d2;border-bottom:2px solid #bf9667;font:700 clamp(16px,2vw,25px)/1.25 "Barlow Condensed",sans-serif}
 .journey:has(#journeyPanel:not([hidden])) :is(#overlay,#bossBars,#floats,#pause){visibility:hidden}
 #journeyPanel{--paper:#fff0d8;--gold:#edbd7d;position:fixed;inset:0;z-index:4;display:flex;align-items:flex-end;overflow:auto;isolation:isolate;color:var(--paper);background:#18191b;line-height:1.4}
@@ -7,6 +7,7 @@
 #journeyPanel[data-art="diner"] .journeyArt{background-image:url("../game/assets/R8-N00-01.jpg");background-position:center 40%}
 #journeyPanel[data-art="arcade"] .journeyArt{background-image:url("../game/assets/ILL-N01-02.jpg")}
 #journeyPanel[data-art="cuda"] .journeyArt{background-image:url("../game/assets/ILL-N01-03.jpg")}
+#journeyPanel[data-art="arrival"] .journeyArt{background-image:url("./assets/seats-arrival.webp");background-position:63% 40%}
 #journeyPanel[data-art="ending"] .journeyArt{background-image:url("./assets/last-booth.webp");background-position:65% center}
 #journeyPanel[data-art="seats"],#journeyPanel[data-art="field"]{background:transparent}
 #journeyPanel[data-art="seats"] .journeyArt{background-image:linear-gradient(90deg,#101719cf,transparent 85%)}
@@ -36,3 +37,106 @@
 #journeyPanel[data-art="field"] #journeyTitle{font-size:clamp(32px,4.8vw,66px);margin-bottom:7px}
 @media(max-height:570px){.journeyPage{margin-block:16px}#journeyTitle{font-size:clamp(36px,7vw,60px)}.journeyActions{margin-top:10px}#journeySeats{margin-top:9px}}
 @media(max-width:600px){.journeyArt:after{background:linear-gradient(0deg,#121619 5%,#14181be8 34%,#15181926 83%)}.journeyArt{background-position:60% top}.journeyPage{width:100%;margin:22px 18px}.journeyActions{gap:7px}.journeyActions button,.journeyActions a{padding-inline:11px}#journeyTitle{font-size:clamp(39px,12vw,68px)}}
+
+#journeyRelay,#cudaLesson{position:fixed;z-index:2;bottom:128px;left:50%;transform:translateX(-50%);width:max-content;max-width:min(470px,84vw);padding:8px 14px;background:#10191df5;color:#f5f1dd;border:1px solid #89b0b5;font:700 clamp(14px,1.4vw,18px)/1.25 "Barlow Condensed",sans-serif;text-align:center;pointer-events:none}
+.journey:has(#cudaLesson:not([hidden]),#journeyRelay:not([hidden])) #hint{visibility:hidden}
+@media(orientation:landscape) and (max-height:570px){
+  #journeyRelay{bottom:8px;left:10px;transform:none;max-width:calc(50vw - 165px);padding:5px 8px;text-align:left;font-size:14px}
+  #cudaLesson{bottom:10px}
+}
+#journeyPair{margin-top:12px;font-size:14px}
+#journeyPair[data-lit="true"]{display:inline-grid;grid-template-columns:auto auto;position:relative;padding:9px 14px 12px;column-gap:14px;border:1px solid #a89b79;border-radius:6px;background:linear-gradient(110deg,#392a1d,#142c38)}
+#journeyPair[data-lit="true"]:after{content:"";position:absolute;bottom:4px;left:23%;right:23%;height:2px;background:linear-gradient(90deg,#edbd7d,#f6f4c7 50%,#8acbff);box-shadow:0 0 7px #f2d396}
+@media(max-width:520px){#journeyPair[data-lit="true"]{grid-template-columns:auto;row-gap:4px}}
+#journeyPair p{display:flex;align-items:center;gap:8px}#journeyPair svg{width:31px;height:24px;fill:currentColor;flex:none}.relaySender{color:#edbd7d}.relayOwn{color:#8acbff}
+#journeyImport{margin-top:14px;padding:8px;border-radius:4px;box-shadow:none;font-size:13px}#journeyCode{width:8em;padding:7px;margin:0 5px;color:#fff;background:#172127;border:1px solid #cbb28b}#journeyImport button{padding:7px;color:#fff0d8;background:#172127;border:1px solid #cbb28b;border-radius:3px}
+
+.survivor:not(.finale) .skill[data-available="false"]{display:none}
+.survivor:not(.finale) #hint{bottom:72px}
+
+#journeyPanel[data-art="relay"] .journeyArt{background-image:url("./assets/last-booth.webp");background-position:66% center}
+#journeyPanel[data-art="relay"] #journeyTitle{font-size:clamp(40px,6.5vw,90px)}
+#journeyScout{box-sizing:border-box;width:min(100%,360px);margin-top:17px;padding:12px 16px 14px;color:#30281f;background:#eee3c9;border-left:4px double #b49460;border-radius:2px;text-shadow:none;box-shadow:0 3px 12px #08090944}
+#journeyScout label{display:flex;justify-content:space-between;gap:12px;padding-bottom:6px;border-bottom:1px dashed #998667;color:#694e2f;font:700 14px/1.1 "Barlow Condensed",sans-serif;letter-spacing:.08em;text-transform:uppercase}
+#journeyScout label span{color:#264f55}
+.scoutChoice{display:flex;align-items:center;gap:9px}
+#journeyScoutWeapon{flex:none;width:26px;height:22px;fill:#30565a}
+#journeyScoutSeat{min-width:0;flex:1;min-height:44px;background:transparent;color:#2a2925;border:0;border-bottom:1px solid #a39478;border-radius:0;font:700 18px/1.2 "Barlow Condensed",sans-serif;cursor:pointer}
+#journeyScoutSeat:focus-visible{outline:2px solid #146377;outline-offset:1px}
+#journeyScout #journeyScoutTip{margin-top:7px;font:500 14px/1.35 system-ui}
+@media (orientation:landscape) and (max-height:570px) and (min-width:640px){
+  #journeyPanel[data-art="relay"] .journeyPage{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.85fr);gap:6px 22px;width:100%;margin:16px 5vw}
+  #journeyPanel[data-art="relay"] .journeyPage>*{grid-column:1}
+  #journeyPanel[data-art="relay"] #journeyScout{grid-column:2;grid-row:2 / span 4;align-self:start;width:100%;margin:0}
+  #journeyPanel[data-art="relay"] :is(#journeyTitle,#journeyPlace,#journeyControls,.journeyActions,#journeyImport){margin-block:0}
+  #journeyPanel[data-art="relay"] .journeyActions{grid-column:1/-1;margin-top:5px}
+}
+
+#journeyPanel:has(#journeyReport:not([hidden])){align-items:safe flex-end}
+#journeyReport{width:min(100%,350px);margin-top:14px;padding:15px 19px 17px;background:#f5ead4;color:#322922;border-top:4px solid #af603d;border-bottom:3px double #a68a62;border-radius:2px;text-shadow:none;box-shadow:0 5px 16px #100e134d}
+#journeyReport h2{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:0 0 8px;color:#693721;font:700 24px/1.1 Georgia,serif}
+#journeyReportTitle span{color:#7b492d;font:700 16px/1.1 "Courier New",monospace}
+#journeyReport #reportDare{margin-top:8px;color:#215352;font:700 16px/1.25 Georgia,serif}
+.receiptLines{margin:0;padding:6px 0;border-block:1px dashed #a99578;font:15px/1.45 "Courier New",monospace}
+.receiptLines div{display:flex;justify-content:space-between;gap:12px}
+.receiptLines dt{color:#564e43}
+.receiptLines dd{margin:0;text-align:right;font-weight:bold}
+#reportPreview summary{display:list-item;width:fit-content;margin-top:3px;padding:8px 0 4px;color:#69432d;font:700 14px/1.25 system-ui;cursor:pointer}
+#reportPreview summary:focus-visible{outline:2px solid #236875;outline-offset:2px}
+#reportMessage{padding-top:6px;white-space:pre-line;overflow-wrap:anywhere;font:13px/1.35 system-ui}
+#journeyPanel:has(#journeyReport:not([hidden])) #journeyShare{color:#20221d;background:#f1c58a;border-color:#efc895}
+#journeyPanel:has(#journeyReport:not([hidden])) #journeyAction{color:var(--paper);background:#171b1deb;border-color:#bbaa89}
+@media(min-width:640px){
+  #journeyPanel:has(#journeyReport:not([hidden])) .journeyPage{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(240px,.85fr);gap:4px clamp(22px,5vw,70px);width:min(92%,1060px);margin-inline:5vw}
+  #journeyPanel:has(:where(#journeyReport:not([hidden]))) .journeyPage>*{grid-column:1}
+  #journeyPanel #journeyReport{grid-column:2;grid-row:2 / span 4;align-self:start;margin:0}
+  #journeyPanel:has(#journeyReport:not([hidden])) #journeyPair{width:fit-content;max-width:100%;grid-template-columns:1fr}
+  #journeyPanel:has(#journeyReport:not([hidden])) :is(.journeyActions,#journeyImport,#journeyManual,#journeyNotice){grid-column:1/-1}
+}
+@media(min-width:640px) and (max-height:570px){
+  #journeyPanel:has(#journeyReport:not([hidden])) .journeyPage{gap:3px 20px;margin-block:10px}
+  #journeyPanel:has(#journeyReport:not([hidden])) #journeyTitle{font-size:clamp(31px,5.2vw,48px);margin-bottom:6px}
+  #journeyPanel:has(#journeyReport:not([hidden])) :is(#journeyPlace,#journeyPair){margin-block:1px}
+  #journeyReport{padding:9px 13px}
+}
+
+#journeyNewsSource{display:inline-block;width:fit-content;margin-top:8px;color:#f6dcb2;font:600 13px/1.35 system-ui;text-underline-offset:3px}
+#journeyNewsSource:focus-visible{outline:2px solid #fff0c8;outline-offset:3px}
+#journeyPanel[data-art="return"] .journeyArt{background-image:url("./assets/last-booth.webp");background-position:65% center}
+#journeyPanel[data-art="reflection"]{background:transparent}
+#journeyPanel[data-art="reflection"] .journeyArt:after{background:linear-gradient(90deg,#0a1117ed,#0b1519b5 34%,#0c141a25 66%,transparent),linear-gradient(0deg,#111619a6,transparent 65%)}
+#journeyPanel[data-art="coffee"] .journeyArt{background-image:url("./assets/seat-for-you.webp");background-position:65% center}
+#journeyPanel:is([data-art="return"],[data-art="coffee"]){align-items:safe flex-end}
+#journeyPanel:is([data-art="return"],[data-art="coffee"]) #journeyTitle{font-size:clamp(40px,6.1vw,82px)}
+.reflection #health{width:clamp(145px,19vw,260px);height:25px;padding:4px;border-radius:3px;background:#19292de8;border:1px solid #886f53}
+.reflection #health .track,.reflection #hpFill{border-radius:1px}
+.reflection #health #hp{top:1px;color:#fff5da}
+.reflection #training{left:auto;right:18px;transform:none;border:1px solid #638484;border-bottom:2px solid #75c6c7;background:#122227eb;padding:4px 16px;color:#f5e9d6}
+.reflection #status:not(:empty){left:auto;right:18px;transform:none;width:max-content;top:53px;max-width:min(320px,28vw);padding:6px 13px;border-left:2px solid #93cfda;background:#111b22e8;color:#fff1d8;font:600 clamp(14px,1.3vw,18px)/1.2 "Barlow Condensed",sans-serif;text-shadow:none}
+.reflection #hint{bottom:114px;color:#f3ddbf;text-shadow:0 1px 3px #13100a}
+@media(orientation:landscape) and (max-height:570px){
+  #journeyPanel:is([data-art="return"],[data-art="coffee"]) #journeyTitle{font-size:clamp(32px,5vw,45px)}
+  #journeyPanel #journeyNewsSource{margin-top:3px}
+  .reflection #training{right:10px;font-size:17px;padding:3px 9px}
+  .reflection #status:not(:empty){top:37px;right:10px;max-width:min(230px,26vw);padding:3px 8px;font-size:14px}
+  .reflection #hint{display:none}
+  .reflection #skills{bottom:9px}
+  .reflection .skill{width:119px;height:44px;padding:3px 4px 3px 23px;grid-template-columns:25px 1fr}
+  .reflection .skill svg{width:25px;height:26px;margin:0}
+  .reflection .skill .sr{font-size:14px;line-height:13px}
+}
+
+#journeyTab{display:contents}
+#journeyTab:has(#journeyReport[hidden]),#journeyTab>summary{display:none}
+#journeyPanel:is([data-art="return"],[data-art="reflection"],[data-art="coffee"]):has(#journeyReport:not([hidden])) .journeyPage{display:flex;flex-direction:column;align-items:flex-start;width:min(600px,90%);margin:clamp(16px,5vh,56px) 5vw;gap:0}
+#journeyPanel:is([data-art="return"],[data-art="reflection"],[data-art="coffee"]) #journeyTab:has(#journeyReport:not([hidden])){display:block;margin-top:8px}
+#journeyPanel:is([data-art="return"],[data-art="reflection"],[data-art="coffee"]) #journeyTab>summary{display:list-item;padding:6px 2px;color:#ffe4b9;font:600 14px/1.35 system-ui;cursor:pointer;list-style-position:inside}
+#journeyTab>summary:focus-visible{outline:2px solid #fff0c8;outline-offset:2px}
+#journeyPanel:is([data-art="return"],[data-art="reflection"],[data-art="coffee"]) #journeyReport{width:min(350px,85vw);margin:4px 0}
+#journeyPanel:is([data-art="return"],[data-art="reflection"]) .journeyActions #journeyAction{background:#edc18a;color:#1b201e}
+#journeyPanel:is([data-art="return"],[data-art="reflection"]) .journeyActions #journeyShare{background:#152024e8;color:#f6e6cb}
+@media(orientation:landscape) and (max-height:570px){
+  #journeyPanel:is([data-art="return"],[data-art="reflection"],[data-art="coffee"]):has(#journeyReport:not([hidden])) .journeyPage{width:68%;margin:10px 4vw}
+  #journeyPanel:is([data-art="return"],[data-art="reflection"],[data-art="coffee"]) #journeyTab:has(#journeyReport:not([hidden])){margin-top:1px}
+  #journeyPanel:is([data-art="return"],[data-art="reflection"],[data-art="coffee"]) .journeyActions{margin-top:5px}
+}

@@ -1,33 +1,34 @@
 {
   "purpose": "Maintained source and asset hashes; source paths identify the R29 extraction, with original digests retained for revised rows.",
-  "contract": "JEN-CONTRACT-026",
+  "contract": "JEN-CONTRACT-029",
   "files": [
     {
       "path": "combat/campaign-data.js",
-      "sha256": "0c18f2d9867c511088f85c32a656437911bb221f8801e04f3e5027de7adc9f23",
+      "sha256": "3258f89ea30c3258024422d3111d2e25d90559d7e0bcda3d5c0dfeb0b640dd10",
       "source": "collaboration/tasks/jensen-combat-polish-r28-20261117/runtime/campaign-data.js",
       "extraction_sha256": "c6786b54c8d62a3171acfb8ad863285e15c28ed2109afc355aadeb22548ce2c8",
-      "revision": "R35 journey encounter variants; original practice and R34 finale data retained."
+      "revision": "R37 · Survivor wave counts, healing and unlocks"
     },
     {
       "path": "combat/game.js",
-      "sha256": "a748c28e5d4f2d461b6368ee23463cb59098558208db06a947a2bebeb0864211",
+      "sha256": "bf916508dce1066a8265ba4c7a2688fa06d1e150b93fe98cfeff0f29c78a5952",
       "source": "collaboration/tasks/jensen-combat-polish-r28-20261117/runtime/game.js",
       "extraction_sha256": "47b1faa077fc8add4f476a90e16fc36241437ab72481955c938672e9ea6c2615",
-      "revision": "R35 integrates the chapter lifecycle and real seat-death order into native combat."
+      "revision": "R40 · Diner duel integration, native hits and phase HUD"
     },
     {
       "path": "combat/index.html",
-      "sha256": "17c8cc98fc67424fb36ddda8838507d9c2aae91237ab6d00737392b1dddb4cd2",
+      "sha256": "179e8679c6c721901396b8083e9908e49db5056d3c5130441713ee4f0147e719",
       "source": "collaboration/tasks/jensen-combat-polish-r28-20261117/runtime/index.html",
       "extraction_sha256": "9db8e7861c7329de35d31ad89f4b60b34d4d42fb98a1f6fe15e97dde106121cd",
-      "revision": "R35 journey briefings, career endings and friend scorecard UI."
+      "revision": "R40 · Reflection stage, dated news and receipt drawer"
     },
     {
       "path": "combat/models.js",
-      "sha256": "5c821b2c0a6b6546065c361b36fc49bd33e5d63f1bb2177fbde3f63818e6de90",
+      "sha256": "d150026e5859247fbf9994ec2d6588fcb74e72610532be56cd4fae68ac0ed1b3",
       "source": "collaboration/tasks/jensen-combat-polish-r28-20261117/runtime/models.js",
-      "extraction_sha256": "dca823c2ccce7ac3b70b180cadf65c10d72a7dfc3775a5c757a07df3c8d9067d"
+      "extraction_sha256": "dca823c2ccce7ac3b70b180cadf65c10d72a7dfc3775a5c757a07df3c8d9067d",
+      "revision": "R37 · Age-specific Jensen and period equipment"
     },
     {
       "path": "combat/render-style.js",
@@ -66,18 +67,24 @@
     },
     {
       "path": "game/assets/ILL-N01-01.jpg",
-      "sha256": "b2b4ef4db1d479cb019d882c30960bc6fec263a92cdabb43d778edb0061fa63b",
-      "source": "collaboration/tasks/jensen-engine-ab-r17-20261115/engine-a/assets/r9/ILL-N01-01.jpg"
+      "sha256": "6ca82e6d39554184fb435ee540c44f21477af93234e75aad4577b8fdac46cae7",
+      "source": "collaboration/tasks/jensen-engine-ab-r17-20261115/engine-a/assets/r9/ILL-N01-01.jpg",
+      "extraction_sha256": "b2b4ef4db1d479cb019d882c30960bc6fec263a92cdabb43d778edb0061fa63b",
+      "revision": "R37 · Revised narrative illustration"
     },
     {
       "path": "game/assets/ILL-N01-02.jpg",
-      "sha256": "c8fb2814da176c6c2d9ae6fd449f172271b2caa54460c8d2307fbba2f3fc76e8",
-      "source": "collaboration/tasks/jensen-engine-ab-r17-20261115/engine-a/assets/r9/ILL-N01-02.jpg"
+      "sha256": "fe8d4cdf0a18a218f4ac1791c7300a54568b5bb44dbf0b727ef22520bab86662",
+      "source": "collaboration/tasks/jensen-engine-ab-r17-20261115/engine-a/assets/r9/ILL-N01-02.jpg",
+      "extraction_sha256": "c8fb2814da176c6c2d9ae6fd449f172271b2caa54460c8d2307fbba2f3fc76e8",
+      "revision": "R37 · Revised narrative illustration"
     },
     {
       "path": "game/assets/ILL-N01-03.jpg",
-      "sha256": "1859c37d33bb76ea93a6925702b1b68b45898cd26c0855b9336e40f7d0bd7b72",
-      "source": "collaboration/tasks/jensen-engine-ab-r17-20261115/engine-a/assets/r9/ILL-N01-03.jpg"
+      "sha256": "46fd5f6bcdf0e6cd37a02be5cfb87047c2f7f6a5ce7098dec1a78ffc4b00accf",
+      "source": "collaboration/tasks/jensen-engine-ab-r17-20261115/engine-a/assets/r9/ILL-N01-03.jpg",
+      "extraction_sha256": "1859c37d33bb76ea93a6925702b1b68b45898cd26c0855b9336e40f7d0bd7b72",
+      "revision": "R37 · Revised narrative illustration"
     },
     {
       "path": "game/assets/ILL-N01-04.jpg",
@@ -86,8 +93,10 @@
     },
     {
       "path": "game/assets/R8-N00-01.jpg",
-      "sha256": "9bf00994eb12e4d1dc42a90f0f5aaba3a977e671baa8d1a16dad33b83a0bcac0",
-      "source": "collaboration/tasks/jensen-engine-ab-r17-20261115/engine-a/assets/r9/R8-N00-01.jpg"
+      "sha256": "fcf5bd8c94e5df289281053fbd7a9170ec501ea38d9355abe96ecb13f3318cb7",
+      "source": "collaboration/tasks/jensen-engine-ab-r17-20261115/engine-a/assets/r9/R8-N00-01.jpg",
+      "extraction_sha256": "9bf00994eb12e4d1dc42a90f0f5aaba3a977e671baa8d1a16dad33b83a0bcac0",
+      "revision": "R37 · Revised narrative illustration"
     },
     {
       "path": "game/assets/R8-N00-02.jpg",
@@ -96,13 +105,17 @@
     },
     {
       "path": "game/assets/R8-N00-03.jpg",
-      "sha256": "16c36192b156e17113d4a62d72fb072c4c20b0686290bffa173a7023a18096fa",
-      "source": "collaboration/tasks/jensen-engine-ab-r17-20261115/engine-a/assets/r9/R8-N00-03.jpg"
+      "sha256": "ed15a42ee99ace8102d4e6502635746f7a3e04aef80fa86d27f2a1acd16325ba",
+      "source": "collaboration/tasks/jensen-engine-ab-r17-20261115/engine-a/assets/r9/R8-N00-03.jpg",
+      "extraction_sha256": "16c36192b156e17113d4a62d72fb072c4c20b0686290bffa173a7023a18096fa",
+      "revision": "R37 · Revised narrative illustration"
     },
     {
       "path": "game/assets/R8-N00-04.jpg",
-      "sha256": "0e10065b2d375af971bfcba24fe679e33d32e83cd67c1b660394246d76efd2c1",
-      "source": "collaboration/tasks/jensen-engine-ab-r17-20261115/engine-a/assets/r9/R8-N00-04.jpg"
+      "sha256": "ad795daf5d328ec2a886d1e9b2ddafa37e25211dcdc101eb5224fff796e9142c",
+      "source": "collaboration/tasks/jensen-engine-ab-r17-20261115/engine-a/assets/r9/R8-N00-04.jpg",
+      "extraction_sha256": "0e10065b2d375af971bfcba24fe679e33d32e83cd67c1b660394246d76efd2c1",
+      "revision": "R37 · Revised narrative illustration"
     },
     {
       "path": "game/assets/diner-floor-v1.jpg",
@@ -126,8 +139,9 @@
     },
     {
       "path": "game/index.template.html",
-      "sha256": "150633c3c9bc32521ae585cb8d61f9080698d0733d84887f5e877e236eb999fb",
-      "source": "src/jensen/index.template.html"
+      "sha256": "06340b2055ac3b5c97058ffc213452f51a6b6bf66c65b85b9623d94b84fbc8af",
+      "source": "src/jensen/index.template.html",
+      "revision": "R37 · Age-specific illustrated 2D head and glasses"
     },
     {
       "path": "game/lab.js",
@@ -136,14 +150,15 @@
     },
     {
       "path": "game/runtime.js",
-      "sha256": "3b9f24feeb45893132ba4447df722132296b06185686aa5cc509b1f5fbd9da63",
-      "source": "src/jensen/runtime.js"
+      "sha256": "dd56b025ddee5b042c995998a66760bafc9cdac91ad502711d9d0cadead55ff5",
+      "source": "src/jensen/runtime.js",
+      "revision": "R37 · Matching progression and equipment in 2D"
     },
     {
       "path": "game/store.js",
-      "sha256": "9d32c9e1452bbab92251789e0529cee7816b174d48e057295e535dfdac210af3",
+      "sha256": "599401b12c4b1c59f644c005bbdbbcc9e4d7e7c92336b3539c5ad412035ec249",
       "source": "src/jensen/store.js",
-      "revision": "R35 compatible checkpoints and ordered victory result on the existing career key."
+      "revision": "R40 · Idempotent epilogue proof preserving the saved score"
     },
     {
       "path": "game/story.js",
@@ -161,27 +176,27 @@
       "source": "src/jensen/ui.html"
     },
     {
-      "path": "warrior/audio/battle.mp3",
+      "path": "references/warrior/audio/battle.mp3",
       "sha256": "f03c833c137abbc79afd375fd4c617f03a77c201838ea8f377f4d606899b7def",
       "source": "R29 curated asset/navigation; art/history.json records historical provenance"
     },
     {
-      "path": "warrior/audio/interface.mp3",
+      "path": "references/warrior/audio/interface.mp3",
       "sha256": "0b8d0b62e47550fc61ab6919b13c4bbfd752a0552b3b394a551643291b5214b5",
       "source": "R29 curated asset/navigation; art/history.json records historical provenance"
     },
     {
-      "path": "warrior/four.html",
+      "path": "references/warrior/four.html",
       "sha256": "d4141221880315fabd048882b06ce932e6112e07feb14580648dfd69e5242546",
       "source": "collaboration/tasks/expedition-trial-input-fix-20261112/build/patch/games/expedition.html"
     },
     {
-      "path": "warrior/index.html",
+      "path": "references/warrior/index.html",
       "sha256": "e937476a5132922a81011fe2664c1350990d030fc72bbe22efdb02375cef6163",
       "source": "R29 curated asset/navigation; art/history.json records historical provenance"
     },
     {
-      "path": "warrior/six.html",
+      "path": "references/warrior/six.html",
       "sha256": "579cf76c26fac1240269a9d9b6d56cade3e8faf41936b41b435d55a3df7bf675",
       "source": "public/games/v0.2.html"
     },
@@ -412,14 +427,16 @@
     },
     {
       "path": "art/history.json",
-      "sha256": "c5b994246d414d878528c7ceb20bf4efa6acd45c1bab4c67c70c48f5fa82fd12",
-      "source": "R29 curated asset/navigation; art/history.json records historical provenance"
+      "sha256": "0728ca513405f2336164c69a7158a3b8cefd8c21b5c3dbfb7979e92d0263a870",
+      "source": "R29 curated asset/navigation; art/history.json records historical provenance",
+      "revision": "R40 · Rendered scene provenance"
     },
     {
       "path": "art/index.html",
-      "sha256": "cfff5e62ff0657e116a07f841fe172bb7f5af7562388724ccc543bf15cdcea7c",
+      "sha256": "cc6256422bf248cc508f6f2896a094ec04cd2e3e7127c456d2a96cdc58b47313",
       "source": "R29 curated asset/navigation; art/history.json records historical provenance",
-      "extraction_sha256": "a5ca7355d7dd5ac54eb17093d207104baa02da9b4b8e8403c455cabe68bc8e06"
+      "extraction_sha256": "a5ca7355d7dd5ac54eb17093d207104baa02da9b4b8e8403c455cabe68bc8e06",
+      "revision": "R40 · Reflection gameplay frame and preserved R37 gallery"
     },
     {
       "path": "art/assets/ten-seats-finale.png",
@@ -458,27 +475,64 @@
     },
     {
       "path": "combat/journey.js",
-      "sha256": "415c5d700de3180937f90f7c422cfcda111c179470969c8b5736a983bd8c2946",
+      "sha256": "e43d115408b9d849ddf166b5bea6c1e37d346e15d31c7f7ac82e0797d507cdd7",
       "source": "R35 career navigation, chapter text, score and versioned friend invitation.",
-      "revision": "R35 career navigation, chapter text, score and versioned friend invitation."
+      "revision": "R40 · Earned epilogue, one-shot signature and practice route"
     },
     {
       "path": "combat/journey.css",
-      "sha256": "2842c0c7eae5cc7290d48dabb26e30845c897dec5678c361fc1b6a923ac30ba8",
+      "sha256": "048399b555147d959d2b2339c2264e74405999ff4130ecef75fddb5356bdc175",
       "source": "R35 story presentation and scorecard layout.",
-      "revision": "R35 story presentation and scorecard layout."
+      "revision": "R40 · Readable phase HUD, dated news and coffee ending"
     },
     {
       "path": "combat/journey-setpiece.js",
-      "sha256": "161abdc437f2b969c06f920f3274d4c534a5e24acf5e0c3dbfb66c0c41db32e1",
+      "sha256": "374f4f70a8cfc3b86bb59ee765bfef7d0bc81673efe7bda2844a5970d8453dca",
       "source": "R35 original procedural diner and arcade scenery and victory animations.",
-      "revision": "R35 original procedural diner and arcade scenery and victory animations."
+      "revision": "R37 · Scale-aware floor and perimeter scenery"
     },
     {
       "path": "combat/assets/last-booth.webp",
-      "sha256": "39787f142254edeb972b87d14b0493ed331b7130d7f75807efe2fa8673121f51",
+      "sha256": "c3f974295cdd813f65e3c1379d476befbb9d768c12ff3bfb4f4a3130d255bd9b",
       "source": "R35 original local 1600x900 Blender render of the worn serving tray and wafer shield in the diner booth.",
-      "revision": "R35 original local 1600x900 Blender render of the worn serving tray and wafer shield in the diner booth."
+      "revision": "R37 · Wafer and hammer in the diner"
+    },
+    {
+      "path": "combat/survivor-skills.js",
+      "sha256": "afd722f9126b042a0e80d47ad0f5284467470917f397ffe5ba2459ea1da2d5ea",
+      "source": "R37 native Cyclone Guard and Thunder Leap combat module.",
+      "revision": "R40 · Record only a released boardroom skill"
+    },
+    {
+      "path": "art/assets/survivor-fight.png",
+      "sha256": "a770952d9a8fdcd60dfcb03d088951c72bdc47cff589caa618663bfc8f6c615e",
+      "source": "R37 desktop Chrome edition 3 guest encounter.",
+      "revision": "R37 · Frozen desktop guest combat screenshot"
+    },
+    {
+      "path": "combat/assets/seats-arrival.webp",
+      "sha256": "ffe9e1cfb727ee2455ac415858a63bf16c4253fe96f9d96c4ddb74dc47d6586c",
+      "source": "R37 story entrance illustration of mature Jensen and his final equipment."
+    },
+    {
+      "path": "combat/reflection-combat.js",
+      "sha256": "782345287f534ccd4b60a28c0ad2ff704f5f5cf74987faf132ccc1d4abb9ed94",
+      "source": "R40 · Duel phases, locked attacks, earned counters and pose"
+    },
+    {
+      "path": "combat/reflection-stage.js",
+      "sha256": "adff895292a0ffe6ae9c1f1f9b1e9aefed68dd2b5bb4d504a7ca2a26860e61c8",
+      "source": "R40 · Playable rain-window diner, glass echo and telegraphs"
+    },
+    {
+      "path": "combat/assets/seat-for-you.webp",
+      "sha256": "5bba0e37f4ed779e36f68ab32cb5f2bd0fa2851af197c84f266d5bcf3b533021",
+      "source": "R40 · Original illustrated coffee ending"
+    },
+    {
+      "path": "art/assets/reflection-duel.webp",
+      "sha256": "61f92620c3b4062e930a778e8fd0cabe2054668e72d7c5970bf5a0e4645bfab2",
+      "source": "R40 · Actual runtime capture from the playable epilogue practice"
     }
   ]
 }

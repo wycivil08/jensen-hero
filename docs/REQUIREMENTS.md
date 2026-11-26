@@ -1,4 +1,22 @@
-# Current requirements — JEN-CONTRACT-026
+# Current requirements — JEN-CONTRACT-030
+
+## Independent warrior game — 2026-11-26
+
+**CORE-15.** Develop the Fable-origin Runeforge warrior expedition and Jensen Hero as independent products. Jensen retains its playable four- and six-skill comparison snapshots and owns its story, Survivor combat and career saves. Each product owns its source, tests and release decisions.
+
+## The Reflection epilogue — 2026-11-25
+
+**CORE-14.** The approved [return epilogue](RETURN-EPILOGUE-PROPOSAL.md) extends the three-act game with a playable diner-window duel after The Ten Seats. Historical cards attribute the resignation and reinstatement to their documented events. Keep the fictional ten-seat contest, its saved report and the unchanged friend relay. Provide one shared encounter in an independently playable prototype, a rendered vertical slice and the saved story. Demonstrate a harmless preview, a locked, avoidable signature attack, an actionable recovery window, two earned counters, loss/retry and a return to the booth. Use an actual last released move when available, an honestly presented demonstration otherwise. A returning career may enter the epilogue without defeating the boardroom again. Standalone practice and friend challenges do not write career progress. 35–50 seconds is a playtest target.
+
+## Survivor combat and hero identity — 2026-11-21
+
+**CORE-12.** Make the maintained journey play as a Survivor brawler: a larger traversable field under a following camera, converging reinforcements around the hero, automatic attacks while moving, plentiful fragile mobs and stronger bosses with avoidable, attributable attacks. Preserve the ten independent seats, recipient opening objective, CUDA retarget lesson, career saves and old challenge edition. Explore two complementary warrior actives, modest short buffs, and real hammer lightning amplified by a readable landing. Six original skills are a reference to inspect, not a prescribed new button count.
+
+**CORE-13.** Audit all player-facing protagonist artwork and equipment. Anchor age-specific likeness, GPU gauntlets, wafer shield and Mjolnir silhouette in dated visual references, then translate them into coherent game art. Show the resulting in-game view and distinguish historical concept sheets from current player-facing assets.
+
+## Selective adoption of One More Light — 2026-11-21
+
+**CORE-11.** The owner delegates adoption of demonstrable improvements from the Astra Pro prototype. The coordinator selects an in-fight, history-linked CUDA lesson and an optional two-player relay earned from actual Ten Seats combat. Keep the current 3D encounter, boss counterplay, complete solo ending, career saves and existing v1 challenge links. The new invitation may convey a move or target choice, never authenticate a person or a global finish ordinal.
 
 ## Three-act playable V0 — 2026-11-20
 

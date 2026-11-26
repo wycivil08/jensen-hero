@@ -1,182 +1,212 @@
 {
   "project": "Runeforge art review",
-  "contract": "JEN-CONTRACT-021",
-  "contract_sha256": "13f4242264a39f2d8fa793787bd99988f4ea1ced01bc5b35f89939c9e1419aac",
+  "contract": "JEN-CONTRACT-029",
+  "contract_sha256": "04b5e28e14ec7585f78ab91d7ccc9e621fb87296cd41179fd915c837c27e4dc6",
   "current": {
-    "version": "R28",
-    "source": "jensen-combat-polish-r28-20261117/site/index.html",
+    "version": "R40",
+    "source": "Desktop Chrome, clean offline reflection practice, ordinary mouse and keyboard controls",
     "assets": [
       {
-        "asset": "assets/g1-entry-3d.webp",
-        "sha256": "b05298bafd3177089d2590b352cd0cfdb7402d091014df309d5206ea38cb3b79",
-        "bytes": 42806,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g1-entry-3d.webp",
-        "sourceSha256": "b05298bafd3177089d2590b352cd0cfdb7402d091014df309d5206ea38cb3b79"
-      },
-      {
-        "asset": "assets/g1-entry-before.webp",
-        "sha256": "2459750642d06f094a1d6767e4c420dfb533d6518646c2195738657fbdd4f3bc",
-        "bytes": 41980,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g1-entry-before.webp",
-        "sourceSha256": "2459750642d06f094a1d6767e4c420dfb533d6518646c2195738657fbdd4f3bc"
-      },
-      {
-        "asset": "assets/g1-entry-painted.webp",
-        "sha256": "a4eecbd64dd5dd6ef4a5b5555c7f23612a0eb3e9b4066411c63abdfb779f4214",
-        "bytes": 47318,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g1-entry-painted.webp",
-        "sourceSha256": "a4eecbd64dd5dd6ef4a5b5555c7f23612a0eb3e9b4066411c63abdfb779f4214"
-      },
-      {
-        "asset": "assets/g2-gpu-3d.webp",
-        "sha256": "148753fd3c4eff505759f477d6a690746954cb884dcab92c47f17d98386d5098",
-        "bytes": 43362,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g2-gpu-3d.webp",
-        "sourceSha256": "148753fd3c4eff505759f477d6a690746954cb884dcab92c47f17d98386d5098"
-      },
-      {
-        "asset": "assets/g2-gpu-painted.webp",
-        "sha256": "f59d39029873fe82c3ec997f9dce72bec7cdecefd2ab0dc5bafd4a51824edadc",
-        "bytes": 46760,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g2-gpu-painted.webp",
-        "sourceSha256": "f59d39029873fe82c3ec997f9dce72bec7cdecefd2ab0dc5bafd4a51824edadc"
-      },
-      {
-        "asset": "assets/g3-dash-3d.webp",
-        "sha256": "04c3ac042639f45c1f2920411ef47d46203e8828ee5478d1c85c71e09f6fb44e",
-        "bytes": 37824,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g3-dash-3d.webp",
-        "sourceSha256": "04c3ac042639f45c1f2920411ef47d46203e8828ee5478d1c85c71e09f6fb44e"
-      },
-      {
-        "asset": "assets/g3-dash-painted.webp",
-        "sha256": "58d846a1ae16ff0e30bf0739e203fcb0605c6d5de1636332ac51b3ded6aea427",
-        "bytes": 43246,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g3-dash-painted.webp",
-        "sourceSha256": "58d846a1ae16ff0e30bf0739e203fcb0605c6d5de1636332ac51b3ded6aea427"
-      },
-      {
-        "asset": "assets/g4-pulse-3d.webp",
-        "sha256": "11088db1e81ae9650d2eb753808d35124d567572a650a1bd837030ec83613718",
-        "bytes": 43288,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g4-pulse-3d.webp",
-        "sourceSha256": "11088db1e81ae9650d2eb753808d35124d567572a650a1bd837030ec83613718"
-      },
-      {
-        "asset": "assets/g4-pulse-painted.webp",
-        "sha256": "1864307143fb3983e4df918cc79ca1088991f3f5bd50e997c9609aede89884e8",
-        "bytes": 48252,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g4-pulse-painted.webp",
-        "sourceSha256": "1864307143fb3983e4df918cc79ca1088991f3f5bd50e997c9609aede89884e8"
-      },
-      {
-        "asset": "assets/g5-cuda-3d.webp",
-        "sha256": "898cf3c3a81e59f2261228d0fd6e33e0f4369d2b23d87d8cf23e1b5b7a5ce733",
-        "bytes": 53666,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g5-cuda-3d.webp",
-        "sourceSha256": "898cf3c3a81e59f2261228d0fd6e33e0f4369d2b23d87d8cf23e1b5b7a5ce733"
-      },
-      {
-        "asset": "assets/g5-cuda-before.webp",
-        "sha256": "c286bb004f6390192d037095feb80e79143f31a9e50e4a550748d715081dd633",
-        "bytes": 50676,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g5-cuda-before.webp",
-        "sourceSha256": "c286bb004f6390192d037095feb80e79143f31a9e50e4a550748d715081dd633"
-      },
-      {
-        "asset": "assets/g5-cuda-painted.webp",
-        "sha256": "956f2eb80c74f8ba011e4c8013fde6938d54e49417e4ab0168ef8c858965f955",
-        "bytes": 56492,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g5-cuda-painted.webp",
-        "sourceSha256": "956f2eb80c74f8ba011e4c8013fde6938d54e49417e4ab0168ef8c858965f955"
-      },
-      {
-        "asset": "assets/g6-shield-3d.webp",
-        "sha256": "8f7dde4e0921fac43fc010c6565a1a07f70f526334b744834df71e4293c3664c",
-        "bytes": 47506,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g6-shield-3d.webp",
-        "sourceSha256": "8f7dde4e0921fac43fc010c6565a1a07f70f526334b744834df71e4293c3664c"
-      },
-      {
-        "asset": "assets/g6-shield-painted.webp",
-        "sha256": "6e80f1d3fa6d7df2a8175b3bc63a8098098a686e9ed03aa9e3f642ba96a4ab82",
-        "bytes": 52504,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g6-shield-painted.webp",
-        "sourceSha256": "6e80f1d3fa6d7df2a8175b3bc63a8098098a686e9ed03aa9e3f642ba96a4ab82"
-      },
-      {
-        "asset": "assets/g7-thunder-3d.webp",
-        "sha256": "2f992efcbacd1c90397abc4483bfbc204e357a2a272f8c5122f2dcb04614a8b4",
-        "bytes": 47162,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g7-thunder-3d.webp",
-        "sourceSha256": "2f992efcbacd1c90397abc4483bfbc204e357a2a272f8c5122f2dcb04614a8b4"
-      },
-      {
-        "asset": "assets/g7-thunder-before.webp",
-        "sha256": "10ac6d489a8b4a0d29178504717bd6e203703dd66a0d7636448826bdb964ee39",
-        "bytes": 46474,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g7-thunder-before.webp",
-        "sourceSha256": "10ac6d489a8b4a0d29178504717bd6e203703dd66a0d7636448826bdb964ee39"
-      },
-      {
-        "asset": "assets/g7-thunder-painted.webp",
-        "sha256": "ad8cc0f1308e2dfd4e725b75737ae9e0209925c7b041e27306fb1026730dc663",
-        "bytes": 51770,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g7-thunder-painted.webp",
-        "sourceSha256": "ad8cc0f1308e2dfd4e725b75737ae9e0209925c7b041e27306fb1026730dc663"
-      },
-      {
-        "asset": "assets/g8-board-3d.webp",
-        "sha256": "1c534d7c5c5fca6dbc4026162c8104ff0033d81292f80668bf29bbe57c93b308",
-        "bytes": 60016,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g8-board-3d.webp",
-        "sourceSha256": "1c534d7c5c5fca6dbc4026162c8104ff0033d81292f80668bf29bbe57c93b308"
-      },
-      {
-        "asset": "assets/g8-board-before.webp",
-        "sha256": "ca6ec001705ab5ec140d1979f2ef91becedc29b417ebc7b767fc9e07cf7ba1a2",
-        "bytes": 56456,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g8-board-before.webp",
-        "sourceSha256": "ca6ec001705ab5ec140d1979f2ef91becedc29b417ebc7b767fc9e07cf7ba1a2"
-      },
-      {
-        "asset": "assets/g8-board-painted.webp",
-        "sha256": "a11a7d1fac80e156247734a158d1434901baa50741bc409f30762632b8b32a88",
-        "bytes": 63890,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g8-board-painted.webp",
-        "sourceSha256": "a11a7d1fac80e156247734a158d1434901baa50741bc409f30762632b8b32a88"
-      },
-      {
-        "asset": "assets/g8-cast-3d.webp",
-        "sha256": "8edbfa2fb9a80ece62e2fcca9d3bfe9209936e17a9f2b5b01f96d05b7cea5487",
-        "bytes": 55906,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g8-cast-3d.webp",
-        "sourceSha256": "8edbfa2fb9a80ece62e2fcca9d3bfe9209936e17a9f2b5b01f96d05b7cea5487"
-      },
-      {
-        "asset": "assets/g8-cast-painted.webp",
-        "sha256": "a3cb1426e371856a52cca84a0f12ec77699b222b929f90efd32c4f5c1dcbc8a9",
-        "bytes": 58772,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g8-cast-painted.webp",
-        "sourceSha256": "a3cb1426e371856a52cca84a0f12ec77699b222b929f90efd32c4f5c1dcbc8a9"
-      },
-      {
-        "asset": "assets/g8-low-3d.webp",
-        "sha256": "74f1e8fe790ee8bcca8b2e4ae744071106833a46687f5c9baafd16333990a6bc",
-        "bytes": 63594,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g8-low-3d.webp",
-        "sourceSha256": "74f1e8fe790ee8bcca8b2e4ae744071106833a46687f5c9baafd16333990a6bc"
-      },
-      {
-        "asset": "assets/g8-low-painted.webp",
-        "sha256": "c82cbc13731b87123e3b4974e1d22bac0ba348787b32f7ea5e256bd180f6d673",
-        "bytes": 68130,
-        "source": "jensen-combat-polish-r28-20261117/site/assets/g8-low-painted.webp",
-        "sourceSha256": "c82cbc13731b87123e3b4974e1d22bac0ba348787b32f7ea5e256bd180f6d673"
+        "asset": "assets/reflection-duel.webp",
+        "sha256": "61f92620c3b4062e930a778e8fd0cabe2054668e72d7c5970bf5a0e4645bfab2",
+        "bytes": 57172,
+        "capturedPngSha256": "b213ecb8011489f4397008e9d3cac23fdbed36f5e4e5d05b74e256fdb58da1a0",
+        "sourceStandaloneSha256": "983e40e1135f6fee42ddcb4b74f77804c417e82988f95fcd7d8e429d438987cf",
+        "sourceGameSha256": "bf916508dce1066a8265ba4c7a2688fa06d1e150b93fe98cfeff0f29c78a5952",
+        "sourceStageSha256": "adff895292a0ffe6ae9c1f1f9b1e9aefed68dd2b5bb4d504a7ca2a26860e61c8",
+        "sourceDuelSha256": "782345287f534ccd4b60a28c0ad2ff704f5f5cf74987faf132ccc1d4abb9ed94"
       }
     ]
   },
   "history": {
+    "R37": {
+      "version": "R37",
+      "source": "Desktop Chrome, edition 3 guest encounter, normal player inputs",
+      "assets": [
+        {
+          "asset": "assets/survivor-fight.png",
+          "sha256": "a770952d9a8fdcd60dfcb03d088951c72bdc47cff589caa618663bfc8f6c615e",
+          "bytes": 643608,
+          "sourceGameSha256": "c51b0207c4422406e5ab40fa309f54d52aaa305afabe026b3eaab454bd9597a9",
+          "sourceModelsSha256": "d150026e5859247fbf9994ec2d6588fcb74e72610532be56cd4fae68ac0ed1b3",
+          "sourceSkillSha256": "ffc78e07efd5580438d999ee680533e58a941c04c5d6e1ed70e44ea492092001"
+        }
+      ]
+    },
+    "R28": {
+      "version": "R28",
+      "source": "jensen-combat-polish-r28-20261117/site/index.html",
+      "assets": [
+        {
+          "asset": "assets/g1-entry-3d.webp",
+          "sha256": "b05298bafd3177089d2590b352cd0cfdb7402d091014df309d5206ea38cb3b79",
+          "bytes": 42806,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g1-entry-3d.webp",
+          "sourceSha256": "b05298bafd3177089d2590b352cd0cfdb7402d091014df309d5206ea38cb3b79"
+        },
+        {
+          "asset": "assets/g1-entry-before.webp",
+          "sha256": "2459750642d06f094a1d6767e4c420dfb533d6518646c2195738657fbdd4f3bc",
+          "bytes": 41980,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g1-entry-before.webp",
+          "sourceSha256": "2459750642d06f094a1d6767e4c420dfb533d6518646c2195738657fbdd4f3bc"
+        },
+        {
+          "asset": "assets/g1-entry-painted.webp",
+          "sha256": "a4eecbd64dd5dd6ef4a5b5555c7f23612a0eb3e9b4066411c63abdfb779f4214",
+          "bytes": 47318,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g1-entry-painted.webp",
+          "sourceSha256": "a4eecbd64dd5dd6ef4a5b5555c7f23612a0eb3e9b4066411c63abdfb779f4214"
+        },
+        {
+          "asset": "assets/g2-gpu-3d.webp",
+          "sha256": "148753fd3c4eff505759f477d6a690746954cb884dcab92c47f17d98386d5098",
+          "bytes": 43362,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g2-gpu-3d.webp",
+          "sourceSha256": "148753fd3c4eff505759f477d6a690746954cb884dcab92c47f17d98386d5098"
+        },
+        {
+          "asset": "assets/g2-gpu-painted.webp",
+          "sha256": "f59d39029873fe82c3ec997f9dce72bec7cdecefd2ab0dc5bafd4a51824edadc",
+          "bytes": 46760,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g2-gpu-painted.webp",
+          "sourceSha256": "f59d39029873fe82c3ec997f9dce72bec7cdecefd2ab0dc5bafd4a51824edadc"
+        },
+        {
+          "asset": "assets/g3-dash-3d.webp",
+          "sha256": "04c3ac042639f45c1f2920411ef47d46203e8828ee5478d1c85c71e09f6fb44e",
+          "bytes": 37824,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g3-dash-3d.webp",
+          "sourceSha256": "04c3ac042639f45c1f2920411ef47d46203e8828ee5478d1c85c71e09f6fb44e"
+        },
+        {
+          "asset": "assets/g3-dash-painted.webp",
+          "sha256": "58d846a1ae16ff0e30bf0739e203fcb0605c6d5de1636332ac51b3ded6aea427",
+          "bytes": 43246,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g3-dash-painted.webp",
+          "sourceSha256": "58d846a1ae16ff0e30bf0739e203fcb0605c6d5de1636332ac51b3ded6aea427"
+        },
+        {
+          "asset": "assets/g4-pulse-3d.webp",
+          "sha256": "11088db1e81ae9650d2eb753808d35124d567572a650a1bd837030ec83613718",
+          "bytes": 43288,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g4-pulse-3d.webp",
+          "sourceSha256": "11088db1e81ae9650d2eb753808d35124d567572a650a1bd837030ec83613718"
+        },
+        {
+          "asset": "assets/g4-pulse-painted.webp",
+          "sha256": "1864307143fb3983e4df918cc79ca1088991f3f5bd50e997c9609aede89884e8",
+          "bytes": 48252,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g4-pulse-painted.webp",
+          "sourceSha256": "1864307143fb3983e4df918cc79ca1088991f3f5bd50e997c9609aede89884e8"
+        },
+        {
+          "asset": "assets/g5-cuda-3d.webp",
+          "sha256": "898cf3c3a81e59f2261228d0fd6e33e0f4369d2b23d87d8cf23e1b5b7a5ce733",
+          "bytes": 53666,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g5-cuda-3d.webp",
+          "sourceSha256": "898cf3c3a81e59f2261228d0fd6e33e0f4369d2b23d87d8cf23e1b5b7a5ce733"
+        },
+        {
+          "asset": "assets/g5-cuda-before.webp",
+          "sha256": "c286bb004f6390192d037095feb80e79143f31a9e50e4a550748d715081dd633",
+          "bytes": 50676,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g5-cuda-before.webp",
+          "sourceSha256": "c286bb004f6390192d037095feb80e79143f31a9e50e4a550748d715081dd633"
+        },
+        {
+          "asset": "assets/g5-cuda-painted.webp",
+          "sha256": "956f2eb80c74f8ba011e4c8013fde6938d54e49417e4ab0168ef8c858965f955",
+          "bytes": 56492,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g5-cuda-painted.webp",
+          "sourceSha256": "956f2eb80c74f8ba011e4c8013fde6938d54e49417e4ab0168ef8c858965f955"
+        },
+        {
+          "asset": "assets/g6-shield-3d.webp",
+          "sha256": "8f7dde4e0921fac43fc010c6565a1a07f70f526334b744834df71e4293c3664c",
+          "bytes": 47506,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g6-shield-3d.webp",
+          "sourceSha256": "8f7dde4e0921fac43fc010c6565a1a07f70f526334b744834df71e4293c3664c"
+        },
+        {
+          "asset": "assets/g6-shield-painted.webp",
+          "sha256": "6e80f1d3fa6d7df2a8175b3bc63a8098098a686e9ed03aa9e3f642ba96a4ab82",
+          "bytes": 52504,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g6-shield-painted.webp",
+          "sourceSha256": "6e80f1d3fa6d7df2a8175b3bc63a8098098a686e9ed03aa9e3f642ba96a4ab82"
+        },
+        {
+          "asset": "assets/g7-thunder-3d.webp",
+          "sha256": "2f992efcbacd1c90397abc4483bfbc204e357a2a272f8c5122f2dcb04614a8b4",
+          "bytes": 47162,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g7-thunder-3d.webp",
+          "sourceSha256": "2f992efcbacd1c90397abc4483bfbc204e357a2a272f8c5122f2dcb04614a8b4"
+        },
+        {
+          "asset": "assets/g7-thunder-before.webp",
+          "sha256": "10ac6d489a8b4a0d29178504717bd6e203703dd66a0d7636448826bdb964ee39",
+          "bytes": 46474,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g7-thunder-before.webp",
+          "sourceSha256": "10ac6d489a8b4a0d29178504717bd6e203703dd66a0d7636448826bdb964ee39"
+        },
+        {
+          "asset": "assets/g7-thunder-painted.webp",
+          "sha256": "ad8cc0f1308e2dfd4e725b75737ae9e0209925c7b041e27306fb1026730dc663",
+          "bytes": 51770,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g7-thunder-painted.webp",
+          "sourceSha256": "ad8cc0f1308e2dfd4e725b75737ae9e0209925c7b041e27306fb1026730dc663"
+        },
+        {
+          "asset": "assets/g8-board-3d.webp",
+          "sha256": "1c534d7c5c5fca6dbc4026162c8104ff0033d81292f80668bf29bbe57c93b308",
+          "bytes": 60016,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g8-board-3d.webp",
+          "sourceSha256": "1c534d7c5c5fca6dbc4026162c8104ff0033d81292f80668bf29bbe57c93b308"
+        },
+        {
+          "asset": "assets/g8-board-before.webp",
+          "sha256": "ca6ec001705ab5ec140d1979f2ef91becedc29b417ebc7b767fc9e07cf7ba1a2",
+          "bytes": 56456,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g8-board-before.webp",
+          "sourceSha256": "ca6ec001705ab5ec140d1979f2ef91becedc29b417ebc7b767fc9e07cf7ba1a2"
+        },
+        {
+          "asset": "assets/g8-board-painted.webp",
+          "sha256": "a11a7d1fac80e156247734a158d1434901baa50741bc409f30762632b8b32a88",
+          "bytes": 63890,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g8-board-painted.webp",
+          "sourceSha256": "a11a7d1fac80e156247734a158d1434901baa50741bc409f30762632b8b32a88"
+        },
+        {
+          "asset": "assets/g8-cast-3d.webp",
+          "sha256": "8edbfa2fb9a80ece62e2fcca9d3bfe9209936e17a9f2b5b01f96d05b7cea5487",
+          "bytes": 55906,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g8-cast-3d.webp",
+          "sourceSha256": "8edbfa2fb9a80ece62e2fcca9d3bfe9209936e17a9f2b5b01f96d05b7cea5487"
+        },
+        {
+          "asset": "assets/g8-cast-painted.webp",
+          "sha256": "a3cb1426e371856a52cca84a0f12ec77699b222b929f90efd32c4f5c1dcbc8a9",
+          "bytes": 58772,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g8-cast-painted.webp",
+          "sourceSha256": "a3cb1426e371856a52cca84a0f12ec77699b222b929f90efd32c4f5c1dcbc8a9"
+        },
+        {
+          "asset": "assets/g8-low-3d.webp",
+          "sha256": "74f1e8fe790ee8bcca8b2e4ae744071106833a46687f5c9baafd16333990a6bc",
+          "bytes": 63594,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g8-low-3d.webp",
+          "sourceSha256": "74f1e8fe790ee8bcca8b2e4ae744071106833a46687f5c9baafd16333990a6bc"
+        },
+        {
+          "asset": "assets/g8-low-painted.webp",
+          "sha256": "c82cbc13731b87123e3b4974e1d22bac0ba348787b32f7ea5e256bd180f6d673",
+          "bytes": 68130,
+          "source": "jensen-combat-polish-r28-20261117/site/assets/g8-low-painted.webp",
+          "sourceSha256": "c82cbc13731b87123e3b4974e1d22bac0ba348787b32f7ea5e256bd180f6d673"
+        }
+      ]
+    },
     "R24": {
       "title": "R24 · Eight-stage runtime slice",
       "status": "historical-runtime-captures",
@@ -399,9 +429,9 @@
       ]
     },
     "R7": {
-      "title": "R7 · Opening story illustrations",
-      "status": "historical-story-illustrations",
-      "summary": "Eight existing game illustrations. These are story art, not combat art; N01-02 reuses the founders concept. R7 opening-slice work is historical and does not represent the full prototype.",
+      "title": "Opening story illustrations · revised in R37",
+      "status": "playable-story-with-revised-portraits",
+      "summary": "The playable 2D opening pairs its original scenes with updated portraits in R37. The teenager is an artistic reconstruction.",
       "source": "jensen-a-complete-r7-20261114/art/",
       "images": [
         {
@@ -409,15 +439,17 @@
           "asset": "../game/assets/R8-N00-01.jpg",
           "caption": "N00 · Young hero at the counter",
           "alt": "Young hero pauses at the counter and looks toward the open floor.",
-          "sha256": "9bf00994eb12e4d1dc42a90f0f5aaba3a977e671baa8d1a16dad33b83a0bcac0",
+          "sha256": "fcf5bd8c94e5df289281053fbd7a9170ec501ea38d9355abe96ecb13f3318cb7",
           "source": "jensen-a-complete-r7-20261114/art/n00/ILL-N00-01.png",
-          "sourceSha256": "aa68f645228e785de233fd592882040802c74484fb1d30bf4138d0d8234bbf3c"
+          "sourceSha256": "aa68f645228e785de233fd592882040802c74484fb1d30bf4138d0d8234bbf3c",
+          "priorAssetSha256": "9bf00994eb12e4d1dc42a90f0f5aaba3a977e671baa8d1a16dad33b83a0bcac0",
+          "revision": "R37"
         },
         {
           "id": "N00-02",
           "asset": "../game/assets/R8-N00-02.jpg",
-          "caption": "N00 · Friendly invitation",
-          "alt": "The shift lead and bald teammate invite the young hero; pose differs from the original shoulder-check idea.",
+          "caption": "The diner aisle closes",
+          "alt": "Casually dressed troublemakers crowd the aisle as the restaurant staff step aside.",
           "sha256": "3cf1d05bed4f920fbd79974881389759bc1ca5a9dd9131334a80b6bcaa036c0a",
           "source": "jensen-a-complete-r7-20261114/art/n00/ILL-N00-02.png",
           "sourceSha256": "5cb35eb95e4e25603892f87e7133b1dedc5adaa25ece411f38aa414e66d01180"
@@ -425,47 +457,57 @@
         {
           "id": "N00-03",
           "asset": "../game/assets/R8-N00-03.jpg",
-          "caption": "N00 · Tray on the table",
-          "alt": "One ordinary tray rests within reach; the hero has not gained equipment.",
-          "sha256": "16c36192b156e17113d4a62d72fb072c4c20b0686290bffa173a7023a18096fa",
+          "caption": "A tray within reach",
+          "alt": "Two coworkers offer a serving tray while Jensen stands at the counter.",
+          "sha256": "ed15a42ee99ace8102d4e6502635746f7a3e04aef80fa86d27f2a1acd16325ba",
           "source": "jensen-a-complete-r7-20261114/art/n00/ILL-N00-03.png",
-          "sourceSha256": "2716a476ed4824b8c120d9b87bbdc6dceb3f9cccca751ab501ee50a697e58fa7"
+          "sourceSha256": "2716a476ed4824b8c120d9b87bbdc6dceb3f9cccca751ab501ee50a697e58fa7",
+          "priorAssetSha256": "16c36192b156e17113d4a62d72fb072c4c20b0686290bffa173a7023a18096fa",
+          "revision": "R37"
         },
         {
           "id": "N00-04",
           "asset": "../game/assets/R8-N00-04.jpg",
-          "caption": "N00 · Ready to move",
-          "alt": "The hero crouches with an open hand, ready to move sideways.",
-          "sha256": "0e10065b2d375af971bfcba24fe679e33d32e83cd67c1b660394246d76efd2c1",
+          "caption": "A path through the crowd",
+          "alt": "The young waiter crouches with one hand open as troublemakers close around him.",
+          "sha256": "ad795daf5d328ec2a886d1e9b2ddafa37e25211dcdc101eb5224fff796e9142c",
           "source": "jensen-a-complete-r7-20261114/art/n00/ILL-N00-04.png",
-          "sourceSha256": "27857c496eb06c77f67d0b95ad001e1a4c4e7fa01a0c35b3318356eda23e81b7"
+          "sourceSha256": "27857c496eb06c77f67d0b95ad001e1a4c4e7fa01a0c35b3318356eda23e81b7",
+          "priorAssetSha256": "0e10065b2d375af971bfcba24fe679e33d32e83cd67c1b660394246d76efd2c1",
+          "revision": "R37"
         },
         {
           "id": "N01-01",
           "asset": "../game/assets/ILL-N01-01.jpg",
-          "caption": "N01 · Years later",
-          "alt": "The story transitions from the restaurant opening to the adult founders.",
-          "sha256": "b2b4ef4db1d479cb019d882c30960bc6fec263a92cdabb43d778edb0061fa63b",
+          "caption": "End of the shift",
+          "alt": "The young waiter speaks across the counter with both hands on a serving tray.",
+          "sha256": "6ca82e6d39554184fb435ee540c44f21477af93234e75aad4577b8fdac46cae7",
           "source": "jensen-a-complete-r7-20261114/art/n01/ILL-N01-01.png",
-          "sourceSha256": "4785897b04237bf72102699950b7160c2f52bbff2871d35f1d339aa4a0e0fb3f"
+          "sourceSha256": "4785897b04237bf72102699950b7160c2f52bbff2871d35f1d339aa4a0e0fb3f",
+          "priorAssetSha256": "b2b4ef4db1d479cb019d882c30960bc6fec263a92cdabb43d778edb0061fa63b",
+          "revision": "R37"
         },
         {
           "id": "N01-02",
           "asset": "../game/assets/ILL-N01-02.jpg",
-          "caption": "N01 · Founders at Denny’s, 1993",
-          "alt": "A reused founders concept marks the 1993 Denny’s scene.",
-          "sha256": "c8fb2814da176c6c2d9ae6fd449f172271b2caa54460c8d2307fbba2f3fc76e8",
+          "caption": "Founders at the diner, 1993",
+          "alt": "Three cofounders discuss a drawing together at the diner table.",
+          "sha256": "fe8d4cdf0a18a218f4ac1791c7300a54568b5bb44dbf0b727ef22520bab86662",
           "source": "jensen-a-complete-r7-20261114/art/n01/ILL-N01-02.png",
-          "sourceSha256": "7a59bfc8af7e4a005c675a08dc17698e0adc23e2db3741f4b880048c60f1d2b3"
+          "sourceSha256": "7a59bfc8af7e4a005c675a08dc17698e0adc23e2db3741f4b880048c60f1d2b3",
+          "priorAssetSha256": "c8fb2814da176c6c2d9ae6fd449f172271b2caa54460c8d2307fbba2f3fc76e8",
+          "revision": "R37"
         },
         {
           "id": "N01-03",
           "asset": "../game/assets/ILL-N01-03.jpg",
-          "caption": "N01 · RIVA era, 1997",
-          "alt": "The story moves into the 1997 RIVA era.",
-          "sha256": "1859c37d33bb76ea93a6925702b1b68b45898cd26c0855b9336e40f7d0bd7b72",
+          "caption": "RIVA era, 1997",
+          "alt": "Adult Jensen looks over a graphics board and a wireframe on a CRT.",
+          "sha256": "46fd5f6bcdf0e6cd37a02be5cfb87047c2f7f6a5ce7098dec1a78ffc4b00accf",
           "source": "jensen-a-complete-r7-20261114/art/n01/ILL-N01-03.png",
-          "sourceSha256": "1d9ecee8c273b8b61ac428ba15786e545ce7bb6369deee09f87ca1790988501e"
+          "sourceSha256": "1d9ecee8c273b8b61ac428ba15786e545ce7bb6369deee09f87ca1790988501e",
+          "priorAssetSha256": "1859c37d33bb76ea93a6925702b1b68b45898cd26c0855b9336e40f7d0bd7b72",
+          "revision": "R37"
         },
         {
           "id": "N01-04",

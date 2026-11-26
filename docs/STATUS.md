@@ -1,4 +1,64 @@
-# Current scope — R35 three-act playable V0 / 2026-11-20
+## R40 Pages entry points / 2026-11-26
+
+The title screen opens the main story. The combat lab keeps its existing address and mode links. The playable vertical slice opens The Reflection in practice mode with its own victory, defeat and retry. The art gallery presents captured frames and design history. Portrait rotation during 3D combat and carrying the named rival through the friend invitation are known gaps. Human first-play, voluntary sharing and physical-device feel remain unverified.
+
+## Independent warrior project / 2026-11-26
+
+The independent `runeforge-warrior` repository owns future work on the four-skill expedition and six-skill lab. Jensen packages the same five frozen comparison files from `references/warrior/` at their established `/warrior/` routes. The full Jensen test suite passed in an isolated copy containing only this checkout. All five files in the built comparison match the pre-split files byte for byte.
+
+# R40 · The Reflection / 2026-11-25
+
+Under contract 029, the Ten Seats awards its original result before the historical reinstatement card opens. A player can face the reflection immediately, leave the duel for later or open a previously completed career. At the diner window, the echo rehearses the last released boardroom skill. A cold story entry demonstrates a hammer swing. Standalone practice demonstrates Thunder Leap. Clearing two distinct recovery windows returns Jensen to his coworker, the coffee and an empty seat. The original ten-seat receipt and friend invitation remain accessible there.
+
+The duel shares the campaign’s Babylon/Havok actors, physics, controls and weapons. It owns its scripted timing, small diner and optional completion mark. This keeps the native prototype and story encounter on a single implementation. The first post-win browser run exposed a stale encounter URL. The final build replaces it with the saved booth URL after the completion write succeeds.
+
+An ordinary-input Chrome run started a new career, lit three CUDA targets, cleared the Ten Seats with 1,730 HP and carried its last released Thunder Leap into the window. Two counterattacks finished the story duel in 41.04 simulation seconds. Reload returned to the coffee ending. In a separate browser check, opening a copy of that earned profile displayed Ashfall first, Reclaimer last and 1,730 HP. Its JH3:9 code opened the matching guest invitation without a career record. In separate 844 × 390 touch emulation, standing still lost at 44.50 seconds. Tapping retry restored 3,800 HP and a guided clear took 39.02 seconds. An earlier touch attempt took 72 seconds after a missed opening. Physical phones, first-time human recognition and player willingness to share remain untested.
+
+Local offline SHA-256: story `3e6d69c6e6022605f836ade9ca209f6f4a936fa977c144fc214afb398d181343`, reflection practice `983e40e1135f6fee42ddcb4b74f77804c417e82988f95fcd7d8e429d438987cf`. No public deployment in this iteration.
+
+## R39 · The diner battle report / 2026-11-23
+
+An edition 3 clear returns a diner receipt with the actual first rival, final rival and remaining HP. The invitation asks a friend to try that last rival first. Any different opener followed by a full clear still completes the relay. Preview, copy and manual fallback use the same message. The first defeated rival still determines the invitation URL or offline code. A resumed solo ending reads its original score.
+
+Gemini 4 Neon delivered two interactive endings using one recorded R38 run. The diners’ tab brings the finale back to the restaurant. The tactical board turns the last rival into a challenge, but its unrestricted selector can recommend and forbid the same opener. The selected ending combines the tab and a single last-rival question. It removes the selector and the outgoing sample’s assumption that the next reader took part in the preceding game.
+
+Ordinary-input Chrome runs cleared the three-act career and completed fresh two-player challenges on desktop and in landscape touch emulation. In the touch run Ashfall fell first, Lifeline last, and the sender had 2,189 HP. The recipient followed the resulting invitation, defeated Lifeline first and Vanguard last, and finished with 1,230 HP. Both challenge contexts kept empty career storage. The offline game SHA-256 is `037a65430408b96c716d89c20a52e34973564c8be00c1c308e790e0fb334bf5d`.
+
+Maintenance decision: reuse the saved defeat order, HP and existing invitation format. The report needs no new score fields, service or account. Voluntary sharing and physical-device usability remain open.
+
+## R38 · CUDA tutorial and friend invitation / 2026-11-23
+
+Under contract 028 (CORE-10–13), the CUDA lesson tells players to click or tap a ringed rival and then another nearby. For 2.4 simulation seconds after the first focused hit, available nearby alternatives can pulse. Reduced motion keeps their rings still. The second target and three actual damage recipients remain required.
+
+Gemini 4 Neon created a standalone diner napkin experiment for guest invitations. The maintained game adopts its named sender opening, diner setting and optional scouting. An invited guest can inspect all ten weapons and counters, or enter combat immediately. The native selection only changes the displayed note. The real first defeat determines the result. The raw experiment handed players a second start screen and its mock result could copy a claim of a clear. Both stay out of the game.
+
+Desktop Chrome and landscape touch emulation each played the updated CUDA lesson from a new career and won after a three-target broadcast. In the combined guest build, both entered an earned seat 9 invitation, scouted seat 5, actually defeated seat 7 first, and cleared all ten. One additional run kept the default scouting choice and started in one action. Guest progress stayed separate from career storage. The offline story SHA-256 is `5837f284d927a7046a4c25b37717b3ccd692697ef808734273af3d11f8156d8f`.
+
+Maintenance choice: reuse the existing first-defeat result, edition 3 code and share action. Keep the experiment outside the maintained game. Human discovery of the gesture, voluntary sharing and physical phone feel remain open.
+
+## R37 · Survivor campaign and character art / 2026-11-21
+
+Contract 028, CORE-12 and CORE-13. The story and edition 3 guest challenge share a following camera and a 52 × 36 playable field. Melee opponents converge on Jensen. Ranged units approach a firing position and telegraph their attack. Holding a direction keeps Jensen moving and striking. In the arcade, Gauntlet Cyclone cleaves a pack while moving. The CUDA encounter asks the player to light three recipients before regaining the spin. In the finale, Cyclone Guard reduces incoming damage by 20% for two seconds. Its first 0.18 seconds can parry one frontal ordinary melee hit or projectile; heavy charges and marked ground remain dangerous. Thunder Leap commits to an aimed landing and deals damage on contact, followed by separate lightning hits. Legacy v1/v2 challenges and saved openings retain their edition.
+
+The frozen V0.3 and V0.3.1 Expedition campaigns have four active skills, ranged enemies and boss rings and leaps. V0.3.1 also has a potion, denser waves and explosive mobs. The separate V0.2 warrior lab has six actives. Their held-attack inputs, kill recovery and readable enemy attacks informed the new two-button design. Automatic nearby strikes are a deliberate change for a short journey.
+
+Teenage Jensen is an artistic reconstruction. The restaurant and founder chapters share facial cues across the refreshed opening and the 2D/3D characters. A new story-only boardroom illustration shows mature Jensen with his right wafer and left hammer at portrait scale. The arcade gauntlets borrow the board, memory and single-fan layout of the 1999 GeForce 256. The final shield borrows a wafer’s die pattern, and the fantasy hammer borrows Mjolnir’s silhouette. Visual references include the [2008 portrait, p. 14](https://www.nvidia.com/docs/IO/65527/ECS_Conf_Book.pdf), [founding account](https://blogs.nvidia.com/blog/nvidia-dennys-trillion/), [GeForce anniversary](https://blogs.nvidia.com/blog/first-gpu-gaming-ai/), [Blackwell wafer](https://blogs.nvidia.com/blog/tsmc-blackwell-manufacturing/) and [licensed hammer](https://instructions.hasbro.com/en-my/instruction/marvel-legends-series-mjolnir-electronic-hammer).
+
+A desktop Chrome career run cleared the diner, gauntlets, three-recipient CUDA lesson and boardroom through the normal portal. Its first finale attempt ended with six seats down. The clear finished on 335.5/3,800 HP with Ashfall first and produced the edition 3 invitation. After the arcade gunner warning correction, a fresh desktop run reached the boardroom illustration again. On the corrected file a guest used the earned invitation, opened on Outrider, cleared all ten in 24.325 simulation seconds with 1,920/3,800 HP and lit the relay. Its career storage stayed empty. The recorded guest fight registered seven Cyclone damage packets, four Leap packets and damaging hammer lightning. A native contact test confirmed two 45-damage lightning hits after a target change and one precisely timed frontal parry. The offline file accepted a guest code with emulated landscape touch and made zero HTTP(S) requests.
+
+Astra Pro returned a conditional design and an original equipment/composition sheet. We adopted its manual frontal parry, short defensive spin and separate landing/lightning events. The art and timings were judged in the running game. The concept’s equipment side labels and mortar seat did not match the established right shield, left hammer and seat 03; the running game follows the established assignments. Its proposed damage coefficients and additional finisher were left out. The first filmed arcade pass also revealed that a single-shot gunner displayed a broad legacy cone over its actual firing lane; the corrected Survivor shot displays the lane alone.
+
+The final arcade recording shows one Cyclone hitting a rusher and a gunner for 48 each on the same sweep. A static guard and moving-target native regression passed within the full `npm test` run. The offline three-act file matches the rebuilt standalone, SHA-256 `3c734b1ab9e80b6234753bdc96737618c68f8fef98212091cd46da9cd49eb242`. Maintenance choice: reuse the existing enemies, camera, story saves and relay. Keep historical warrior sources frozen. Human likeness recognition during motion, first-play difficulty and physical phone feel still need playtests.
+
+## R36 local adoption / 2026-11-21
+
+Contract 027, CORE-11. Two mechanics from the One More Light experiment now run in the existing 3D campaign. In the 2006 arcade fight, a single target flickers one cabinet. Switching to another ringed rival in a linked group releases one three-target CUDA strike and lights the room. The Ten Seats ending offers a relay made from the first rival actually defeated. A guest who clears all ten with a different first defeat lights the paired weapon mark in the diner. A matching opening still earns a solo clear. Offline copies can exchange a short code. The existing v1 fight and career checkpoints remain available.
+
+- A guided desktop Chrome run through the normal portal resumed after the diner, opened the three-target circuit and defeated all ten with 2,975 HP after opening on Vanguard. A fresh context followed the copied v2 invitation, opened on Cinder and cleared with 2,600 HP. Repeating Vanguard first cleared with 2,005 HP and left the relay incomplete. An idle attempt lost and could retry. The challenge wrote no career state.
+- The reviewed build passed the full test suite. An independent native-engine check reproduced and verified the repair for a relay seed at 1 HP. The same attack dealt actual positive damage to three targets at one simulation time. The offline file accepted a valid code through a touch-emulated landscape browser, rejected an invalid one and opened the v1 fallback without an HTTP request.
+- Maintenance choice: extend the current CUDA damage path, career UI and recorded defeat order. Retain the established boss combat and 3D art direction. Local acceptance covers functional play. Human comprehension, voluntary sharing and physical-device feel remain open.
+
+## R35 three-act playable V0 / 2026-11-20
 
 Contract 026, CORE-10. The portal starts a career at the diner. Each victory carries earned equipment or abilities into the next encounter. The arcade has a gauntlet fight and a CUDA fight. The existing R34 encounter closes the story, followed by a return to the diner booth. A versioned friend challenge uses the same ten seats and full loadout without reading or writing career progress. The result records the actual first opponent defeated, seats down and remaining HP.
 

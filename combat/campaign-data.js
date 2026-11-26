@@ -467,18 +467,15 @@
   };
   // Story encounters share native attacks, controls and physics; only layout and difficulty differ from the lab.
   data.journey = {
-    diner: {title:"Diner · clear the aisle",hp:160,activeCap:4,
-      enemyTuning:{troublemaker_boss:{hp:220}},
-      waves:[{name:"Clear the aisle",kind:"mob",enemies:[{kind:"troublemaker_customer",count:3}]},{name:"The ringleader",kind:"boss",enemies:[{kind:"troublemaker_boss",count:1},{kind:"troublemaker_customer",count:1}]}],
-      positions:[[[-1.5,0],[0,-.5],[1.5,0]],[[0,-1.8],[1.5,-.5]]]},
-    arcade: {title:"1993 · twin GPU gauntlets",hp:300,activeCap:4,
-      enemyTuning:{rusher:{damage:12},gunner:{damage:12,cycle:2.4}},
-      waves:[{name:"One at a time",kind:"mob",enemies:[{kind:"gunner",count:1},{kind:"rusher",count:3}]}],
-      positions:[[[-4,-2],[.8,-.4],[2,-.4],[3.2,-.4]]]},
-    cuda: {title:"2006 · parallel breakthrough",hp:420,cuda:true,activeCap:6,
-      enemyTuning:{rusher:{damage:12,hp:180},gunner:{damage:12,cycle:2.4},champion:{hp:900,damage:38,cycle:2.5}},
-      waves:[{name:"Let the current jump",kind:"mob",enemies:[{kind:"gunner",count:1},{kind:"rusher",count:4}]},{name:"Light the arcade",kind:"boss",enemies:[{kind:"champion",count:1},{kind:"rusher",count:3}]}],
-      positions:[[[-4,-2],[.8,-.4],[2,-.4],[3.2,-.4],[2,-1.7]],[[0,-3.5],[-1.2,-1.7],[0,-1.7],[1.2,-1.7]]]}
+    diner: {title:"Diner · clear the aisle",hp:160,activeCap:8,arc:100,cap:3,reach:1.45,
+      enemyTuning:{troublemaker_customer:{hp:20,damage:8},troublemaker_boss:{hp:320,damage:32}},
+      waves:[{name:"Dinner rush",kind:"mob",enemies:[{kind:"troublemaker_customer",count:14}]},{name:"The ringleader",kind:"boss",enemies:[{kind:"troublemaker_boss",count:1},{kind:"troublemaker_customer",count:8}]}]},
+    arcade: {title:"1999 · twin GPU gauntlets",hp:300,slot1:true,activeCap:9,arc:110,cap:4,
+      enemyTuning:{rusher:{hp:60,damage:12},gunner:{hp:60,damage:14,cycle:2.65}},
+      waves:[{name:"Surround the cabinets",kind:"mob",enemies:[{kind:"rusher",count:4},{kind:"gunner",count:2},{kind:"rusher",count:6},{kind:"gunner",count:3},{kind:"rusher",count:5}]}]},
+    cuda: {title:"2006 · parallel breakthrough",hp:420,slot1:true,cuda:true,activeCap:9,arc:110,cap:4,
+      enemyTuning:{rusher:{damage:10,hp:60},gunner:{hp:60,damage:12,cycle:2.8},champion:{hp:1200,damage:65,cycle:2.8}},
+      waves:[{name:"Break the serial field",kind:"mob",enemies:[{kind:"rusher",count:4},{kind:"gunner",count:1}]},{name:"Light the arcade",kind:"boss",enemies:[{kind:"champion",count:1},{kind:"rusher",count:5},{kind:"gunner",count:2},{kind:"rusher",count:7}]}]}
   };
   const assert = (ok, message) => { if (!ok) throw new Error('R24Data: '+message); };
   assert(data.stages.length===8 && Object.keys(data.types).length===29, 'expected 8 stages and 29 types');

@@ -10,6 +10,8 @@ const C=Object.freeze({version:"R28.READABILITY.1",engine:"9.36.0",step:1/120,ma
   arenaX:8.85*1.35,arenaZ:5.12*1.35,wallX:9.3*1.35,wallZ:5.65*1.35,floorX:18.8*1.35,floorZ:11.6*1.35,
   heroScale:1.30,maxProjectiles:40,maxZones:6,maxBeams:2,maxParticles:96,maxLines:64,maxWaves:4,maxFloats:24,
   breather:1.0,stageCue:1.6,bodyRetire:1.25,seed:271828,cuda:R.cuda||{},skill1:R.slot1||{},skill2:R.slot2||{}});
+const SURVIVOR_FIELD=Object.freeze({arenaX:26,arenaZ:18,wallX:26.65,wallZ:18.65,floorX:54,floorZ:38});
+const STEER_KEYS=new Set(["KeyW","KeyA","KeyS","KeyD","ArrowUp","ArrowLeft","ArrowDown","ArrowRight"]);
 const PROPS=[
   ["planter_nw","planter",-8.05,-4.55],["planter_ne","planter",2.9,-4.65],
   ["planter_sw","planter",-8.30,4.60],["planter_se","planter",8.25,4.6],
@@ -22,14 +24,14 @@ const PROPS=[
 const FINALE_WARNING={heal:"healing allies · interrupt",sniper:"lining up a shot · sidestep",volley:"three-shot fan",guardCharge:"charging · step aside",heat:"targeting the floor",shieldBash:"shield bash",shoot:"taking aim",disc:"returning disc · change lanes"};
 const hpFormat=new Intl.NumberFormat("en-US",{maximumFractionDigits:2});
 const SCENARIOS=["all","single","dummy","group",...Object.keys(TYPES)];
-const ui={};for(const id of ["view","boot","bootText","progress","pause","resume","hp","hpFill","target","status","hint","skill1","skill2","cool1","cool2","settings","scenario","damage","heroHP","crit","enemyOverride","enemyHP","immortal","mute","reduced","settingsError","debug","floats","bossBars","resetButton","captureButton","stageSelect","waveSelect","styleSelect","heroOverride","freezeButton","stageLabel","gainCue","icon1","icon2","label1","label2","heroCue","health","lowHealth","finaleIntro","finaleStart","finaleResult","finaleRetry","finaleTitle","finaleMute","finaleReduced","comboPips","hurtEdge"])ui[id]=$(id);
+const ui={};for(const id of ["view","boot","bootText","progress","pause","resume","hp","hpFill","target","status","hint","skill1","skill2","cool1","cool2","settings","scenario","damage","heroHP","crit","enemyOverride","enemyHP","immortal","mute","reduced","settingsError","debug","floats","bossBars","resetButton","captureButton","stageSelect","waveSelect","styleSelect","heroOverride","freezeButton","stageLabel","gainCue","icon1","icon2","label1","label2","heroCue","health","lowHealth","finaleIntro","finaleStart","finaleResult","finaleRetry","finaleTitle","finaleMute","finaleReduced","comboPips","hurtEdge","cudaLesson"])ui[id]=$(id);
 const seatRole=a=>a.fantasyTitle||(a.kind===R.heal.type?"HEALER":({guardCharge:"GUARD",sniper:"SNIPER",shoot:"GUNNER",heat:"ZONE"}[TYPES[a.kind]?.action]||"BOSS"));
 let app=null,fatal="";
 function immutable(x){const y=JSON.parse(JSON.stringify(x));const f=o=>{if(o&&typeof o==="object"){Object.values(o).forEach(f);Object.freeze(o);}return o;};return f(y);}
 function fail(e){const panel=$("journeyPanel");if(panel)panel.hidden=true;fatal=e instanceof Error?e.message:String(e);if(app){app.failed=true;app.ready=false;app.engine.stopRenderLoop();}window.engineCBootFailure(fatal);console.error(e);}
 function stageRow(n){if(!Number.isInteger(n))throw new RangeError("Stage must be an integer");const row=DATA?.stages?.find(s=>s.stage===n);if(!row)throw new RangeError("Stage must be 1–8");return row;}
 function waveNumber(stage,index){if(!Number.isInteger(index)||index<0||index>=stage.waves.length)throw new RangeError("Unknown wave in this stage");return index;}
-function queryOptions(search){const p=new URLSearchParams(search);if(p.get("mode")==="story"||p.get("mode")==="challenge")return{stage:1,style:"3d",lab:false,journeyMode:p.get("mode")};if(p.get("mode")==="finale")return{stage:8,style:"3d",lab:false,finale:true};const raw=p.get("stage"),style=p.get("style")===null?"3d":p.get("style");if(p.getAll("stage").length>1||p.getAll("style").length>1||raw!==null&&!/^[1-8]$/.test(raw))throw new RangeError("Invalid ?stage; use one integer 1–8");if(!["3d","painted"].includes(style))throw new RangeError("Invalid ?style; use 3d or painted");return{stage:raw===null?DATA.stages[0].stage:Number(raw),style,lab:raw!==null};}
+function queryOptions(search){const p=new URLSearchParams(search);if(["story","challenge","reflection"].includes(p.get("mode")))return{stage:1,style:"3d",lab:false,journeyMode:p.get("mode")};if(p.get("mode")==="finale")return{stage:8,style:"3d",lab:false,finale:true};const raw=p.get("stage"),style=p.get("style")===null?"3d":p.get("style");if(p.getAll("stage").length>1||p.getAll("style").length>1||raw!==null&&!/^[1-8]$/.test(raw))throw new RangeError("Invalid ?stage; use one integer 1–8");if(!["3d","painted"].includes(style))throw new RangeError("Invalid ?style; use 3d or painted");return{stage:raw===null?DATA.stages[0].stage:Number(raw),style,lab:raw!==null};}
 function validateData(){
   if(!DATA||!Array.isArray(DATA.stages)||DATA.stages.length!==8||Object.keys(TYPES).length!==29||!R.basic||!R.heal||!R.projectiles)throw new Error("Missing or incompatible campaign-data.js");
   for(const [i,s]of DATA.stages.entries()){
@@ -130,7 +132,10 @@ class Training {
     this.engine=engine;this.scene=scene;this.plugin=plugin;this.physics=scene.getPhysicsEngine();
     this.ready=false;this.failed=false;this.paused=false;this.qaFrozen=false;this.ended=false;this.capture=null;
     this.journey=options.chapter||null;this.journeyMode=options.journeyMode||null;this.seatsDown=[];this.finale=!!options.finale;this.finaleState=this.finale||this.journey?"intro":null;
-    this.stageData=this.finale?{...stageRow(8),hp:DATA.finale.hp,cycle:DATA.finale.cycle,theme:DATA.finale.theme}:this.journey?{...stageRow(options.stage),...DATA.journey[this.journey]}:stageRow(options.stage);this.stageIndex=options.stage;this.waveIndex=0;this.startWave=0;this.styleMode=options.style;this.lab=options.lab;
+    this.reflection=this.journey==="reflection";
+    this.survivor=this.reflection||this.journeyMode==="story"||this.journeyMode==="challenge"&&!!options.survivorEdition;
+    this.field=this.reflection?{arenaX:5.25,arenaZ:4.5,wallX:5.9,wallZ:5.13,floorX:17,floorZ:16}:this.survivor?SURVIVOR_FIELD:C;this.steerKeys=new Set();
+    this.stageData=this.reflection?{...stageRow(8),hp:DATA.finale.hp,cycle:DATA.finale.cycle,title:"The Reflection",waves:[{name:"The diner window"}]}:this.finale?{...stageRow(8),hp:DATA.finale.hp,cycle:DATA.finale.cycle,theme:DATA.finale.theme}:this.journey?{...stageRow(options.stage),...DATA.journey[this.journey]}:stageRow(options.stage);this.stageIndex=options.stage;this.waveIndex=0;this.startWave=0;this.styleMode=options.style;this.lab=options.lab;
     this.settings={scenario:"all",D:this.stageData.D,hp:this.stageData.hp,crit:R.crit.chance,heroOverride:false,override:false,enemyHP:160000,immortal:!this.finale&&!this.journey,reduced:false};
     this.sound=new Sound();this.actors=[];this.props=[];this.staticProps=[];this.staticBodies=[];this.solids=new Set();this.obstacles=[];this.objects=new Map();
     this.projectiles=[];this.zones=[];this.beams=[];this.particles=[];this.lines=[];this.waves=[];this.floats=[];
@@ -149,9 +154,10 @@ class Training {
     this.staticBodies.push(aggregate);this.solids.add(m);return m;
   }
   setupScene(){
-    const s=this.scene;s.clearColor=this.finale?new B.Color4(.041,.067,.085,1):new B.Color4(.54,.59,.47,1);s.ambientColor=new B.Color3(.06,.065,.05);
+    const s=this.scene;s.clearColor=this.reflection?new B.Color4(.025,.037,.066,1):this.finale?new B.Color4(.041,.067,.085,1):new B.Color4(.54,.59,.47,1);s.ambientColor=new B.Color3(.06,.065,.05);
     const sky=new B.HemisphericLight("soft-sky",V(-.2,1,.2),s);sky.intensity=this.finale?.79:.68;sky.groundColor=new B.Color3(.29,.30,.25);
     const sun=new B.DirectionalLight("warm-key",(this.finale?V(.57,-1,.44):V(.24,-1,.20)).normalize(),s);sun.position=V(-8,15,-6);sun.intensity=1.55;sun.diffuse=new B.Color3(1,.94,.86);sun.shadowMinZ=.1;sun.shadowMaxZ=60;
+    if(this.reflection){sky.diffuse=new B.Color3(.60,.76,.85);sky.intensity=.55;sun.diffuse=new B.Color3(1,.79,.57);}
     if(this.finale){
       sky.diffuse=new B.Color3(.82,.91,1);sky.groundColor=new B.Color3(.20,.22,.25);
       const rim=new B.DirectionalLight("cold-steel-rim",V(-.8,-.35,-.55).normalize(),s);
@@ -159,7 +165,7 @@ class Training {
     }
     this.shadow=new B.ShadowGenerator(2048,sun);this.shadow.usePercentageCloserFiltering=true;this.shadow.filteringQuality=B.ShadowGenerator.QUALITY_HIGH;this.shadow.bias=.0004;this.shadow.normalBias=.018;this.shadow.setDarkness(this.finale?.45:.33);
     this.camera=new B.FreeCamera("fixed-composition",V(0,13.5,14),s);this.camera.mode=B.Camera.ORTHOGRAPHIC_CAMERA;this.camera.minZ=.1;this.camera.maxZ=70;this.camera.setTarget(V(0,.15,0));s.activeCamera=this.camera;
-    this.p=M.createPalette(s,this.finale);this.themeParts=[];this.stageProps=[];this.pickups=[];this.fx={spark:this.material("impact-gold","#ffe3a2","#ffc55b"),cuda:this.material("cuda-teal","#6debe7","#48c4d4"),dust:this.material("dust","#d4c6a1"),danger:this.material("hostile-coral","#ff775f","#e5553d"),tell:this.material("warning-ground","#f56a51","#8b2c20",.42)};
+    this.p=M.createPalette(s,this.finale||this.reflection);this.themeParts=[];this.stageProps=[];this.pickups=[];this.fx={spark:this.material("impact-gold","#ffe3a2","#ffc55b"),cuda:this.material("cuda-teal","#6debe7","#48c4d4"),dust:this.material("dust","#d4c6a1"),danger:this.material("hostile-coral","#ff775f","#e5553d"),tell:this.material("warning-ground","#f56a51","#8b2c20",.42)};
     this.fx.lightning=this.material("lightning-core","#efffff","#d6ffff");
     this.fx.heal=this.material("enemy-healing","#ef9fcf","#b94c9b");
     this.fx.target=this.material("target-gold","#ffdc84","#bf8734");
@@ -180,16 +186,17 @@ class Training {
       tex.wrapU=tex.wrapV=B.Texture.WRAP_ADDRESSMODE;tex.uScale=2.6*C.arenaScale;tex.vScale=1.6*C.arenaScale;tex.update(false);
     }
     ground.albedoTexture=tex;
-    this.floor=B.MeshBuilder.CreateBox("floor",{width:C.floorX,height:.3,depth:C.floorZ},s);this.floor.position.y=-.15;this.floor.material=ground;this.floor.receiveShadows=true;
+    this.floor=B.MeshBuilder.CreateBox("floor",{width:this.field.floorX,height:.3,depth:this.field.floorZ},s);this.floor.position.y=-.15;this.floor.material=ground;this.floor.receiveShadows=true;
     this.staticBodies.push(new B.PhysicsAggregate(this.floor,B.PhysicsShapeType.BOX,{mass:0,friction:.85},s));
-    for(const [x,z,w,d] of [[0,-C.wallZ,C.floorX,.35],[0,C.wallZ,C.floorX,.35],[-C.wallX,0,.35,C.floorZ],[C.wallX,0,.35,C.floorZ]]){
+    for(const [x,z,w,d] of [[0,-this.field.wallZ,this.field.floorX,.35],[0,this.field.wallZ,this.field.floorX,.35],[-this.field.wallX,0,.35,this.field.floorZ],[this.field.wallX,0,.35,this.field.floorZ]]){
+      if(this.reflection){this.bodyBox("diner-aisle-edge",[w,2,d],V(x,1,z));continue;}
       const wall=M.roundedBox(s,"low-cream-wall",[w,.58,d],.08,this.p.wall);wall.position.set(x,.29,z);this.bodyBox("wall",[w,.58,d],wall.position,wall);this.shadow.addShadowCaster(wall);
       const cap=M.roundedBox(s,"wall-top",[w+.04,.13,d+.07],.045,this.p.wallTop);cap.position.set(x,.58,z);
     }
-    for(const z of [-C.wallZ,C.wallZ])for(const x of [-C.wallX,-5.8*C.arenaScale,-2.2*C.arenaScale,2.2*C.arenaScale,5.8*C.arenaScale,C.wallX]){
+    if(!this.reflection)for(const z of [-this.field.wallZ,this.field.wallZ])for(const x of [-this.field.wallX,-5.8*C.arenaScale,-2.2*C.arenaScale,2.2*C.arenaScale,5.8*C.arenaScale,this.field.wallX]){
       const post=M.roundedBox(s,"wall-joint-cap",[.48,.78,.49],.075,this.p.wallTop);post.position.set(x,.39,z);this.shadow.addShadowCaster(post);
     }
-    for(const [id,kind,x,z] of PROPS.filter(row=>!row[1].endsWith("_box"))){
+    if(!this.reflection)for(const [id,kind,x,z] of PROPS.filter(row=>!row[1].endsWith("_box"))){
       const p=M.createProp(s,kind,id,this.p,this.finale);p.root.position.set(x,0,z);if(kind==="magazine")p.root.rotation.y=.4;
       p.meshes.forEach(m=>this.shadow.addShadowCaster(m));this.staticProps.push({...p,id,kind});this.objects.set(id,{id,kind,root:p.root,category:"prop"});
       if(kind!=="magazine"){
@@ -234,19 +241,24 @@ class Training {
     this.heroRing=B.MeshBuilder.CreateTorus("hero-foot-cue",{diameter:1,thickness:.030,tessellation:48},s);this.heroRing.material=this.material("hero-cue-mint","#b4efdb","#6ba99c");
     for(const cue of [this.heroRim,this.heroRing]){cue.isPickable=false;cue.setEnabled(false);}
   }
-  resize(){this.engine.setHardwareScalingLevel(1/Math.min(devicePixelRatio||1,1.5));this.engine.resize();const aspect=this.engine.getRenderWidth()/this.engine.getRenderHeight(),v=Math.max(5.35*C.arenaScale,9.65*C.arenaScale/aspect);this.camera.orthoTop=v;this.camera.orthoBottom=-v;this.camera.orthoLeft=-v*aspect;this.camera.orthoRight=v*aspect;}
+  resize(){this.engine.setHardwareScalingLevel(1/Math.min(devicePixelRatio||1,1.5));this.engine.resize();const aspect=this.engine.getRenderWidth()/this.engine.getRenderHeight(),v=this.reflection?Math.max(6.3,7.3/aspect):this.survivor?Math.max(4.85,8/aspect):Math.max(5.35*C.arenaScale,9.65*C.arenaScale/aspect);this.camera.orthoTop=v;this.camera.orthoBottom=-v;this.camera.orthoLeft=-v*aspect;this.camera.orthoRight=v*aspect;}
   makeProps(){for(const [id,kind,x,z] of PROPS.filter(row=>row[1].endsWith("_box"))){
     const p=M.createProp(this.scene,kind,id,this.p,this.finale);p.root.position.set(x,.82+p.size[1]/2+.012,z);p.root.computeWorldMatrix(true);
     const aggregate=new B.PhysicsAggregate(p.root,B.PhysicsShapeType.BOX,{mass:2,friction:.72,restitution:.08},this.scene);aggregate.body.setLinearDamping(.35);aggregate.body.setAngularDamping(.65);
     this.props.push({...p,id,kind,mesh:p.root,aggregate,mass:2});this.solids.add(p.root);p.meshes.forEach(m=>this.shadow.addShadowCaster(m));this.objects.set(id,{id,kind,category:"prop",root:p.root,dynamic:true});
   }}
   makeActor(row,dummy=false,elite=false,friendly=false){
-    const [id,kind,x,z,scale]=row,rig=M.createActor(this.scene,kind,id,this.p,{stage:this.stageIndex,tray:this.tray,seat:TYPES[kind]?.seat||0,finale:this.finale});
+    const [id,kind,x,z,scale]=row,rig=M.createActor(this.scene,kind,id,this.p,{stage:this.stageIndex,tray:this.tray,seat:TYPES[kind]?.seat||0,finale:this.finale||this.reflection});
     if(!rig?.sockets?.weapon||typeof rig.pose!=="function"||typeof rig.dispose!=="function"||kind==="hero"&&typeof rig.setForm!=="function")throw new Error("models.js does not implement the frozen R24 actor/setForm/socket interface");
     if(kind==="hero")rig.setForm(this.stageIndex,this.tray);
     const seat=this.finale&&DATA.finale.seats[kind],native=seat?{...TYPES[kind],...seat}:TYPES[kind]?{...TYPES[kind],...(this.journey?this.stageData.enemyTuning?.[kind]:null)}:null,special=elite?(R.elite.byType[kind]||{}):{};
     const spec=native?{...native,windup:native.windup+(special.windupAdd||0),end:native.end+(special.windupAdd||0),duration:native.duration+(special.windupAdd||0)+(special.recoveryAdd||0),cycle:native.cycle+(special.windupAdd||0)+(special.recoveryAdd||0),...special}:null;
-    const hp=kind==="hero"?this.settings.hp:friendly?1:dummy?Math.max(500000,this.settings.override?this.settings.enemyHP:0):this.settings.override?this.settings.enemyHP:elite?R.elite.hpInStageD*this.stageData.D:native.hp;
+    if(this.survivor&&spec){
+      spec.speed=spec.boss?(spec.action==="guardCharge"?1.85:1.55):2.15;
+      if(spec.seat)spec.hp=Math.round(spec.hp*1.25);
+      if(this.cudaLesson&&this.waveIndex===0&&kind==="rusher")spec.hp=180;
+    }
+    const hp=kind==="hero"?this.settings.hp:friendly?1:dummy?Math.max(500000,this.settings.override?this.settings.enemyHP:0):this.settings.override?this.settings.enemyHP:elite?R.elite.hpInStageD*this.stageData.D:spec.hp;
     const a={id,kind,spec,fantasyTitle:seat?.label,elite,friendly,seat:native?.seat||0,boss:!!native?.boss,dummy,rig,root:rig.root,scale,hp,maxHP:hp,dead:false,retired:false,deathAge:0,yaw:0,velocity:V(),recoil:V(),actualSpeed:0,travel:0,turnVelocity:0,reactAge:99,stun:0,controlUntil:0,protected:false,action:null,cooldowns:[0,0],nextAttack:this.simTime+1.1+this.actors.length*.16,ammo:3,pattern:0,healAttempts:0,nextHeal:this.simTime+R.heal.firstAfter,path:[],pathAge:99,pathGoal:null,blockedAge:0,previousFeet:V(x,.015,z),previousWeapon:V(),stepTravel:0};
     this.syncMetrics(a);a.ctrlHeight=a.m.height;a.ctrlRadius=Math.min(a.m.radius,kind==="ember_beast"?.56*scale:a.m.height/2-.03);
     rig.root.scaling.setAll(scale);rig.root.position.set(x,.025,z);
@@ -256,8 +268,12 @@ class Training {
     a.tell=new B.Mesh(id+"-warning",this.scene);const vd=new B.VertexData(),pos=[0,0,0],idx=[],nor=[];
     for(let i=0;i<=16;i++){const t=-.32+i*.64/16;pos.push(Math.sin(t),0,Math.cos(t));if(i)idx.push(0,i,i+1);}B.VertexData.ComputeNormals(pos,idx,nor);vd.positions=pos;vd.indices=idx;vd.normals=nor;vd.applyToMesh(a.tell);a.tell.material=this.fx.tell;a.tell.isPickable=false;a.tell.setEnabled(false);
     const edge=[V()];for(let i=0;i<=16;i++){const t=-.32+i*.64/16;edge.push(V(Math.sin(t),.006,Math.cos(t)));}edge.push(V());a.tellEdge=B.MeshBuilder.CreateLines(id+"-warning-edge",{points:edge},this.scene);a.tellEdge.parent=a.tell;a.tellEdge.color=B.Color3.FromHexString("#ffcaac");a.tellEdge.alpha=.9;a.tellEdge.isPickable=false;
+    if(this.journey==="cuda"&&kind==="rusher"){
+      a.cudaCue=B.MeshBuilder.CreateTorus(id+"-cuda-relay",{diameter:1.25,thickness:.065,tessellation:32},this.scene);
+      a.cudaCue.material=this.fx.cuda;a.cudaCue.isPickable=false;
+    }
     a.sourceCue=B.MeshBuilder.CreateTorus(id+"-danger-source",{diameter:.46,thickness:.055,tessellation:24},this.scene);a.sourceCue.material=this.fx.danger;a.sourceCue.isPickable=false;a.sourceCue.setEnabled(false);
-    const aimedShot=this.finale&&(native?.action==="shoot"||native?.action==="heal"&&R.heal.fallbackAction==="shoot");
+    const aimedShot=(this.finale||this.survivor)&&(native?.action==="shoot"||native?.action==="heal"&&R.heal.fallbackAction==="shoot");
     a.tellBands=native&&(aimedShot||["volley","beam","sniper"].includes(native.action))?(native.action==="volley"?[-R.enemyPatterns.volley.fan*Math.PI/360,0,R.enemyPatterns.volley.fan*Math.PI/360]:[0]).map((offset,i)=>{const mesh=B.MeshBuilder.CreateCylinder(id+"-tell-"+i,{diameter:1,height:1,tessellation:6},this.scene);mesh.material=this.fx.danger;mesh.isPickable=false;mesh.setEnabled(false);return{mesh,offset};}):[];
     if(this.finale&&native?.action==="disc")a.tellBands.push(this.createDiscTell(id));
     a.floorRings=(native?.ground?[native.ground.innerRadius,native.ground.radius].filter(Boolean):[]).map((radius,i)=>{
@@ -300,10 +316,10 @@ class Training {
     band.turn.position.z=band.stop.position.z=length;
     band.turn.setEnabled(!blocked);band.stop.setEnabled(blocked);
   }
-  pose(a){a.rig.pose({time:this.simTime,travel:a.travel,speed:a.actualSpeed,yawRate:a.turnVelocity,action:a.action,reactAge:a.reactAge,reactHeavy:!!a.reactHeavy,discOut:this.finale&&a.seat===10&&this.projectiles.some(p=>p.root?.owner===a.id&&p.type==="disc"),dead:a.dead,deathAge:a.deathAge,stage:this.stageIndex,tray:this.tray,shieldPresented:a===this.hero&&this.shieldPresented(a)});}
+  pose(a){a.rig.pose({time:this.simTime,travel:a.travel,speed:a.actualSpeed,yawRate:a.turnVelocity,action:a.action,reactAge:a.reactAge,reactHeavy:!!a.reactHeavy,discOut:this.finale&&a.seat===10&&this.projectiles.some(p=>p.root?.owner===a.id&&p.type==="disc"),dead:a.dead,deathAge:a.deathAge,stage:this.stageIndex,tray:this.tray,shieldPresented:a===this.hero&&this.shieldPresented(a)});if(this.echo&&a===this.echo)window.ReflectionCombat.pose(a.rig,this.duel,this.settings.reduced);}
   weapon(a){return a.rig.sockets.weapon.getAbsolutePosition().clone();}
   rootEvent(a,type,damage,duration,windup,end){
-    const hero=a.kind==="hero",profile=hero?this.activeProfile():null,cuda=Object.freeze({...R.cuda,enabled:hero&&this.stageData.cuda&&R.cuda.allowedTypes.includes(type)});
+    const hero=a.kind==="hero",profile=hero?this.activeProfile():null,cuda=Object.freeze({...R.cuda,enabled:hero&&this.stageData.cuda&&(!this.cudaLesson||this.cudaLesson.phase==="parallel")&&R.cuda.allowedTypes.includes(type)});
     return {id:this.run+":"+(++this.sequence),owner:a.id,sourceKind:a.kind,type,damageKind:hero?"hero":R.damageKinds[a.kind]||"ordinary_light_melee",acceptedAt:this.simTime,acceptedBaseD:hero?profile.D:damage,cuda,
       age:0,previousAge:0,duration,windup,activeEnd:end,yaw:a.yaw,startYaw:a.yaw,base:damage,crit:hero&&this.random()<this.settings.crit,critMultiplier:R.crit.multiplier,
       directHit:new Set(),cudaHit:new Set(),packetHit:new Map(),shieldDecisions:new Map(),props:new Set(),directRecords:[],selectedAtAccept:this.selectedID,
@@ -320,7 +336,7 @@ class Training {
       r.swing=swing;r.finisher=finisher;if(finisher)this.combo=0;
       r.geometry={shape:"fan",reach:profile.reach,arc:profile.arc,cap:profile.cap};a.punchCount=(a.punchCount||0)+1;r.hand=this.stageIndex>=6||this.tray||a.punchCount%2?"l":"r";
     }else if(hero&&type==="skill1"){
-      if(!this.stageData.slot1)return null;r=this.rootEvent(a,type,profile.D*R.slot1.damageMultiplier,R.slot1.duration,R.slot1.contactStart,R.slot1.contactEnd);
+      if(!this.slotAvailable(0))return null;r=this.rootEvent(a,type,profile.D*R.slot1.damageMultiplier,R.slot1.duration,R.slot1.contactStart,R.slot1.contactEnd);
       r.geometry={shape:"dash",reach:Math.min(profile.reach,1.9),arc:this.stageData.shield?R.slot1.shield.guardArc:R.slot1.fist.guardArc,cap:R.slot1.cap};r.guardStage=this.stageData.shield?"shield":"fist";
     }else if(hero&&type==="skill2"){
       if(!this.stageData.slot2)return null;const form=this.stageIndex>=R.hammer.fromStage?R.slot2.hammer:R.slot2.gauntlet;
@@ -361,7 +377,7 @@ class Training {
     }
     if(rush){r.geometry=rush;r.punishOpen=false;r.interruptible=false;a.recoil.setAll(0);this.drawRushTell(a,rush.length,rush.radius);}
     r.sourceColumn=a.column??null;r.curveSign=(a.pattern=(a.pattern||0)+1)%2?1:-1;
-    a.action=r;a.velocity.setAll(0);a.path.length=0;
+    a.action=r;a.velocity.setAll(0);a.path.length=0;if(this.survivor)a.pathAge=99;
     if(hero){this.pendingRoots.add(r);if(type==="basic")a.nextAttack=this.simTime+r.duration;else this.combo=0;if(type==="skill1")a.cooldowns[0]=this.simTime+R.slot1.cooldown;if(type==="skill2")a.cooldowns[1]=this.simTime+R.slot2.cooldown;this.sound.play("swing");}
     else if(type!=="reload")a.nextAttack=this.simTime+(a.kind===R.heal.type&&type==="shoot"?R.heal.fallbackCycle:enemy.cycle);
     a.previousWeapon.copyFrom(this.weapon(a));return r;
@@ -385,17 +401,50 @@ class Training {
     if(r.geometry?.shape==="mortar")for(const p of this.projectiles)if(p.root===r)this.retireProjectile(p);
     if(a===this.hero)this.finalizeRoot(r,discard||a.dead);a.action=null;a.tell.setEnabled(false);a.tellBands.forEach(e=>e.mesh.setEnabled(false));a.velocity.setAll(0);this.pose(a);a.previousWeapon.copyFrom(this.weapon(a));this.pruneDanger();
   }
-  disposeActor(a){if(a.controller)a.controller.dispose();a.rig.meshes.forEach(m=>this.shadow.removeShadowCaster(m));a.tell.dispose();a.sourceCue.dispose();a.tellBands.forEach(e=>e.mesh.dispose());a.floorRings.forEach(e=>e.dispose());a.emitterCue?.dispose();a.rig.dispose();if(a.bar)a.bar.remove();this.objects.delete(a.id);}
+  disposeActor(a){if(a.controller)a.controller.dispose();a.rig.meshes.forEach(m=>this.shadow.removeShadowCaster(m));a.tell.dispose();a.sourceCue.dispose();a.cudaCue?.dispose();a.tellBands.forEach(e=>e.mesh.dispose());a.floorRings.forEach(e=>e.dispose());a.emitterCue?.dispose();a.rig.dispose();if(a.bar)a.bar.remove();this.objects.delete(a.id);}
   reset(){
+    this.steerKeys.clear();this.nextReinforcement=0;this.ingressNumber=0;this.mobDefeats=0;this.autoTarget=null;this.dragId=null;
+    this.reflectionStage?.dispose();this.reflectionStage=null;this.echo=null;this.lastMove=null;
     this.clearTransient();this.combo=0;this.comboUntil=0;this.lastWarning="";this.qaFrozen=false;this.actors.forEach(a=>this.disposeActor(a));this.actors.length=0;
     for(const p of this.props){this.solids.delete(p.mesh);p.meshes.forEach(m=>this.shadow.removeShadowCaster(m));p.aggregate.dispose();p.dispose();this.objects.delete(p.id);}this.props.length=0;
     for(const list of [this.damageEvents,this.cudaEvents,this.lightningEvents,this.blockEvents,this.healEvents,this.impulseEvents,this.progressEvents,this.pickupEvents])list.length=0;
     this.lastHealSniperStart=-Infinity;this.run++;this.resetCount++;this.rng=C.seed;this.sequence=0;this.simTime=0;this.nextCUDA=0;this.nextRegen=0;this.ended=false;this.completedStages=[];this.aiCursor=0;this.stageStarted=0;this.waveStarted=0;this.gainUntil=0;
     this.measures.steps=0;this.measures.droppedSeconds=0;this.measures.hitstopSeconds=0;
-    this.seatsDown=[];this.tray=false;this.waveIndex=this.startWave;this.makeProps();this.applyTheme();this.hero=this.makeActor(["hero","hero",0,3.0,C.heroScale]);
+    this.cudaLesson=this.journey==="cuda"?{phase:"serial",serialTarget:null,rootId:null,targets:[],time:null}:null;
+    window.JourneySetpiece?.lesson?.(this.cudaLesson);
+    this.seatsDown=[];this.tray=false;this.waveIndex=this.startWave;if(!this.reflection){this.makeProps();this.applyTheme();}this.hero=this.makeActor(["hero","hero",0,this.reflection?1.8:3.0,C.heroScale]);
     this.hero.yaw=Math.PI;this.hero.root.rotation.y=this.hero.yaw;this.pose(this.hero);this.hero.previousWeapon.copyFrom(this.weapon(this.hero));
-    this.makeFriendlyStaff();this.makeTray();this.spawnWave();this.aim.copyFrom(V(0,0,-2));this.paused=document.hidden&&this.finaleState!=="intro";ui.pause.hidden=!this.paused;ui.status.textContent="";ui.gainCue.hidden=true;
+    if(this.reflection)this.spawnReflection();else{this.makeFriendlyStaff();this.makeTray();this.spawnWave();}this.aim.copyFrom(V(0,0,-2));this.paused=document.hidden&&this.finaleState!=="intro";ui.pause.hidden=!this.paused;ui.status.textContent="";ui.gainCue.hidden=true;
     this.marker.setEnabled(false);this.selection.setEnabled(false);this.lastTime=performance.now();this.cameraView();this.syncDebug();this.setStyle(this.styleMode);this.hud();
+  }
+  spawnReflection(){
+    const {Duel,glass,arena}=window.ReflectionCombat;
+    this.duel=new Duel(window.JensenJourney.reflectionMove());
+    const echo=this.makeActor(["reflection","hero",glass.x,glass.z,C.heroScale]);
+    this.echo=echo;echo.kind="reflection";echo.boss=true;echo.hp=echo.maxHP=2;
+    this.objects.get(echo.id).kind="reflection";this.floor.visibility=0;
+    this.reflectionStage=window.ReflectionStage.create(this.scene,{window:glass,arena,echo:echo.rig});
+    this.reflectionStage.update(this.duel.view());this.pose(echo);
+  }
+  stepReflection(dt){
+    if(this.hero.dead)return;
+    const duel=this.duel,echo=this.echo,spot=this.hero.root.position;
+    duel.update(dt,spot,event=>{
+      if(event.kind==="complete"){this.endJourney(true);return;}
+      const point=V(event.at.x,.05,event.at.z);
+      const r=this.rootEvent(echo,"echo-"+event.kind,event.damage,.1,0,.1);
+      r.damageKind="ground_heat";
+      this.progressEvents.push({type:"reflection-release",cycle:event.cycle,attack:event.kind,target:[point.x,point.z],hit:event.hit,time:this.simTime});
+      this.trimLog(this.progressEvents);this.sound.play(event.kind==="lightning"?"hit":"hammer");
+      if(event.hit)this.damage(r,this.hero,spot.add(V(0,.5,0)),point,"ground",event.kind);
+    });
+    const x=duel.boss.x,z=duel.boss.z,old=echo.root.position;
+    const speed=Math.hypot(x-old.x,z-old.z)/dt;
+    echo.travel+=speed*dt;echo.actualSpeed=speed;echo.root.position.set(x,.025,z);
+    echo.controller.setPosition(V(x,echo.m.height/2+.025,z));echo.controller.setVelocity(V());
+    const aim=["tell","strike","aftershock"].includes(duel.phase)?duel.target:spot;
+    if(Math.hypot(aim.x-x,aim.z-z)>.2)this.face(echo,Math.atan2(aim.x-x,aim.z-z),dt);
+    echo.root.rotation.y=echo.yaw;this.pose(echo);
   }
   setupUI(){
     window.addEventListener("resize",()=>this.resize());window.addEventListener("blur",()=>this.pauseGame());document.addEventListener("visibilitychange",()=>{if(document.hidden)this.pauseGame();});
@@ -410,17 +459,26 @@ class Training {
         this.beginFinale(button===ui.finaleRetry);
       });
     }else if(!this.journey)this.setupLabUI();
-    ui.view.addEventListener("pointermove",e=>{if(this.journey&&e.pointerType==="touch"&&!e.isPrimary)return;if(this.ready&&!this.paused&&!this.qaFrozen&&!this.ended&&this.finaleState!=="intro")this.aim.copyFrom(this.groundAt(e));});
+    ui.view.addEventListener("pointermove",e=>{if(this.journey&&e.pointerType==="touch"&&!e.isPrimary)return;if(this.ready&&!this.paused&&!this.qaFrozen&&!this.ended&&this.finaleState!=="intro"){
+      this.aim.copyFrom(this.groundAt(e));if(this.survivor&&this.dragId===e.pointerId)this.steerPointer(this.aim);
+    }});
+    const release=e=>{if(e.pointerId===this.dragId)this.dragId=null;};
+    ui.view.addEventListener("pointerup",release);ui.view.addEventListener("pointercancel",release);ui.view.addEventListener("lostpointercapture",release);
     ui.view.addEventListener("pointerdown",e=>{
       if(e.button!==0||e.pointerType==="touch"&&(!this.journey||!e.isPrimary)||!this.ready||this.finaleState==="intro"||this.finale&&this.ended)return;e.preventDefault();ui.view.focus();if(this.paused){this.resumeGame();return;}if(this.qaFrozen||this.hero.dead||this.ended)return;
       const ray=this.pointerRay(e);let chosen=null,best=Infinity;
       for(const a of this.actors){if(!this.isHostile(a))continue;const p=a.root.position,r=Math.max(a.m.hurtRadius,.36),hit=boxRay(ray.origin,ray.direction,p.add(V(-r,.03,-r)),p.add(V(r,a.m.height,r)));if(hit!==null&&hit<best){chosen=a;best=hit;}}
       this.pendingSkill=null;
-      if(chosen){const changed=chosen.id!==this.selectedID;this.selectedID=chosen.id;this.order={type:"attack"};this.aim.copyFrom(chosen.root.position);if(this.hero.action?.type==="basic"&&(!this.finale||changed)&&!this.hero.action.finisher)this.cancel(this.hero,"target-change");}
-      else {this.selectedID=null;this.order={type:"move",point:this.groundAt(e)};this.aim.copyFrom(this.order.point);if(this.hero.action?.type==="basic"&&!this.hero.action.finisher)this.cancel(this.hero,"ground-click");}
+      if(chosen){const changed=chosen.id!==this.selectedID;this.selectedID=chosen.id;this.order={type:"attack"};this.aim.copyFrom(chosen.root.position);if(this.hero.action?.type==="basic"&&(!this.finale&&!this.survivor||changed)&&!this.hero.action.finisher)this.cancel(this.hero,"target-change");}
+      else {this.selectedID=null;this.order={type:"move",point:this.groundAt(e)};this.aim.copyFrom(this.order.point);if(this.survivor&&e.pointerId!==undefined){this.dragId=e.pointerId;this.steerPointer(this.aim);ui.view.setPointerCapture?.(e.pointerId);}if(!this.survivor&&this.hero.action?.type==="basic"&&!this.hero.action.finisher)this.cancel(this.hero,"ground-click");}
       this.hero.path.length=0;this.hero.pathAge=99;this.hero.blockedAge=0;
     });
+    window.addEventListener("keyup",e=>this.steerKeys.delete(e.code));
     window.addEventListener("keydown",e=>{
+      if(this.survivor&&(e.ctrlKey||e.metaKey||e.altKey))return;
+      if(this.survivor&&this.finaleState==="playing"&&!this.paused&&STEER_KEYS.has(e.code)&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement?.tagName||"")){
+        e.preventDefault();this.steerKeys.add(e.code);this.dragId=null;this.order=null;return;
+      }
       if(this.finaleState==="intro"||this.finale&&this.ended||e.repeat||/INPUT|SELECT|TEXTAREA/.test(document.activeElement?.tagName||""))return;
       if(e.code==="Digit1"||e.code==="Digit2"){e.preventDefault();this.requestSkill(e.code==="Digit1"?0:1);}
       if(e.code==="Enter"&&this.paused){e.preventDefault();this.resumeGame();}
@@ -463,7 +521,7 @@ class Training {
     ui.finaleIntro.hidden=true;ui.finaleResult.hidden=true;ui.pause.hidden=true;ui.view.focus();return true;
   }
   retryJourney(event){
-    if(!this.journey||this.finaleState!=="lost"&&!(this.journeyMode==="challenge"&&this.finaleState==="won"))return false;
+    if(!this.journey||this.finaleState!=="lost"&&!(["challenge","reflection"].includes(this.journeyMode)&&this.finaleState==="won"))return false;
     this.reset();this.finaleState="intro";this.paused=true;return this.beginJourney(event);
   }
   endJourney(won){
@@ -472,15 +530,17 @@ class Training {
     for(const a of this.actors){this.cancel(a,"journey-end",true);a.velocity.setAll(0);a.recoil.setAll(0);a.path.length=0;a.controller?.setVelocity(V());}
     ui.finaleIntro.hidden=true;ui.finaleResult.hidden=true;ui.pause.hidden=true;ui.status.textContent="";
     this.progressEvents.push({type:won?"journey-victory":"journey-defeat",chapter:this.journey,time:this.simTime});
-    if(won)window.JourneySetpiece?.cleared(this.journey);
-    Promise.resolve(window.JensenJourney.finish({won,hp:Math.max(0,this.hero.hp),seatsDown:[...this.seatsDown]})).catch(fail);
+    if(won&&!this.reflection)window.JourneySetpiece?.cleared(this.journey);
+    Promise.resolve(window.JensenJourney.finish({won,hp:Math.max(0,this.hero.hp),seatsDown:[...this.seatsDown],...(this.journey==="seats"&&this.journeyMode==="story"?{lastMove:this.lastMove}:{}),...(this.reflection?{reflection:{counters:this.duel.counters}}:{})})).catch(fail);
   }
   pointerRay(e){const r=ui.view.getBoundingClientRect();return this.scene.createPickingRay(e.clientX-r.left,e.clientY-r.top,B.Matrix.Identity(),this.camera);}
-  groundAt(e){const ray=this.pointerRay(e),pick=this.scene.pickWithRay(ray,m=>m===this.floor,false);const p=pick?.hit?pick.pickedPoint.clone():Math.abs(ray.direction.y)>1e-6?ray.origin.add(ray.direction.scale(-ray.origin.y/ray.direction.y)):this.aim.clone();return V(clamp(p.x,-C.arenaX,C.arenaX),0,clamp(p.z,-C.arenaZ,C.arenaZ));}
-  requestSkill(slot){if(this.finale&&this.simTime<.45||!Number.isInteger(slot)||!this.slotAvailable(slot)||!this.ready||this.finaleState==="intro"||this.paused||this.qaFrozen||this.ended||this.hero.dead||this.pendingSkill!==null)return false;const a=this.hero;if(a.stun>0||a.cooldowns[slot]>this.simTime||a.action&&(a.action.type!=="basic"||a.action.finisher))return false;this.pendingSkill=slot;return true;}
-  testAttack(x,z,slot){if(this.journey||this.finaleState==="intro"||![x,z].every(Number.isFinite)||![0,1,2].includes(slot)||this.paused||this.qaFrozen||this.hero.dead||this.ended)return false;this.aim.set(clamp(x,-C.arenaX,C.arenaX),0,clamp(z,-C.arenaZ,C.arenaZ));if(slot)return this.requestSkill(slot-1);if(this.hero.action||this.simTime<this.hero.nextAttack||this.hero.stun>0)return false;this.order=null;const d=this.aim.subtract(this.hero.root.position);this.start(this.hero,"basic",Math.atan2(d.x,d.z));return true;}
-  testMove(x,z){if(this.journey||this.finaleState==="intro"||![x,z].every(Number.isFinite)||this.paused||this.qaFrozen||this.hero.dead||this.ended)return false;this.selectedID=null;this.pendingSkill=null;this.order={type:"move",point:V(clamp(x,-C.arenaX,C.arenaX),0,clamp(z,-C.arenaZ,C.arenaZ))};if(this.hero.action?.type==="basic"&&!this.hero.action.finisher)this.cancel(this.hero,"move-api");this.hero.pathAge=99;return true;}
-  pauseGame(){if(this.journey&&this.finaleState!=="playing"||!this.ready||this.paused||this.finale&&this.finaleState!=="playing")return;if(this.finale)this.clearHurt();this.paused=true;this.accumulator=0;this.hitstop=0;this.pendingSkill=null;this.order=null;
+  groundAt(e){const ray=this.pointerRay(e),pick=this.scene.pickWithRay(ray,m=>m===this.floor,false);const p=pick?.hit?pick.pickedPoint.clone():Math.abs(ray.direction.y)>1e-6?ray.origin.add(ray.direction.scale(-ray.origin.y/ray.direction.y)):this.aim.clone();return V(clamp(p.x,-this.field.arenaX,this.field.arenaX),0,clamp(p.z,-this.field.arenaZ,this.field.arenaZ));}
+  requestSkill(slot){if(this.reflection&&["preview","enter","return","complete"].includes(this.duel.phase))return false;if(this.finale&&this.simTime<.45||!Number.isInteger(slot)||!this.slotAvailable(slot)||!this.ready||this.finaleState==="intro"||this.paused||this.qaFrozen||this.ended||this.hero.dead||this.pendingSkill!==null)return false;const a=this.hero;if(a.stun>0||a.cooldowns[slot]>this.simTime||a.action&&(a.action.type!=="basic"||a.action.finisher))return false;this.pendingSkill=slot;return true;}
+  testAttack(x,z,slot){if(this.journey||this.finaleState==="intro"||![x,z].every(Number.isFinite)||![0,1,2].includes(slot)||this.paused||this.qaFrozen||this.hero.dead||this.ended)return false;this.aim.set(clamp(x,-this.field.arenaX,this.field.arenaX),0,clamp(z,-this.field.arenaZ,this.field.arenaZ));if(slot)return this.requestSkill(slot-1);if(this.hero.action||this.simTime<this.hero.nextAttack||this.hero.stun>0)return false;this.order=null;const d=this.aim.subtract(this.hero.root.position);this.start(this.hero,"basic",Math.atan2(d.x,d.z));return true;}
+  testMove(x,z){if(this.journey||this.finaleState==="intro"||![x,z].every(Number.isFinite)||this.paused||this.qaFrozen||this.hero.dead||this.ended)return false;this.selectedID=null;this.pendingSkill=null;this.order={type:"move",point:V(clamp(x,-this.field.arenaX,this.field.arenaX),0,clamp(z,-this.field.arenaZ,this.field.arenaZ))};if(this.hero.action?.type==="basic"&&!this.hero.action.finisher)this.cancel(this.hero,"move-api");this.hero.pathAge=99;return true;}
+  pauseGame(){if(this.journey&&this.finaleState!=="playing"||!this.ready||this.paused||this.finale&&this.finaleState!=="playing")return;if(this.finale)this.clearHurt();this.steerKeys.clear();this.dragId=null;this.paused=true;this.accumulator=0;this.hitstop=0;this.pendingSkill=null;this.order=null;
+    // Pausing a Survivor encounter freezes committed attacks and their warning clocks.
+    if(this.survivor){ui.pause.hidden=false;return;}
     for(const a of this.actors){if(!a.dead)this.cancel(a,"pause",true);a.velocity.setAll(0);a.recoil.setAll(0);a.path.length=0;if(a.controller)a.controller.setVelocity(V());}
     for(const r of this.pendingRoots){r.cudaResolved=true;r.discarded=true;}this.pendingRoots.clear();this.cudaQueue.length=0;this.healQueue.length=0;this.pruneDanger();ui.pause.hidden=false;
   }
@@ -490,7 +550,7 @@ class Training {
   pathTo(a,goal){
     const from=V(a.root.position.x,0,a.root.position.z),boxes=this.obstacleBoxes(a),inside=(p,b)=>p.x>b.min.x&&p.x<b.max.x&&p.z>b.min.z&&p.z<b.max.z;
     if(boxes.some(b=>inside(goal,b)))return [];const clear=(p,q)=>!boxes.some(b=>!inside(p,b)&&boxRay(p,q.subtract(p),b.min,b.max,1)!==null);
-    if(clear(from,goal))return [goal.clone()];const nodes=[from,goal.clone()];for(const b of boxes)for(const x of[b.min.x-.04,b.max.x+.04])for(const z of[b.min.z-.04,b.max.z+.04]){const n=V(x,0,z);if(Math.abs(x)<C.arenaX&&Math.abs(z)<C.arenaZ&&!boxes.some(o=>inside(n,o)))nodes.push(n);}
+    if(clear(from,goal))return [goal.clone()];const nodes=[from,goal.clone()];for(const b of boxes)for(const x of[b.min.x-.04,b.max.x+.04])for(const z of[b.min.z-.04,b.max.z+.04]){const n=V(x,0,z);if(Math.abs(x)<this.field.arenaX&&Math.abs(z)<this.field.arenaZ&&!boxes.some(o=>inside(n,o)))nodes.push(n);}
     const dist=nodes.map(()=>Infinity),prev=nodes.map(()=>-1),done=new Set();dist[0]=0;
     for(let k=0;k<nodes.length;k++){let u=-1;for(let i=0;i<nodes.length;i++)if(!done.has(i)&&(u<0||dist[i]<dist[u]))u=i;if(u<0||!Number.isFinite(dist[u])||u===1)break;done.add(u);for(let v=1;v<nodes.length;v++)if(!done.has(v)&&clear(nodes[u],nodes[v])){const d=dist[u]+B.Vector3.Distance(nodes[u],nodes[v]);if(d<dist[v]){dist[v]=d;prev[v]=u;}}}
     if(!Number.isFinite(dist[1]))return [];const out=[];for(let i=1;i>0;i=prev[i]){out.unshift(nodes[i]);if(prev[i]<0)return [];}return out;
@@ -498,9 +558,50 @@ class Training {
   seek(a,goal,speed,dt){a.pathAge+=dt;if(a.pathAge>.45||!a.pathGoal||B.Vector3.DistanceSquared(a.pathGoal,goal)>.3){a.path=this.pathTo(a,goal);a.pathGoal=goal.clone();a.pathAge=0;if(!a.path.length&&a===this.hero){this.order=null;ui.status.textContent="Path blocked. Click another route.";}}
     while(a.path.length&&Math.hypot(a.path[0].x-a.root.position.x,a.path[0].z-a.root.position.z)<.12)a.path.shift();if(!a.path.length)return V();const d=a.path[0].subtract(a.root.position);d.y=0;const n=d.length();return n>.001?d.scale(Math.min(speed,Math.sqrt(2*C.brake*Math.max(0,n-.04)),n/dt)/n):V();}
   face(a,yaw,dt){const old=a.yaw;a.yaw+=angle(a.yaw,yaw)*(1-Math.exp(-C.turn*dt));a.turnVelocity=angle(old,a.yaw)/dt;}
+  steerPointer(point){
+    this.dragOffset=V(point.x-this.camera.position.x,0,point.z-(this.camera.position.z-14));
+    this.order={type:"move",point:point.clone()};
+  }
+  survivorMove(dt){
+    const a=this.hero,keys=this.steerKeys;
+    if(keys.size){
+      const x=Number(keys.has("KeyD")||keys.has("ArrowRight"))-Number(keys.has("KeyA")||keys.has("ArrowLeft"));
+      const z=Number(keys.has("KeyS")||keys.has("ArrowDown"))-Number(keys.has("KeyW")||keys.has("ArrowUp"));
+      const pos=a.root.position,v=V(x,0,z).normalize().scale(C.speed);
+      if(Math.abs(pos.x)>=this.field.arenaX&&Math.sign(pos.x)===Math.sign(v.x))v.x=0;
+      if(Math.abs(pos.z)>=this.field.arenaZ&&Math.sign(pos.z)===Math.sign(v.z))v.z=0;
+      return v;
+    }
+    if(this.order?.type!=="move")return V();
+    if(this.dragId!==null&&this.dragOffset){
+      this.order.point.set(clamp(this.camera.position.x+this.dragOffset.x,-this.field.arenaX,this.field.arenaX),0,clamp(this.camera.position.z-14+this.dragOffset.z,-this.field.arenaZ,this.field.arenaZ));
+      this.aim.copyFrom(this.order.point);
+    }
+    const p=this.order.point;if(Math.hypot(p.x-a.root.position.x,p.z-a.root.position.z)<.09){this.order=null;return V();}
+    return this.seek(a,p,C.speed,dt);
+  }
+  survivorBasic(dt){
+    const a=this.hero,selected=this.actors.find(e=>e.id===this.selectedID&&this.isHostile(e));
+    if(!selected){if(this.order?.type==="attack")this.order=null;this.selectedID=null;}
+    const origin=a.root.position,manual=selected&&this.order?.type==="attack";
+    const distance=t=>Math.hypot(t.root.position.x-origin.x,t.root.position.z-origin.z);
+    const clear=t=>!this.blocked(origin.add(V(0,.82,0)),t.root.position.add(V(0,Math.min(.75,t.m.height*.55),0)));
+    let target=null;
+    if(selected&&distance(selected)<=this.comfort(selected)&&clear(selected))target=selected;
+    if(manual&&!target)return this.seek(a,V(selected.root.position.x,0,selected.root.position.z),C.speed,dt);
+    if(!target&&this.simTime>=a.nextAttack){
+      target=this.actors.filter(e=>this.isHostile(e)&&distance(e)<=this.comfort(e)).sort((x,y)=>distance(x)-distance(y)).find(clear);
+    }
+    if(target&&this.simTime>=a.nextAttack){
+      const p=target.root.position;this.autoTarget=target.id;
+      this.start(a,"basic",Math.atan2(p.x-origin.x,p.z-origin.z));
+    }
+    return this.survivorMove(dt);
+  }
   decide(a,dt){
-    if(a.dead||a.retired||a.friendly||a.dummy||a.stun>0||this.hero.dead||a!==this.hero&&(this.transition||this.simTime<this.spawnAt))return V();const r=a.action;
+    if(a===this.echo||a.dead||a.retired||a.friendly||a.dummy||a.stun>0||this.hero.dead||a!==this.hero&&(this.transition||this.simTime<this.spawnAt))return V();const r=a.action;
     if(r){
+      if(this.survivor&&a===this.hero&&r.type==="basic")return this.survivorMove(dt);
       if(a===this.hero&&r.type==="skill1"&&r.age>=R.slot1.advanceStart&&r.age<R.slot1.advanceEnd&&r.dashDistance<R.slot1.distance){
         let remain=R.slot1.distance-r.dashDistance;const dir=V(Math.sin(r.yaw),0,Math.cos(r.yaw));
         for(const t of this.actors)if(t!==a&&!t.dead&&!t.retired){const d=t.root.position.subtract(a.root.position),along=B.Vector3.Dot(d,dir);if(along>0&&Math.abs(d.x*dir.z-d.z*dir.x)<t.ctrlRadius+a.ctrlRadius)remain=Math.min(remain,Math.max(0,along-t.ctrlRadius-a.ctrlRadius-.06));}
@@ -515,6 +616,7 @@ class Training {
     }
     if(a===this.hero){
       if(this.pendingSkill!==null){const slot=this.pendingSkill;this.pendingSkill=null;if(!this.slotAvailable(slot)||a.cooldowns[slot]>this.simTime)return V();const d=this.aim.subtract(a.root.position);this.start(a,slot?"skill2":"skill1",d.lengthSquared()>.01?Math.atan2(d.x,d.z):a.yaw);return V();}
+      if(this.survivor)return this.survivorBasic(dt);
       if(!this.order)return V();if(this.order.type==="attack"){
         const t=this.actors.find(e=>e.id===this.selectedID&&this.isHostile(e));if(!t){this.order=null;this.selectedID=null;return V();}const d=t.root.position.subtract(a.root.position);d.y=0;const yaw=Math.atan2(d.x,d.z);
         if(d.length()<=this.comfort(t)){this.face(a,yaw,dt);if(Math.abs(angle(a.yaw,yaw))<.18&&this.simTime+1e-9>=a.nextAttack&&!this.blocked(a.root.position.add(V(0,.85,0)),t.root.position.add(V(0,Math.min(.75,t.m.height*.55),0))))this.start(a,"basic",yaw);return V();}
@@ -523,6 +625,15 @@ class Training {
       const d=this.order.point.subtract(a.root.position);d.y=0;if(d.length()<.07){this.order=null;a.velocity.setAll(0);return V();}return this.seek(a,this.order.point,C.speed,dt);
     }
     const spec=a.spec,delta=this.hero.root.position.subtract(a.root.position);delta.y=0;const d=delta.length(),yaw=Math.atan2(delta.x,delta.z);
+    if(this.survivor){
+      const attackRange=Math.min(spec.range,5.35);
+      // Require the source to come into view and leave the hero a path around cover.
+      if(d<=attackRange&&this.simTime>=(a.nextSightCheck||0)){
+        a.coverBlocks=this.blocked(a.root.position.add(V(0,.8,0)),this.hero.root.position.add(V(0,.8,0)));a.nextSightCheck=this.simTime+.22;
+      }
+      if(d>attackRange||a.coverBlocks)
+        return this.seek(a,V(this.hero.root.position.x,0,this.hero.root.position.z),spec.speed,dt);
+    }
     if(["gun_column","gunner"].includes(a.kind)&&a.ammo<=0){this.start(a,"reload",yaw);return V();}
     let type=spec.action;
     if(type==="heal"){
@@ -553,9 +664,10 @@ class Training {
     this.simTime+=dt;if(this.combo&&this.simTime>=this.comboUntil)this.combo=0;this.measures.steps++;this.pruneDanger();
     if(this.pendingSkill!==null&&this.hero.action?.type==="basic")this.cancel(this.hero,"skill-input");
     const active=this.actors.filter(a=>!a.retired),enemies=active.filter(a=>a!==this.hero),rotation=this.aiCursor++%Math.max(1,enemies.length),ordered=[this.hero,...enemies.slice(rotation),...enemies.slice(0,rotation)];
-    for(const a of ordered){a.previousFeet.copyFrom(a.root.position);a.previousWeapon.copyFrom(this.weapon(a));if(a.action)a.action.previousAge=a.action.age;a.reactAge+=dt;a.stun=Math.max(0,a.stun-dt);const d=this.decide(a,dt);a.wanted=d.length();this.move(a,d,dt);}
+    for(const a of ordered){if(a===this.echo)continue;a.previousFeet.copyFrom(a.root.position);a.previousWeapon.copyFrom(this.weapon(a));if(a.action)a.action.previousAge=a.action.age;a.reactAge+=dt;a.stun=Math.max(0,a.stun-dt);const d=this.decide(a,dt);a.wanted=d.length();this.move(a,d,dt);}
     this.plugin.executeStep(dt,this.physics.getBodies());
     for(const a of active){
+      if(a===this.echo)continue;
       if(a.controller){const p=a.controller.getPosition();a.root.position.set(p.x,p.y-a.m.height/2,p.z);}const distance=Math.hypot(a.root.position.x-a.previousFeet.x,a.root.position.z-a.previousFeet.z);a.actualSpeed=distance/dt;a.travel+=distance;
       if(a.action){a.action.age+=dt;if(this.finale&&a.action.type==="sniper")a.action.locked=a.action.age+1e-9>=a.action.lockAt;if(a.action.type==="skill1")a.action.dashDistance+=distance;}
       if(!a.action&&a.wanted>.5&&a.actualSpeed<.1)a.blockedAge+=dt;else a.blockedAge=0;
@@ -563,13 +675,14 @@ class Training {
       if(a===this.hero&&!a.action){a.stepTravel+=distance;if(a.stepTravel>.72){a.stepTravel%=.72;this.sound.play("step");}}
       if(a.dead)a.deathAge+=dt;this.pose(a);
     }
+    if(this.reflection)this.stepReflection(dt);
     // Hero contact and all existing harmful packets precede heal resolution.
     if(!this.hero.dead)this.contacts(this.hero);
     for(const a of active)if(a!==this.hero&&!a.dead&&!a.friendly){this.contacts(a);this.enemyRelease(a);}
     this.updateProjectiles(dt);this.updateZones(dt);this.updateBeams(dt);this.updateWaves(dt);
     for(const r of [...this.pendingRoots])if(r.age+1e-9>=r.activeEnd)this.finalizeRoot(r,this.hero.dead);
     this.resolveHeals();
-    for(const a of active){const r=a.action,tell=r&&r.warning&&r.type!=="heal"&&r.age<r.windup&&!a.dead;a.tell.setEnabled(!!tell&&!(this.finale&&(a.tellBands.length||a.floorRings.length)));
+    for(const a of active){const r=a.action,tell=r&&r.warning&&r.type!=="heal"&&r.age<r.windup&&!a.dead;a.tell.setEnabled(!!tell&&!(this.finale&&(a.tellBands.length||a.floorRings.length))&&!(this.survivor&&r.type==="shoot"&&a.tellBands.length));
       if(r?.geometry?.shape==="rush-capsule")r.punishOpen=r.age>=r.activeEnd&&r.age+1e-9<r.duration&&!r.packetHit.get("melee:contact")?.has(this.hero.id)&&!this.hero.dead;
       if(a.emitterCue){
         const charging=!!tell&&r.age>=r.windup-.36;a.emitterCue.setEnabled(charging);
@@ -583,7 +696,7 @@ class Training {
       if(a.tell.isEnabled()){a.tell.position.copyFrom(r.origin);a.tell.position.y=.025;a.tell.rotation.y=r.yaw;const range=r.type==="heal"?R.heal.range:a.spec.range;if(r.geometry?.shape==="rush-capsule")a.tell.scaling.setAll(1);else a.tell.scaling.set(range,1,range);a.tell.material=r.type==="heal"?this.fx.heal:this.fx.tell;}
       for(const band of a.tellBands){
         band.mesh.setEnabled(!!tell);if(!tell)continue;
-        if(this.finale&&["shoot","sniper","disc"].includes(r.type)){
+        if((this.finale||this.survivor)&&["shoot","sniper","disc"].includes(r.type)){
           const from=(a.rig.sockets.muzzle||a.rig.sockets.weapon).getAbsolutePosition();
           const shot=a.spec.projectile||R.projectiles[a.kind]||R.projectiles.seat_02;
           const end=from.add(this.shotDirection(from,r.aim,0,r.type==="disc"?shot.outboundDistance:0).scale(shot.outboundDistance||shot.speed*shot.life));
@@ -604,7 +717,7 @@ class Training {
     for(const a of [...this.actors])if(a!==this.hero&&a.retired){this.disposeActor(a);this.actors.splice(this.actors.indexOf(a),1);}
     if(this.capture?.wait&&this.damageEvents.some(e=>e.source===this.hero.id&&e.time>this.capture.since&&e.channel==="direct"&&e.actual>0)){this.capture={wait:false,frozen:true,rootId:this.damageEvents.findLast(e=>e.source===this.hero.id&&e.time>this.capture.since&&e.channel==="direct"&&e.actual>0)?.rootId};this.freeze(true);ui.status.textContent="Real contact frame · QA frozen";}
     if(this.journey&&this.hero.dead)this.endJourney(false);
-    this.checkProgress();this.cameraView();
+    this.refillWave();this.checkProgress();this.cameraView();
   }
   contacts(a){
     const r=a.action;if(!r||a.friendly||a.dead)return;
@@ -616,7 +729,7 @@ class Training {
     const end=this.weapon(a),span=r.age-r.previousAge||1,f0=clamp((r.windup-r.previousAge)/span,0,1),f1=clamp((r.activeEnd-r.previousAge)/span,0,1),p0=B.Vector3.Lerp(a.previousWeapon,end,f0),p1=B.Vector3.Lerp(a.previousWeapon,end,f1);
     if(a===this.hero){
       this.line(p0,p1,r.finisher ? .12 : .025,this.fx.cuda,r.finisher ? .20 : .08,r,"weapon-trail");const g=r.geometry,origin=a.root.position.clone();
-      const candidates=this.actors.filter(t=>this.isHostile(t)&&!r.directHit.has(t.id)).map(t=>({t,point:this.fanIntersection(origin,r.yaw,g.reach,g.arc,t)})).filter(o=>o.point).sort((a,b)=>B.Vector3.DistanceSquared(a.t.root.position,origin)-B.Vector3.DistanceSquared(b.t.root.position,origin)||(a.t.id<b.t.id?-1:1));
+      const candidates=this.actors.filter(t=>this.isHostile(t)&&!r.directHit.has(t.id)).map(t=>({t,point:this.fanIntersection(origin,r.yaw,g.reach,g.arc,t)})).filter(o=>o.point).sort((a,b)=>(this.survivor?Number(b.t.id===r.selectedAtAccept)-Number(a.t.id===r.selectedAtAccept):0)||B.Vector3.DistanceSquared(a.t.root.position,origin)-B.Vector3.DistanceSquared(b.t.root.position,origin)||(a.t.id<b.t.id?-1:1));
       for(const {t,point}of candidates){if(g.cap!==null&&r.directHit.size>=g.cap)break;
         const handOrigin=origin.add(V(0,Math.min(.8,a.m.height*.5),0));if(this.blocked(handOrigin,point)||this.blocked(p0,p1))continue;
         // The accepted fan is a form-specific melee volume, sampled only during
@@ -644,6 +757,7 @@ class Training {
   strikeProps(r,p0,p1,origin,radius){for(const p of this.props){if(r.props.has(p.id))continue;p.mesh.computeWorldMatrix(true);const inv=B.Matrix.Invert(p.mesh.getWorldMatrix()),from=B.Vector3.TransformCoordinates(p0,inv),to=B.Vector3.TransformCoordinates(p1,inv),h=p.size.map(x=>x/2+radius),t=boxRay(from,to.subtract(from),V(-h[0],-h[1],-h[2]),V(...h),1);if(t!==null){const at=B.Vector3.Lerp(p0,p1,t);if(!this.blocked(origin.add(V(0,.9,0)),at,p.mesh))this.pushProp(r,p,at,origin);}}}
   pushProp(r,p,at,origin){if(r.props.has(p.id))return;r.props.add(p.id);const d=p.mesh.position.subtract(origin);d.y=0;if(d.lengthSquared()<1e-8)d.z=1;const power=r.type==="skill2"?3.6:r.type==="skill1"?2.7:1.7;d.normalize().scaleInPlace(power);d.y=power*.14;p.aggregate.body.applyImpulse(d,at);this.impulseEvents.push({rootId:r.id,prop:p.id,mass:2,impulse:d.asArray(),time:this.simTime});if(this.impulseEvents.length>64)this.impulseEvents.shift();this.emit(at,d.normalize(),5,r);this.feedback(r,true);}
   damage(r,t,point,origin,channel,packetId="contact"){
+    if(t===this.echo&&(!this.duel.open||channel!=="direct"||r.owner!==this.hero.id||r.base<=0))return false;
     if(t.friendly||t.dead||t.retired)return false;const cuda=channel==="cuda",heroRoot=r.owner===this.hero.id;
     let ledger;if(cuda)ledger=r.cudaHit;else if(heroRoot)ledger=r.directHit;else {const key=channel+":"+packetId;if(!r.packetHit.has(key))r.packetHit.set(key,new Set());ledger=r.packetHit.get(key);}
     if(ledger.has(t.id)||cuda&&r.directHit.has(t.id))return false;ledger.add(t.id);
@@ -651,7 +765,15 @@ class Training {
     const punish=heroRoot&&channel==="direct"&&t.action?.punishOpen&&t.action.age<t.action.duration&&(!t.spec.punishRange||Math.hypot(this.hero.root.position.x-t.root.position.x,this.hero.root.position.z-t.root.position.z)<=t.spec.punishRange);
     if(punish)requested=Math.round(requested*t.spec.punishMultiplier);
     const previousHP=t.hp;
-    if(t===this.hero){guard=this.mitigateHero(r,t,origin,requested,packetId);requested=guard.requested;}else requested=this.incomingDefense(t,r,origin,requested);
+    if(t===this.hero){guard=this.mitigateHero(r,t,origin,requested,packetId);requested=guard.requested;}else if(t===this.echo){
+      if(!this.duel.counter(r.id,this.simTime))return false;
+      requested=1;
+      this.progressEvents.push({type:"reflection-counter",cycle:this.duel.cycle,rootId:r.id,time:this.simTime});
+      this.trimLog(this.progressEvents);
+    }else requested=this.incomingDefense(t,r,origin,requested);
+    if(heroRoot&&channel==="direct"&&requested>0&&this.lessonContact(r,t))this.cuda({root:r,seed:t,contact:point,origin,seedKilledByOriginal:false,triggerTime:this.simTime,eligible:true,lesson:true});
+    // Broadcast before the serial HP floor so a depleted seed still takes this direct packet.
+    if(this.cudaLesson&&this.cudaLesson.phase!=="parallel"&&heroRoot&&!r.lessonBroadcast)requested=Math.min(requested,Math.max(0,t.hp-1));
     const before=t.hp,actual=Math.min(before,requested);t.hp=before-actual;
     if(this.finale&&t===this.hero&&!this.settings.reduced&&t.hp<previousHP)this.hurtStrength=Math.min(.62,this.hurtStrength+2.2*(previousHP-t.hp)/t.maxHP);
     const ev={rootId:r.id,source:r.owner,target:t.id,type:r.type,finisher:!!r.finisher,punish:!!punish,channel,packetId,acceptedBaseD:r.acceptedBaseD,base,requested,actual,hpBefore:before,hpAfter:t.hp,crit,guard:guard?.mode||null,time:this.simTime};this.damageEvents.push(ev);this.trimLog(this.damageEvents);
@@ -676,16 +798,68 @@ class Training {
     }
     if(t===this.hero&&!cuda&&guard?.prevented>0){const dir=t.root.position.subtract(origin);dir.y=0;if(dir.lengthSquared()<1e-7)dir.z=1;this.applyControl(r,t,dir.normalize());}
     if(guard?.event){guard.event.actualDamage=actual;guard.event.hpBefore=before;guard.event.hpAfter=t.hp;}
-    if(t.hp<=0&&!(t===this.hero&&this.settings.immortal))this.die(t);return actual>0;
+    if(t.hp<=0&&t!==this.echo&&!(t===this.hero&&this.settings.immortal))this.die(t);
+    return actual>0;
+  }
+  lessonContact(r,target){
+    const lesson=this.cudaLesson;
+    if(!lesson||lesson.phase==="parallel"||r.type!=="basic"||r.selectedAtAccept!==target.id||target.kind!=="rusher")return false;
+    if(lesson.phase==="serial"){
+      lesson.phase="ready";lesson.serialTarget=target.id;lesson.readyAt=this.simTime;
+      this.progressEvents.push({type:"cuda-serial-resealed",target:target.id,rootId:r.id,time:this.simTime});
+      window.JourneySetpiece?.lesson?.(lesson);return false;
+    }
+    if(target.id===lesson.serialTarget)return false;
+    return this.lessonCohort(target,r);
+  }
+  lessonCohort(target,root=null){
+    const seed=target.root.position.add(V(0,Math.min(.7,target.m.height*.6),0));let links=0;
+    for(const actor of this.actors){
+      if(!this.isHostile(actor)||actor.hp<=0||actor===target||root?.directHit.has(actor.id))continue;
+      const point=actor.root.position.add(V(0,Math.min(.7,actor.m.height*.6),0));
+      if(B.Vector3.DistanceSquared(seed,point)<=R.cuda.seedRange**2&&!this.blocked(seed,point)&&++links===2)return true;
+    }
+    return false;
+  }
+  lessonHUD(){
+    const lesson=this.cudaLesson;
+    if(ui.cudaLesson){
+      ui.cudaLesson.hidden=!lesson||this.finaleState!=="playing"||this.ended||lesson.phase==="parallel"&&this.simTime-lesson.time>3;
+      if(lesson)ui.cudaLesson.textContent=lesson.phase==="serial"?"Click or tap a ringed rival to focus your first hit.":lesson.phase==="ready"?"Now click or tap a DIFFERENT nearby ringed rival.":"CUDA online · One strike reached three rivals.";
+    }
+    const age=lesson?.phase==="ready"?this.simTime-lesson.readyAt:Infinity,pulsing=age>=0&&age<2.4&&!this.settings.reduced;
+    // Sample the short hint at 5 Hz in simulation time, using the actual contact eligibility rules.
+    if(pulsing&&this.simTime>=(lesson.cueNextAt??-Infinity)){
+      lesson.cueNextAt=this.simTime+.2;
+      for(const relay of this.actors)if(relay.cudaCue){
+        const seed=relay.root.position.add(V(0,Math.min(.7,relay.m.height*.6),0));
+        relay.cudaHintEligible=this.isHostile(relay)&&relay.id!==lesson.serialTarget&&B.Vector3.DistanceSquared(this.hero.root.position,seed)<=R.cuda.seedRange**2&&!this.blocked(this.hero.root.position,seed)&&this.lessonCohort(relay);
+      }
+    }
+    for(const relay of this.actors)if(relay.cudaCue){
+      const available=this.isHostile(relay)&&lesson.phase!=="parallel"&&relay.id!==lesson.serialTarget;
+      const pulse=available&&pulsing&&relay.cudaHintEligible?Math.sin(age*Math.PI/.6)**2:0;
+      relay.cudaCue.setEnabled(available);relay.cudaCue.scaling.setAll(1+.28*pulse);
+      relay.cudaCue.position.set(relay.root.position.x,.065,relay.root.position.z);
+    }
   }
   cuda(q){
-    const r=q.root,c=r.cuda;if(r.cudaResolved||this.hero.dead)return;r.cudaResolved=true;
+    const r=q.root,c=q.lesson?{...r.cuda,neighbors:2,depth:1,hop:R.cuda.seedRange}:r.cuda;if(r.cudaResolved||this.hero.dead)return;r.cudaResolved=true;
     const event={rootId:r.id,source:r.owner,type:r.type,acceptedBaseD:r.acceptedBaseD,base:r.acceptedBaseD*c.factor,seed:q.seed.id,triggerTime:q.triggerTime,time:this.simTime,seedActual:0,directExcluded:[...r.directHit],edges:[],reason:"no-extra-target"};
-    const finish=()=>{this.cudaEvents.push(event);this.trimLog(this.cudaEvents,64);};
+    const finish=()=>{
+      this.cudaEvents.push(event);this.trimLog(this.cudaEvents,64);
+      if(q.lesson&&event.edges.length>=2){
+        Object.assign(this.cudaLesson,{phase:"parallel",rootId:r.id,targets:[q.seed.id,...event.edges.map(e=>e.to)],time:this.simTime});
+        this.progressEvents.push({type:"cuda-parallel-open",rootId:r.id,targets:[...this.cudaLesson.targets],time:this.simTime});
+        this.nextCUDA=this.simTime+R.cuda.interval;window.JourneySetpiece?.lesson?.(this.cudaLesson);
+      }
+      if(q.lesson)r.lessonBroadcast=false;
+    };
     if(!q.eligible){event.reason="interval";finish();return;}
     if(q.seed.dead&&!q.seedKilledByOriginal){event.reason="seed-no-longer-alive";finish();return;}
     const pointOf=a=>a.root.position.add(V(0,Math.min(.7,a.m.height*.6),0)),seedPoint=q.seed.dead?q.contact.clone():pointOf(q.seed);
     if(B.Vector3.DistanceSquared(q.origin,seedPoint)>c.seedRange**2||this.blocked(q.origin,seedPoint)){event.reason="seed-blocked-or-out-of-range";finish();return;}
+    if(q.lesson)r.lessonBroadcast=true;
     const queue=[{id:q.seed.id,position:seedPoint,depth:0}],visited=new Set(r.directHit);visited.add(q.seed.id);let hits=0;
     while(queue.length&&hits<c.neighbors){const source=queue.shift();if(source.depth>=c.depth)continue;
       const candidates=this.actors.filter(a=>this.isHostile(a)&&a.hp>0&&!visited.has(a.id)&&!r.cudaHit.has(a.id)).map(a=>({a,point:pointOf(a)})).map(o=>({...o,d:B.Vector3.DistanceSquared(source.position,o.point)})).filter(o=>o.d<=c.hop**2&&B.Vector3.DistanceSquared(seedPoint,o.point)<=c.seedRange**2).sort((a,b)=>a.d-b.d||(a.a.id<b.a.id?-1:1));
@@ -698,7 +872,12 @@ class Training {
     event.reason=event.edges.length?"linked":"no-extra-target";finish();
   }
   die(a){
-    if(a.dead)return;if(this.journey&&a.seat)this.seatsDown.push(a.seat);a.dead=true;a.deathAge=0;if(a.action)this.cancel(a,"death",true);a.velocity.setAll(0);a.recoil.setAll(0);a.tell.setEnabled(false);a.tellBands.forEach(e=>e.mesh.setEnabled(false));
+    if(a.dead)return;if(this.journey&&a.seat){this.seatsDown.push(a.seat);if(this.seatsDown.length===1)window.JensenJourney.firstDown?.(a.seat);}a.dead=true;a.deathAge=0;if(a.action)this.cancel(a,"death",true);a.velocity.setAll(0);a.recoil.setAll(0);a.tell.setEnabled(false);a.tellBands.forEach(e=>e.mesh.setEnabled(false));
+    if(this.survivor&&a!==this.hero&&!a.friendly&&!a.boss&&!this.hero.dead&&++this.mobDefeats%5===0){
+      const hero=this.hero,before=hero.hp,actual=Math.min(hero.maxHP-before,Math.round(hero.maxHP*.12));hero.hp+=actual;
+      this.healEvents.push({type:"rally",owner:hero.id,defeated:a.id,mobs:this.mobDefeats,actual,hpBefore:before,hpAfter:hero.hp,time:this.simTime});this.trimLog(this.healEvents);
+      if(actual>0)this.floatDamage("+"+actual,false,hero.root.position.add(V(0,hero.m.height*.8,0)),"heal",hero);
+    }
     if(a.controller){a.controller.dispose();a.controller=null;}if(this.selectedID===a.id){this.selectedID=null;this.order=null;}
     if(this.finale&&a.seat){
       for(const pool of [this.projectiles,this.zones,this.beams])for(const effect of pool)if(effect.root?.owner===a.id){effect.root=null;effect.life=0;effect.mesh.setEnabled(false);}
@@ -746,7 +925,7 @@ class Training {
     }else if(r.geometry?.shape==="annulus"){
       this.groundPulse(r,r.origin);
     }else if(r.type==="heat"){
-      const mortar=r.geometry?.shape==="mortar",flight=mortar ? .85 : .65,gravity=mortar ? -23 : -8,goal=V(clamp(aim.x,-C.arenaX,C.arenaX),.08,clamp(aim.z,-C.arenaZ,C.arenaZ));
+      const mortar=r.geometry?.shape==="mortar",flight=mortar ? .85 : .65,gravity=mortar ? -23 : -8,goal=V(clamp(aim.x,-this.field.arenaX,this.field.arenaX),.08,clamp(aim.z,-this.field.arenaZ,this.field.arenaZ));
       const velocity=goal.subtract(muzzle).scale(1/flight);velocity.y=(goal.y-muzzle.y-.5*gravity*flight*flight)/flight;
       if(mortar)velocity.y+=(.10-goal.y)/flight-gravity*C.step/2;
       this.launch(r,muzzle,velocity,gravity,"heat",{life:flight+.3,radius:.1,packetId:"heat-flight",
@@ -835,7 +1014,7 @@ class Training {
         }
       }
       if(p.type==="disc"&&!p.returning&&p.travel+1e-8>=p.outboundDistance)p.returning=true;
-      if(p.life<=1e-9||Math.abs(p.position.x)>C.arenaX+.7||Math.abs(p.position.z)>C.arenaZ+.7||p.position.y<-.2){this.retireProjectile(p);continue;}
+      if(p.life<=1e-9||Math.abs(p.position.x)>this.field.arenaX+.7||Math.abs(p.position.z)>this.field.arenaZ+.7||p.position.y<-.2){this.retireProjectile(p);continue;}
       this.projectilePose(p);
     }
   }
@@ -901,15 +1080,29 @@ class Training {
     for(const p of this.lines)if(p.life>0){p.life-=dt;if(p.life<=0){p.root=null;p.mesh.setEnabled(false);}else{p.mesh.visibility=p.life/p.max;if(p.root?.finisher&&p.type==="weapon-trail")p.mesh.scaling.x=p.mesh.scaling.z=.12*(.2+.8*p.mesh.visibility);}}
     for(const f of this.floats)if(f.life>0){f.life-=dt;f.position.y+=dt*.65;if(f.life<=0){f.element.hidden=true;f.leader.hidden=true;}}this.shake*=Math.exp(-22*dt);
   }
-  cameraView(){const s=this.settings.reduced?0:this.shake,offset=V(Math.sin(this.simTime*109)*s,Math.sin(this.simTime*137)*s*.5,0);this.camera.position.copyFrom(V(0,13.5,14).add(offset));this.camera.setTarget(V(0,.15,0).add(offset));}
+  cameraView(){
+    if(this.reflection){this.camera.position.set(0,13.5,14);this.camera.setTarget(V(0,.6,-1.1));return;}
+    const s=this.settings.reduced?0:this.shake,offset=V(Math.sin(this.simTime*109)*s,Math.sin(this.simTime*137)*s*.5,0);
+    if(this.survivor&&this.hero){
+      const x=Math.max(0,this.field.wallX-this.camera.orthoRight),z=Math.max(0,this.field.wallZ-this.camera.orthoTop*1.45);
+      offset.x+=clamp(this.hero.root.position.x,-x,x);offset.z+=clamp(this.hero.root.position.z,-z,z);
+    }
+    this.camera.position.copyFrom(V(0,13.5,14).add(offset));this.camera.setTarget(V(0,.15,0).add(offset));
+  }
   project(point){const viewport=this.camera.viewport.toGlobal(this.engine.getRenderWidth(),this.engine.getRenderHeight()),v=B.Vector3.Project(point,B.Matrix.Identity(),this.scene.getTransformMatrix(),viewport),r=ui.view.getBoundingClientRect();return{x:v.x*r.width/this.engine.getRenderWidth(),y:v.y*r.height/this.engine.getRenderHeight(),visible:v.z>=0&&v.z<=1};}
   hud(){if(!this.hero)return;const a=this.hero,p=this.activeProfile();ui.hp.textContent=this.finale?hpFormat.format(a.hp)+" / "+hpFormat.format(a.maxHP):Math.round(a.hp*100)/100+" / "+a.maxHP;ui.hpFill.style.width=a.hp/a.maxHP*100+"%";const low=!a.dead&&a.hp/a.maxHP<=.25;ui.lowHealth.hidden=!low;ui.health.dataset.low=String(low);ui.health.setAttribute("aria-label",low?"Hero health · low":"Hero health");
     if(this.finale){
       ui.hurtEdge.hidden=this.hurtStrength===0||this.settings.reduced;ui.hurtEdge.style.opacity=String(this.hurtStrength);
     }
     if(this.finale&&ui.comboPips.dataset.charge!==String(this.combo)){ui.comboPips.dataset.charge=String(this.combo);ui.comboPips.setAttribute("aria-valuenow",String(this.combo));ui.comboPips.setAttribute("aria-valuetext",["No charge","One hit charged","Heavy swing ready"][this.combo]);}
-    ui.stageLabel.textContent=this.journey&&!this.finale?`${this.stageData.title} · ${this.waveIndex+1}/${this.stageData.waves.length}`:this.finale?`${this.actors.filter(e=>this.isHostile(e)).length} seats left · ${Math.floor(this.simTime/60)}:${String(Math.floor(this.simTime)%60).padStart(2,"0")}`:`G${this.stageIndex} · ${this.waveIndex+1}/${this.stageData.waves.length}`;ui.stageLabel.parentElement.title=this.stageData.title+" · "+this.stageData.waves[this.waveIndex].name;
-    const t=this.actors.find(t=>t.id===this.selectedID&&this.isHostile(t));ui.target.textContent=t&&this.finale?`${t.fantasyTitle} · ${hpFormat.format(t.hp)} / ${hpFormat.format(t.maxHP)}`:t?"Target · "+(t.seat?seatRole(t)+" "+String(t.seat).padStart(2,"0")+" · ":"")+(TYPES[t.kind]?.label||t.kind)+"  "+Math.ceil(t.hp)+" / "+t.maxHP:"";
+    this.lessonHUD();
+    ui.stageLabel.textContent=this.reflection?`The Reflection · ${this.duel.counters}/2 counters`:this.journey&&!this.finale?`${this.stageData.title} · ${this.waveIndex+1}/${this.stageData.waves.length}`:this.finale?`${this.actors.filter(e=>this.isHostile(e)).length} seats left · ${Math.floor(this.simTime/60)}:${String(Math.floor(this.simTime)%60).padStart(2,"0")}`:`G${this.stageIndex} · ${this.waveIndex+1}/${this.stageData.waves.length}`;ui.stageLabel.parentElement.title=this.stageData.title+" · "+this.stageData.waves[this.waveIndex].name;
+    const t=this.actors.find(t=>t.id===this.selectedID&&this.isHostile(t));ui.target.textContent=this.reflection?"":t&&this.finale?`${t.fantasyTitle} · ${hpFormat.format(t.hp)} / ${hpFormat.format(t.maxHP)}`:t?"Target · "+(t.seat?seatRole(t)+" "+String(t.seat).padStart(2,"0")+" · ":"")+(TYPES[t.kind]?.label||t.kind)+"  "+Math.ceil(t.hp)+" / "+t.maxHP:"";
+    if(this.reflection){
+      const cue=this.finaleState==="playing"&&!this.ended?this.duel.cue():"";
+      if(ui.status.textContent!==cue)ui.status.textContent=cue;
+      this.reflectionStage.update(this.duel.view());
+    }
     const head=this.project(a.root.position.add(V(0,a.m.height+.24,0))),feet=this.project(a.root.position),bodyWidth=Math.abs(this.project(a.root.position.add(V(a.m.hurtRadius+.3,0,0))).x-feet.x);
     ui.heroCue.hidden=a.dead||!head.visible;ui.heroCue.style.transform=`translate(${head.x}px,${head.y}px) translate(-50%,-100%)`;
     for(const cue of [this.heroRim,this.heroRing]){cue.setEnabled(!a.dead);cue.position.copyFrom(a.root.position);cue.position.y=cue===this.heroRing?.075:.045;cue.scaling.set(a.ctrlRadius*3,1,a.ctrlRadius*3);}
@@ -938,6 +1131,7 @@ class Training {
     }
     const labels=[],view=ui.view.getBoundingClientRect(),occupied=[{left:feet.x-bodyWidth-8,right:feet.x+bodyWidth+8,top:head.y-32,bottom:feet.y+22},{left:0,right:view.width,top:0,bottom:116},{left:view.width/2-105,right:view.width/2+105,top:view.height-125,bottom:view.height}];
     for(const t of this.actors.filter(t=>t.bar).sort((x,y)=>Number(y.id===this.selectedID)-Number(x.id===this.selectedID)||Number(y.action?.type==="heal")-Number(x.action?.type==="heal")||(this.finale?Number(hostileOwners.has(y.id)||!!y.action?.punishOpen)-Number(hostileOwners.has(x.id)||!!x.action?.punishOpen):0)||x.seat-y.seat)){t.bar.hidden=t.dead||t.retired;const point=this.project(t.root.position.add(V(0,t.m.height+.16,0))),casting=!t.dead&&t.action?.type==="heal"&&t.action.age<t.action.windup&&!t.action.cancelled;let lift=0;
+      if(this.survivor&&(point.x<0||point.x>view.width||point.y<0||point.y>view.height)){t.bar.hidden=true;continue;}
       const detailed=this.finale&&(t.id===this.selectedID||hostileOwners.has(t.id)||casting||t.action?.punishOpen);
       if(t.seat&&!t.dead&&!t.retired){
         const spacing=detailed?48:29;
@@ -988,11 +1182,13 @@ class Training {
   snapshot(){
     const actor=a=>({id:a.id,kind:a.kind,seat:a.seat,elite:a.elite,friendly:a.friendly,dummy:a.dummy,hp:a.hp,maxHP:a.maxHP,x:a.root.position.x,y:a.root.position.y,z:a.root.position.z,yaw:a.yaw,action:a.action?.type||(a.dead?"defeat":a.actualSpeed>.1?"move":"idle"),rootId:a.action?.id||null,finisher:!!a.action?.finisher,punishOpen:!!a.action?.punishOpen,locked:!!a.action?.locked,reactHeavy:!!a.reactHeavy,age:a.action?.age||0,acceptedBaseD:a.action?.acceptedBaseD??null,geometry:a.action?.geometry||null,hitChannels:a.action?{direct:[...a.action.directHit],cuda:[...a.action.cudaHit],packets:[...a.action.packetHit].map(([key,set])=>({key,targets:[...set]}))}:null,
       castTargets:a.action?.castTargets||[],healAttempts:a.healAttempts,nextHeal:a.nextHeal,protectedWindup:a.protected,pose:{driver:"parent-child joints",weapon:this.weapon(a).asArray(),shield:a.rig.sockets.shield?.getAbsolutePosition().asArray()||null,anatomicalRight:"-X local",anatomicalLeft:"+X local",hand:a.action?.hand||null},velocity:a.controller?a.controller.getVelocity().asArray():[0,0,0],dead:a.dead,retired:a.retired});
-    const p=this.hero?this.activeProfile():null;
+    const p=this.hero?this.activeProfile():null;if(this.survivor)this.camera.getViewMatrix();
     return immutable({ready:this.ready,error:fatal,version:C.version,dataVersion:DATA.version,form:"G"+this.stageIndex,stage:this.stageIndex,stageTitle:this.stageData.title,wave:this.waveIndex,waveName:this.stageData.waves[this.waveIndex].name,engineVersion:B.Engine.Version,renderer:"WebGL"+this.engine.webGLVersion,style:this.styleMode,styleApplied:STYLE.applied(this.scene),styleReady:STYLE.ready(this.scene),physicsEnabled:!!this.physics,physicsDriver:"HavokPlugin.executeStep fixed120Hz",animationDriver:"R24Models parent-child joint poses",paused:this.paused,qaFrozen:this.qaFrozen,controlledCapture:this.capture,ended:this.ended,time:this.simTime,run:this.run,seed:C.seed,rngState:this.rng,settings:this.settings,nativeEnemies:TYPES,
-      finaleState:this.finaleState,journeyChapter:this.journey,journeyMode:this.journeyMode,seatsDown:this.seatsDown,hammerCharge:this.combo,chargeRemaining:this.combo?Math.max(0,this.comboUntil-this.simTime):0,progression:{mode:this.journey?this.journeyMode:this.finale?"finale":this.settings.scenario==="all"?"campaign-combat":"isolated-lab",labEntry:this.lab,stageStarted:this.stageStarted,waveStarted:this.waveStarted,spawnAt:this.spawnAt,transition:this.transition,completedStages:this.completedStages,budgetIsInformational:true,saveWrites:false},
-      actualNumbers:{...p,maxHP:this.hero?.maxHP||this.settings.hp,skill1:this.stageData.slot1?R.slot1.damageMultiplier*p.D:null,skill2:this.stageData.slot2?R.slot2.damageMultiplier*p.D:null,CUDA:this.stageData.cuda?R.cuda.factor*p.D:0,CUDAAllowedTypes:R.cuda.allowedTypes,CUDASeedDamage:false,CUDADistances:{hop:R.cuda.hop,seedRange:R.cuda.seedRange,units:"3D world metres"},critChance:this.settings.crit,critMultiplier:R.crit.multiplier,shieldChance:this.stageData.shield?R.shield.chance:0,legacyFrontMultiplier:1},
-      gear:{stage:this.stageIndex,tray:this.tray,fists:this.stageIndex<R.hammer.fromStage,shield:this.stageData.shield,hammer:this.stageIndex>=R.hammer.fromStage,slot1:this.stageData.slot1,slot2:this.stageData.slot2,passives:{cuda:this.stageData.cuda,shield:this.stageData.shield,regen:this.stageData.regen},nextCUDA:this.nextCUDA,nextRegen:this.nextRegen},
+      survivor:this.survivor?{field:[this.field.arenaX,this.field.arenaZ],cameraTarget:this.camera.getTarget().asArray(),orthoHalfWidth:this.camera.orthoRight,orthoHalfHeight:this.camera.orthoTop,reinforcements:this.reinforcements?.length||0,autoTarget:this.autoTarget,availableSlots:[this.slotAvailable(0),this.slotAvailable(1)],mobDefeats:this.mobDefeats}:null,
+      reflection:this.reflection?{...this.duel.view(),hits:this.duel.hits}:null,lastMove:this.lastMove,
+      finaleState:this.finaleState,cudaLesson:this.cudaLesson,journeyChapter:this.journey,journeyMode:this.journeyMode,seatsDown:this.seatsDown,hammerCharge:this.combo,chargeRemaining:this.combo?Math.max(0,this.comboUntil-this.simTime):0,progression:{mode:this.journey?this.journeyMode:this.finale?"finale":this.settings.scenario==="all"?"campaign-combat":"isolated-lab",labEntry:this.lab,stageStarted:this.stageStarted,waveStarted:this.waveStarted,spawnAt:this.spawnAt,transition:this.transition,completedStages:this.completedStages,budgetIsInformational:true,saveWrites:false},
+      actualNumbers:{...p,maxHP:this.hero?.maxHP||this.settings.hp,skill1:this.stageData.slot1?R.slot1.damageMultiplier*p.D:null,skill2:this.stageData.slot2?R.slot2.damageMultiplier*p.D:null,CUDA:this.stageData.cuda&&(!this.cudaLesson||this.cudaLesson.phase==="parallel")?R.cuda.factor*p.D:0,CUDAAllowedTypes:R.cuda.allowedTypes,CUDASeedDamage:false,CUDADistances:{hop:R.cuda.hop,seedRange:R.cuda.seedRange,units:"3D world metres"},critChance:this.settings.crit,critMultiplier:R.crit.multiplier,shieldChance:this.stageData.shield?R.shield.chance:0,legacyFrontMultiplier:1},
+      gear:{stage:this.stageIndex,tray:this.tray,fists:this.stageIndex<R.hammer.fromStage,shield:this.stageData.shield,hammer:this.stageIndex>=R.hammer.fromStage,slot1:this.stageData.slot1,slot2:this.stageData.slot2,passives:{cuda:this.stageData.cuda&&(!this.cudaLesson||this.cudaLesson.phase==="parallel"),shield:this.stageData.shield,regen:this.stageData.regen},nextCUDA:this.nextCUDA,nextRegen:this.nextRegen},
       hero:this.hero?actor(this.hero):null,enemies:this.actors.filter(a=>a!==this.hero&&!a.friendly).map(actor),friendlies:this.actors.filter(a=>a.friendly).map(actor),selectedID:this.selectedID,
       objects:[...this.objects.values()].map(o=>({id:o.id,kind:o.kind,category:o.category,position:o.root.position.asArray(),dynamic:!!o.dynamic,active:o.root.isEnabled()})),damageEvents:this.damageEvents,cudaEvents:this.cudaEvents,chainEvents:this.cudaEvents,lightningEvents:this.lightningEvents,blockEvents:this.blockEvents,healEvents:this.healEvents,impulseEvents:this.impulseEvents,progressEvents:this.progressEvents,pickupEvents:this.pickupEvents,
       dynamicProps:this.props.map(p=>({id:p.id,mass:p.mass,position:p.mesh.position.asArray(),rotation:p.mesh.rotationQuaternion?.asArray()||[],velocity:p.aggregate.body.getLinearVelocity().asArray()})),
@@ -1004,8 +1200,8 @@ class Training {
     m.hurtHigh=Math.min(m.hurtHigh,m.height-m.hurtRadius);m.hurtLow=Math.min(m.hurtLow,m.hurtHigh);a.m=m;
     if(a.controller&&Math.abs(a.ctrlHeight-m.height)>.001)throw new Error("setForm must keep the controller height stable within a stage");
   }
-  activeProfile(){const s=this.stageData,t=this.tray?R.tray:null;return{D:t?(this.settings.heroOverride?this.settings.D*t.damage/s.D:t.damage):this.settings.D,cycle:t?.cycle||s.cycle,reach:t?.reach||s.reach,arc:t?.arc||s.arc,cap:t?t.cap:s.cap};}
-  isHostile(a){return a!==this.hero&&!a.friendly&&!a.dead&&!a.retired;}
+  activeProfile(){const s=this.stageData,t=this.tray?R.tray:null;return{D:t?(this.settings.heroOverride?this.settings.D*t.damage/s.D:t.damage):this.settings.D,cycle:t?.cycle||s.cycle,reach:t?.reach||s.reach,arc:t?.arc||s.arc,cap:this.cudaLesson&&this.cudaLesson.phase!=="parallel"?1:t?t.cap:s.cap};}
+  isHostile(a){if(a===this.echo&&["preview","enter","return","complete"].includes(this.duel.phase))return false;return a!==this.hero&&!a.friendly&&!a.dead&&!a.retired;}
   setStyle(mode){if(!["3d","painted"].includes(mode))throw new RangeError("Unknown style");STYLE.set(this.scene,mode);this.styleMode=mode;ui.styleSelect.value=mode;if(this.ready)this.hud();return mode;}
   selectStage(n,w=0){const s=stageRow(n);waveNumber(s,w);this.stageData=s;this.stageIndex=n;this.startWave=w;this.waveIndex=w;this.lab=true;this.settings.scenario="all";this.settings.heroOverride=false;this.settings.override=false;this.settings.D=s.D;this.settings.hp=s.hp;this.settings.crit=R.crit.chance;this.reset();this.syncDebug();return true;}
   clearTransient(){
@@ -1037,12 +1233,11 @@ class Training {
   updatePickups(){if(this.tray||this.stageIndex!==R.tray.stage||this.hero.dead)return;const p=this.pickups.find(o=>B.Vector3.DistanceSquared(o.mesh.position,this.hero.root.position)<(.5+this.hero.ctrlRadius)**2);if(!p)return;const before=this.hero.hp;this.cancel(this.hero,"form-change");this.tray=true;this.hero.rig.setForm(this.stageIndex,true);this.syncMetrics(this.hero);this.pose(this.hero);this.hero.previousWeapon.copyFrom(this.weapon(this.hero));this.pickupEvents.push({time:this.simTime,id:p.id,D:this.activeProfile().D,hpBefore:before,hpAfter:this.hero.hp,temporary:true});this.clearPickups();ui.status.textContent="Tray picked up · this stage only";this.setStyle(this.styleMode);}
   spawnPositions(count){
     // An open horseshoe leaves the lower centre lane clear; all seats coexist.
-    const points=[];const radiusX=Math.min(C.arenaX-2,8.0),radiusZ=Math.min(C.arenaZ-1.6,4.4);
+    const points=[];const radiusX=Math.min(this.field.arenaX-2,8.0),radiusZ=Math.min(this.field.arenaZ-1.6,4.4);
     for(let i=0;i<count;i++){const t=count===1?Math.PI/2:.13*Math.PI+i*(1.74*Math.PI/Math.max(1,count-1));points.push(V(Math.cos(t)*radiusX,0,-Math.sin(t)*radiusZ-0.3));}
     return points;
   }
   placementForWave(entries){
-    if(this.journey&&!this.finale)return this.stageData.positions[this.waveIndex].map(([x,z])=>V(x,0,z));
     const out=this.spawnPositions(entries.length);if(entries.length===1)return[V(0,0,-1.1)];
     const seats={seat_01:[-2.2,-.2],seat_04:[0,.1],seat_07:[2.2,-.2],seat_02:[-4,-2],seat_03:[-2,-2.4],seat_05:[-1.2,-4],seat_06:[1.2,-4],seat_08:[4,-2],seat_09:[2,-2.4],seat_10:[0,-2]};
     let guns=0,guards=0,shields=0,rear=0,rushers=0,arcs=0,creatures=0,needles=0,heats=0;
@@ -1078,18 +1273,52 @@ class Training {
     if(mode==="all")for(const e of w.enemies)for(let j=0;j<e.count;j++)entries.push({kind:e.kind,elite:!!e.elite});
     else if(mode==="group")entries=Object.keys(TYPES).filter(k=>TYPES[k].stage===this.stageIndex).slice(0,this.stageData.activeCap).map(kind=>({kind,elite:false}));
     else {const kind=TYPES[mode]?mode:w.enemies.find(e=>TYPES[e.kind].boss)?.kind||w.enemies[0].kind;entries=[{kind,elite:false}];}
-    if(entries.length>this.stageData.activeCap)throw new Error("Spawn cap rejected");
-    const positions=this.placementForWave(entries);
-    entries.forEach((e,i)=>{const p=positions[i];
-      const scale=TYPES[e.kind].scale*(e.elite?R.elite.scaleMultiplier:1),id=TYPES[e.kind].seat?e.kind:`g${this.stageIndex}w${this.waveIndex+1}_${e.kind}_${i+1}`;
-      const a=this.makeActor([id,e.kind,p.x,p.z,scale],mode==="dummy",e.elite);const d=this.hero.root.position.subtract(a.root.position);a.yaw=Math.atan2(d.x,d.z);a.root.rotation.y=a.yaw;
-      if(e.kind==="gun_column"){a.column=entries.slice(0,i).filter(e=>e.kind==="gun_column").length%2;a.nextAttack=this.simTime+R.waves.spawnTell+(a.column?R.enemyPatterns.volley.laneOffset:.2);a.columnNext=a.nextAttack;}
-      if(e.kind===R.heal.type)a.nextHeal=this.waveStarted+R.heal.firstAfter;
-      this.pose(a);a.previousWeapon.copyFrom(this.weapon(a));
-    });
+    if(this.survivor){
+      this.reinforcements=entries.map((e,i)=>({...e,index:i}));
+      const first=this.finale?10:this.cudaLesson&&this.waveIndex===0?5:3;
+      for(let i=0;i<first&&this.reinforcements.length;i++)this.spawnReinforcement();
+      this.nextReinforcement=this.spawnAt+.55;
+    }else{
+      if(entries.length>this.stageData.activeCap)throw new Error("Spawn cap rejected");
+      const positions=this.placementForWave(entries);
+      entries.forEach((e,i)=>this.spawnMember(e,i,positions[i],mode,entries));
+    }
     this.progressEvents.push({type:"wave-start",stage:this.stageIndex,wave:this.waveIndex,kind:w.kind,count:entries.length,time:this.simTime,lab:mode!=="all"||this.lab});this.trimLog(this.progressEvents);this.setStyle(this.styleMode);this.syncDebug();
   }
+  spawnMember(e,i,p,mode,entries){
+    const scale=TYPES[e.kind].scale*(e.elite?R.elite.scaleMultiplier:1),id=TYPES[e.kind].seat?e.kind:`g${this.stageIndex}w${this.waveIndex+1}_${e.kind}_${i+1}`;
+    const a=this.makeActor([id,e.kind,p.x,p.z,scale],mode==="dummy",e.elite),d=this.hero.root.position.subtract(a.root.position);
+    a.yaw=Math.atan2(d.x,d.z);a.root.rotation.y=a.yaw;
+    if(e.kind==="gun_column"){a.column=entries.slice(0,i).filter(e=>e.kind==="gun_column").length%2;a.nextAttack=this.simTime+R.waves.spawnTell+(a.column?R.enemyPatterns.volley.laneOffset:.2);a.columnNext=a.nextAttack;}
+    if(e.kind===R.heal.type)a.nextHeal=this.waveStarted+R.heal.firstAfter;
+    this.pose(a);a.previousWeapon.copyFrom(this.weapon(a));return a;
+  }
+  spawnReinforcement(){
+    const e=this.reinforcements.shift(),hero=this.hero.root.position,i=this.ingressNumber++;
+    let point;
+    if(this.cudaLesson&&this.waveIndex===0){
+      const [x,z]=[[.8,-.4],[2,-.4],[3.2,-.4],[2,-1.7],[-4,-2]][e.index];point=V(x,0,z);
+    }else{
+      const radius=this.finale?6.7+e.index%3*.42:5.0+(i%3)*.48;
+      const boxes=this.obstacleBoxes(this.hero);
+      for(let attempt=0;attempt<40;attempt++){
+        const angle=-Math.PI/2+i*2.39996+attempt*.31;
+        const p=V(hero.x+Math.cos(angle)*radius,0,hero.z+Math.sin(angle)*radius);
+        if(Math.abs(p.x)>this.field.arenaX||Math.abs(p.z)>this.field.arenaZ||boxes.some(b=>p.x>b.min.x&&p.x<b.max.x&&p.z>b.min.z&&p.z<b.max.z)||this.actors.some(a=>!a.dead&&Math.hypot(a.root.position.x-p.x,a.root.position.z-p.z)<1.4))continue;
+        point=p;break;
+      }
+      if(!point){this.reinforcements.unshift(e);return;}
+    }
+    this.spawnMember(e,e.index,point,"all",[]);
+    this.progressEvents.push({type:"ingress",kind:e.kind,position:[point.x,point.z],hero:[hero.x,hero.z],time:this.simTime});this.trimLog(this.progressEvents);
+  }
+  refillWave(){
+    if(!this.survivor||!this.reinforcements?.length||this.hero.dead||this.simTime<this.nextReinforcement)return;
+    if(this.actors.filter(a=>a!==this.hero&&!a.friendly).length>=this.stageData.activeCap)return;
+    this.spawnReinforcement();this.nextReinforcement=this.simTime+.74;
+  }
   checkProgress(){
+    if(this.reflection)return;
     if(this.settings.scenario!=="all"||this.hero.dead||this.ended)return;
     if(this.transition){if(this.simTime<this.transition.at)return;const next=this.transition;this.transition=null;
       if(next.type==="wave"){
@@ -1097,9 +1326,11 @@ class Training {
         this.cancel(this.hero,"wave-end",true);this.hero.path=[];this.hero.velocity.setAll(0);this.waveIndex++;this.spawnWave();
       }else if(next.type==="stage")this.advanceStage();return;
     }
+    if(this.survivor&&this.reinforcements?.length)return;
     if(this.actors.some(a=>this.isHostile(a)||a!==this.hero&&!a.friendly&&!a.retired)||this.hasHazards())return;
     for(const r of this.pendingRoots)this.finalizeRoot(r,true);this.pendingRoots.clear();
     if(this.finale){this.endFinale(true);return;}
+    if(this.cudaLesson&&this.cudaLesson.phase!=="parallel")return;
     if(this.journey&&this.waveIndex+1===this.stageData.waves.length){this.endJourney(true);return;}
     if(this.waveIndex+1<this.stageData.waves.length){this.transition={type:"wave",at:this.simTime+C.breather};ui.status.textContent="Wave clear · next wave incoming";}
     else if(this.stageIndex<DATA.stages.at(-1).stage){const next=stageRow(this.stageIndex+1);this.completedStages.push(this.stageIndex);this.progressEvents.push({type:"stage-victory",stage:this.stageIndex,time:this.simTime});this.transition={type:"stage",at:this.simTime+C.stageCue};ui.gainCue.textContent=next.gain;ui.gainCue.hidden=false;this.gainUntil=this.simTime+C.stageCue;}
@@ -1226,7 +1457,7 @@ class Training {
     if(p.root.geometry?.shape==="mortar"){this.groundPulse(p.root,p.root.aim);this.retireProjectile(p);return;}
     const limit=Math.min(C.maxZones,R.board.maxZones),active=this.zones.filter(z=>z.root).length,zone=active<limit?this.zones.find(e=>!e.root):null;
     if(zone){
-      zone.root=p.root;zone.age=0;zone.delay=.7;zone.tick=0;zone.radius=Math.min(p.zoneRadius,Math.sqrt((4*C.arenaX*C.arenaZ)*R.board.maxZoneWalkableAreaFraction/(Math.PI*limit)));
+      zone.root=p.root;zone.age=0;zone.delay=.7;zone.tick=0;zone.radius=Math.min(p.zoneRadius,Math.sqrt((4*this.field.arenaX*this.field.arenaZ)*R.board.maxZoneWalkableAreaFraction/(Math.PI*limit)));
       zone.position=V(point.x,.035,point.z);zone.mesh.position.copyFrom(zone.position);zone.mesh.material=this.fx.danger;
       zone.mesh.scaling.set(zone.radius/1.1,1,zone.radius/1.1);zone.mesh.visibility=.48;zone.mesh.setEnabled(true);
     }
@@ -1279,24 +1510,33 @@ class Training {
     return{row,wave,style:ui.styleSelect.value,settings:{hp:ui.heroOverride.checked?hp:row.hp,D:ui.heroOverride.checked?D:row.D,crit:ui.heroOverride.checked?crit/100:R.crit.chance,heroOverride:ui.heroOverride.checked,enemyHP,override:ui.enemyOverride.checked,scenario:ui.scenario.value,immortal:ui.immortal.checked,reduced:ui.reduced.checked}};
   }
   applySettings(){const v=this.validatedSettings();this.stageData=v.row;this.stageIndex=v.row.stage;this.startWave=v.wave;this.waveIndex=v.wave;this.styleMode=v.style;this.settings=v.settings;this.lab=true;this.sound.muted=ui.mute.checked;this.reset();}
-  slotAvailable(slot){return slot===0?this.stageData.slot1:slot===1?this.stageData.slot2:false;}
+  slotAvailable(slot){if(this.survivor&&this.cudaLesson&&this.cudaLesson.phase!=="parallel")return false;return slot===0?this.stageData.slot1:slot===1?this.stageData.slot2:false;}
   freeze(value){this.qaFrozen=value;this.accumulator=0;this.lastTime=performance.now();ui.freezeButton.textContent=value?"Unfreeze QA":"QA Freeze Frame";ui.freezeButton.setAttribute("aria-pressed",String(value));if(!value){this.capture=null;ui.status.textContent="";}else ui.status.textContent="QA frozen · controlled frame";if(this.ready)this.hud();return value;}
   async load(){ui.bootText.textContent="Creating stage, models and native physics…";ui.progress.value=55;if(this.finale){
       const image=$("finaleFloor");image.src=image.dataset.src;await image.decode();
       const texture=this.floor.material.albedoTexture,size=texture.getSize();
       texture.getContext().drawImage(image,0,0,size.width,size.height);texture.update(false);
     }
-    this.reset();await this.scene.whenReadyAsync();this.ready=true;ui.boot.hidden=true;if(this.journey){this.paused=true;ui.pause.hidden=true;ui.finaleIntro.hidden=true;ui.finaleResult.hidden=true;window.JourneySetpiece?.stage(this.scene,this.journey);window.JensenJourney.ready(event=>this.beginJourney(event),event=>this.retryJourney(event));}else if(this.finale){ui.finaleIntro.hidden=false;ui.finaleStart.focus();}ui.progress.value=100;this.lastTime=performance.now();}
+    this.reset();await this.scene.whenReadyAsync();this.ready=true;ui.boot.hidden=true;if(this.journey){this.paused=true;ui.pause.hidden=true;ui.finaleIntro.hidden=true;ui.finaleResult.hidden=true;if(!this.reflection)window.JourneySetpiece?.stage(this.scene,this.journey);window.JourneySetpiece?.lesson?.(this.cudaLesson);window.JensenJourney.ready(event=>this.beginJourney(event),event=>this.retryJourney(event));}else if(this.finale){ui.finaleIntro.hidden=false;ui.finaleStart.focus();}ui.progress.value=100;this.lastTime=performance.now();}
 }
+window.SurvivorSkills?.install(Training.prototype);
 (async()=>{
   if(!B||!M||!STYLE||!B.PhysicsCharacterController||typeof window.HavokPhysics!=="function")throw new Error("Missing local Babylon, Havok, models.js or render-style.js");
-  validateData();const options=queryOptions(window.location.search||(["finale","story"].includes(document.documentElement.dataset.mode)?"?mode="+document.documentElement.dataset.mode:""));
+  validateData();const options=queryOptions(window.location.search||(["finale","story","reflection"].includes(document.documentElement.dataset.mode)?"?mode="+document.documentElement.dataset.mode:""));
   if(options.journeyMode){
     const chapter=await window.JensenJourney.open(options.journeyMode);if(chapter===null)return;
-    if(!["diner","arcade","cuda","seats"].includes(chapter))throw new Error("Unknown journey chapter");
-    options.chapter=chapter;options.stage=chapter==="diner"?1:chapter==="seats"?8:2;options.finale=chapter==="seats";
+    if(!["diner","arcade","cuda","seats","reflection"].includes(chapter))throw new Error("Unknown journey chapter");
+    options.survivorEdition=window.JensenJourney.survivorEdition?.()===true;
+    if(chapter==="reflection"&&(!window.ReflectionCombat||!window.ReflectionStage))throw new Error("Missing diner encounter");
+    if((chapter==="reflection"||options.journeyMode==="story"||options.survivorEdition)&&!window.SurvivorSkills)throw new Error("Missing survivor-skills.js");
+    options.chapter=chapter;options.stage=chapter==="diner"?1:["seats","reflection"].includes(chapter)?8:2;options.finale=chapter==="seats";
   }
   if(options.finale){document.body.classList.add("finale");ui.view.setAttribute("aria-label","Boardroom finale. Click the floor to move or a seat to attack. Use 1 for Shield Rush and 2 for Thunder Slam.");}
+  if(options.chapter==="reflection")document.body.classList.add("reflection","survivor");
+  if(options.chapter==="reflection"||options.journeyMode==="story"||options.survivorEdition){
+    const skillHint={reflection:" Leave the marked ground, then return for two counters. Use 1 for Cyclone Guard or 2 for Thunder Leap.",diner:"",arcade:" Press 1 for Gauntlet Cyclone.",cuda:" Click or tap a ringed rival, then a different nearby ringed rival, to restore CUDA and Gauntlet Cyclone.",seats:" Press 1 for Cyclone Guard or 2 for Thunder Leap."};
+    ui.view.setAttribute("aria-label","Move with WASD, arrows or the floor. Strike nearby rivals automatically. Tap a rival to focus."+skillHint[options.chapter]);
+  }
   if(B.Engine.Version!==C.engine)throw new Error("Requires Babylon "+C.engine+"; found "+B.Engine.Version);
   ui.bootText.textContent="Initializing WebGL and local Havok WASM…";ui.progress.value=10;
   const engine=new B.Engine(ui.view,true,{stencil:true,preserveDrawingBuffer:false,powerPreference:"high-performance"},false);

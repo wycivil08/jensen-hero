@@ -18,10 +18,16 @@ const R7Store=(()=>{
     else if(p.receipt!==null)throw Error('Unexpected reward before completion.');
     if(Object.hasOwn(p,'journey')){
       const j=p.journey,index=CHAPTERS.indexOf(j?.chapter),count=index-1;
-      if(!gpu||index<2||!same(Object.keys(j).sort(),['chapter','receipts','score'])||!Array.isArray(j.receipts)||j.receipts.length!==count)throw Error('Invalid journey checkpoint. Original data preserved.');
+      const fields=['chapter','receipts','score'];
+      if(index===4&&j.edition===3)fields.push('edition');
+      if(index===4&&Object.hasOwn(j,'reflection'))fields.push('reflection');
+      fields.sort();
+      if(!gpu||index<2||!same(Object.keys(j).sort(),fields)||!Array.isArray(j.receipts)||j.receipts.length!==count)throw Error('Invalid journey checkpoint. Original data preserved.');
       let revision=p.receipt.revision;
       for(let i=0;i<count;i++){const r=j.receipts[i];if(!r||!Number.isSafeInteger(r.revision)||r.revision<=revision||r.revision>p.revision||!same(r,journeyReceipt(p,i,r.revision)))throw Error('Invalid journey reward receipt. Original data preserved.');revision=r.revision;}
       if(index===4?!validScore(j.score):j.score!==null)throw Error('Invalid journey result. Original data preserved.');
+      if(j.reflection){const r=j.reflection;const fields=r.proof===undefined?['revision']:['proof','revision'];if(!same(Object.keys(r).sort(),fields)||!Number.isSafeInteger(r.revision)||r.revision<=revision||r.revision>p.revision||r.proof!==undefined&&!same(r.proof,{counters:2}))throw Error('Invalid reflection completion. Original data preserved.');}
+      else if(Object.hasOwn(j,'reflection'))throw Error('Invalid reflection completion. Original data preserved.');
     }
     return p;
   }
@@ -33,13 +39,22 @@ const R7Store=(()=>{
   }
   function journeyChapter(p){validate(p);return chapterOf(p);}
   function journeyScore(p){validate(p);return p.journey?.score?freeze(clone(p.journey.score)):null;}
-  function journeyAdvance(p,chapter,score){
+  function journeyAdvance(p,chapter,score,edition=2){
     validate(p);const index=CHAPTERS.indexOf(chapter),current=CHAPTERS.indexOf(chapterOf(p));
     if(index<0||index>current)throw Error('Invalid journey chapter transition.');
     if(index<current||chapter==='ending')return p;
     if(chapter==='diner')return reward(p);
-    if(chapter==='seats'&&!validScore(score))throw Error('A completed Ten Seats result is required.');
+    if(chapter==='seats'&&(!validScore(score)||![2,3].includes(edition)))throw Error('A completed Ten Seats result is required.');
     const n=clone(p);n.revision++;n.journey={chapter:CHAPTERS[index+1],receipts:[...(n.journey?.receipts||[]),journeyReceipt(n,index-1,n.revision)],score:chapter==='seats'?clone(score):null};
+    if(chapter==='seats'&&edition===3)n.journey.edition=3;
+    return validate(n);
+  }
+  function reflectionComplete(p,proof){
+    validate(p);if(chapterOf(p)!=='ending')throw Error('The Ten Seats ending is required.');
+    if(p.journey.reflection)return p;
+    if(!same(proof,{counters:2}))throw Error('Two earned counters are required for reflection completion.');
+    const n=clone(p);n.revision++;n.journey.reflection={revision:n.revision};
+    if(proof!==undefined)n.journey.reflection.proof=clone(proof);
     return validate(n);
   }
   function connect(storage,withLock){
@@ -54,7 +69,9 @@ const R7Store=(()=>{
         if(previous.receipt&&!same(next.receipt,previous.receipt))throw Error('Saved equipment reward cannot be changed.');
         if(previous.journey){
           const j=previous.journey,n=next.journey;
-          if(!n||!same(n.receipts.slice(0,j.receipts.length),j.receipts)||j.score&&!same(n.score,j.score))throw Error('Saved journey rewards or result cannot be changed.');
+          if(!n||!same(n.receipts.slice(0,j.receipts.length),j.receipts)||j.score&&(!same(n.score,j.score)||j.edition!==n.edition))throw Error('Saved journey rewards or result cannot be changed.');
+          if(j.reflection&&!same(j.reflection,n.reflection))throw Error('Saved reflection completion cannot be changed.');
+          if(!j.reflection&&n.reflection&&(before!==4||n.reflection.revision!==next.revision||!same(n.reflection.proof,{counters:2})))throw Error('Reflection completion must prove two earned counters and belong to this ending revision.');
         }
         if(after>before){const r=next.journey?.receipts.at(-1)||next.receipt;if(r.revision!==next.revision)throw Error('New reward must belong to this revision.');}
       }
@@ -72,6 +89,6 @@ const R7Store=(()=>{
     }
     return {read,save};
   }
-  return Object.freeze({KEY,REWARD,owned,create,validate,reward,journeyChapter,journeyAdvance,journeyScore,connect,clone,freeze});
+  return Object.freeze({KEY,REWARD,owned,create,validate,reward,journeyChapter,journeyAdvance,journeyScore,reflectionComplete,connect,clone,freeze});
 })();
 /* R7_STORE_END */

@@ -50,6 +50,16 @@ await check('ending needs an actual full ordered defeat result and its first sav
   const input=plain({...score,hp:.5}),next=S.journeyAdvance(profile,'seats',input);input.seatsDown[0]=10;const ended=await store.save(next),raw=m.raw;assert.equal(S.journeyScore(m.open().read()).hp,.5);
   for(const change of [p=>{p.journey.score.hp=17;},p=>{p.journey.score.seatsDown.reverse();}]){const bad=S.clone(ended);bad.revision++;change(bad);await assert.rejects(store.save(bad),/cannot be changed/);assert.equal(m.raw,raw);}
 });
+await check('earned ruleset cannot be relabelled across editions or attached to an unfinished chapter',async()=>{
+  for(const edition of [2,3]){
+    const {m,store,profile}=await through('seats');
+    const premature=S.clone(profile);premature.journey.edition=3;assert.throws(()=>S.validate(premature));
+    assert.throws(()=>S.journeyAdvance(profile,'seats',score,8),/result/);
+    const ended=await store.save(S.journeyAdvance(profile,'seats',score,edition)),saved=m.raw;
+    const changed=S.clone(ended);changed.revision++;if(edition===2)changed.journey.edition=3;else delete changed.journey.edition;
+    await assert.rejects(store.save(changed),/cannot be changed/);assert.equal(m.raw,saved);
+  }
+});
 await check('two tabs and same-tab queued conflicts cannot overwrite another checkpoint',async()=>{
   const {m,store,profile}=await seeded(),other=m.open(),old=other.read(),a=S.journeyAdvance(profile,'diner'),b=S.clone(a);b.phase='combat2';
   const results=await Promise.allSettled([store.save(a),other.save(b)]);assert.equal(results[0].status,'fulfilled');assert.equal(results[1].status,'rejected');assert.match(results[1].reason.message,/another page/);assert.equal(m.writes,2);
@@ -67,6 +77,45 @@ await check('quota, locks, denied reads and missing acknowledgement preserve rec
 await check('queued saves snapshot the proposed record before waiting for the lock',async()=>{
   const {m,profile}=await seeded();let release;const store=S.connect(m.storage,async fn=>{await new Promise(resolve=>{release=resolve;});return fn();});store.read();
   const next=S.journeyAdvance(profile,'diner'),saving=store.save(next);next.phase='combat2';release();const saved=await saving;assert.equal(saved.phase,'n01');assert.equal(m.open().read().phase,'n01');
+});
+await check('reflection is an optional monotonic ending mark and preserves every legacy score, reward and edition',async()=>{
+  for(const edition of [2,3]){
+    const env=await through('seats'),ended=await env.store.save(S.journeyAdvance(env.profile,'seats',score,edition));
+    const raw=env.m.raw,old=plain(ended);assert.equal(env.m.open().read().journey.reflection,undefined);assert.equal(env.m.raw,raw);
+    for(const proof of [{counters:2}]){
+      const copy=memory(raw),store=copy.open(),original=store.read();
+      const next=S.reflectionComplete(original,proof);assert.equal(next.revision,original.revision+1);assert.equal(next.journey.reflection.revision,next.revision);
+      const saved=await store.save(next);assert.deepEqual(plain(saved.journey.score),old.journey.score);assert.deepEqual(plain(saved.journey.receipts),old.journey.receipts);assert.deepEqual(plain(saved.receipt),old.receipt);assert.equal(saved.journey.edition,old.journey.edition);
+      assert.strictEqual(S.reflectionComplete(saved,{counters:2}),saved);assert.equal(copy.writes,1);
+      for(const change of [p=>delete p.journey.reflection,p=>p.journey.reflection.revision++,p=>p.journey.reflection.proof={counters:1}]){
+        const bad=S.clone(saved);bad.revision++;change(bad);await assert.rejects(store.save(bad));assert.equal(copy.writes,1);
+      }
+    }
+  }
+  for(const chapter of ['diner','arcade','cuda','seats']){const {profile}=await through(chapter);assert.throws(()=>S.reflectionComplete(profile),/ending/);}
+  const {profile}=await through('ending');for(const proof of [undefined,{counters:1},{counters:'2'},{counters:2,unverified:true},null])assert.throws(()=>S.reflectionComplete(profile,proof),/counters/);
+});
+await check('direct transitions cannot mint a proofless mark, while reading and preserving a historical compact mark is allowed',async()=>{
+  const {m,store,profile}=await through('ending'),raw=m.raw;
+  const proofless=S.clone(profile);proofless.revision++;proofless.journey.reflection={revision:proofless.revision};
+  S.validate(proofless);
+  await assert.rejects(store.save(proofless),/prove two earned counters/);assert.equal(m.raw,raw);
+  const historical=memory(JSON.stringify(proofless)),legacy=historical.open(),read=legacy.read();assert.equal(historical.writes,0);
+  assert.strictEqual(S.reflectionComplete(read),read);
+  const phase=S.clone(read);phase.revision++;phase.phase='combat2';await legacy.save(phase);assert.deepEqual(plain(historical.open().read().journey.reflection),plain(read.journey.reflection));
+  const fabricated=S.reflectionComplete(profile,{counters:2});delete fabricated.journey.reflection.proof;
+  await assert.rejects(store.save(fabricated),/prove two earned counters/);assert.equal(m.raw,raw);
+});
+await check('reflection conflicts and interrupted acknowledgements retain the existing compare-and-swap recovery contract',async()=>{
+  const {m,store,profile}=await through('ending'),other=m.open(),base=other.read();
+  const completed=await store.save(S.reflectionComplete(profile,{counters:2})),raw=m.raw;
+  const conflicting=S.reflectionComplete(base,{counters:2});conflicting.phase='combat2';await assert.rejects(other.save(conflicting),/another page/);assert.equal(m.raw,raw);
+  const rollback=S.clone(completed);rollback.revision++;delete rollback.journey.reflection;await assert.rejects(store.save(rollback),/cannot be changed/);
+  for(const failure of ['before','after','ack','lock']){
+    const env=await through('ending'),next=S.reflectionComplete(env.profile,{counters:2});env.m.failureAt=env.m.writes;env.m.failure=failure;
+    await assert.rejects(env.store.save(next));const writes=env.m.writes;env.m.failure='';
+    const saved=await env.store.save(next);assert.equal(saved.journey.reflection.proof.counters,2);assert.equal(env.m.writes,writes+(failure==='before'||failure==='lock'?1:0));
+  }
 });
 console.log(checks+' journey save checks passed');
 })().catch(error=>{console.error(error);process.exitCode=1;});

@@ -32,9 +32,9 @@ button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,summ
 .skill .icon{display:grid;place-items:center}.skill svg{width:57px;height:49px;fill:currentColor;stroke:currentColor;stroke-linejoin:round;stroke-linecap:round;margin-top:4px}
 .skill .cooldown{position:absolute;bottom:4px;left:0;width:100%;font-size:11px;font-weight:650;line-height:14px;text-align:center;font-variant-numeric:tabular-nums}
 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-details{position:absolute;right:14px;top:14px;width:288px;pointer-events:auto;font-size:12px}
-summary{width:max-content;margin-left:auto;padding:7px 10px;border-radius:9px;background:#343f40dc;border:1px solid #f7f3e04d;color:#f4f2e7;cursor:pointer;list-style:none;font-size:12px}
-summary::-webkit-details-marker{display:none}details[open] summary{margin-bottom:7px}
+#debugDetails{position:absolute;right:14px;top:14px;width:288px;pointer-events:auto;font-size:12px}
+#debugDetails summary{width:max-content;margin-left:auto;padding:7px 10px;border-radius:9px;background:#343f40dc;border:1px solid #f7f3e04d;color:#f4f2e7;cursor:pointer;list-style:none;font-size:12px}
+#debugDetails summary::-webkit-details-marker{display:none}#debugDetails[open] summary{margin-bottom:7px}
 form{padding:14px;border:1px solid #e5e2cc5c;border-radius:12px;background:#283437f2;box-shadow:0 8px 24px #2a342c44;max-height:78vh;overflow:auto}
 label.row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
 input[type=number],select{width:137px;padding:6px 7px;border:1px solid #a8b6a659;border-radius:5px;background:#3b474a;color:#faf7ed;font-size:12px}
@@ -60,11 +60,11 @@ progress{width:100%;height:7px;margin-top:15px;accent-color:#bac89d}
 .bossBar.healer small{color:#ffd5ed;background:#59344fea}.bossBar[data-casting="true"] small{color:#fff1fa;background:#873b6b;box-shadow:0 0 0 1px #f7b6de}.bossBar[data-casting="true"] small::after{content:"";position:absolute;left:0;bottom:0;width:var(--cast);height:2px;background:#ffd4ed;border-radius:2px}
 #notice{display:none;position:absolute;left:10px;bottom:4px;font-size:11px;color:#2c3637;background:#f2ebdccc;padding:4px 7px;border-radius:4px}
 @media(max-aspect-ratio:1/1),(pointer:coarse){#notice{display:block}}
-@media(max-width:900px){#health{left:10px;top:13px;width:215px;height:28px}#hp{top:5px;font-size:10px}#training{font-size:21px;top:10px;padding:7px 15px}details{top:12px;right:10px;width:270px}.skill{width:74px;height:72px}#skills{bottom:15px}#hint{bottom:94px;font-size:11px}}
+@media(max-width:900px){#health{left:10px;top:13px;width:215px;height:28px}#hp{top:5px;font-size:10px}#training{font-size:21px;top:10px;padding:7px 15px}#debugDetails{top:12px;right:10px;width:270px}.skill{width:74px;height:72px}#skills{bottom:15px}#hint{bottom:94px;font-size:11px}}
 @media(prefers-reduced-motion:reduce){#hpFill,#hint{transition:none}}
 @font-face{font-family:"Barlow Condensed";src:url("./assets/BarlowCondensed-Bold.ttf") format("truetype");font-weight:700;font-display:swap}
 #hurtEdge,#comboPips,.finale-name{display:none}
-.finale{--ink:#0e151a;--brass:#d9a75f;--ivory:#fff4dc;--display:"Barlow Condensed","Arial Narrow",sans-serif}
+:is(.finale,.survivor){--ink:#0e151a;--brass:#d9a75f;--ivory:#fff4dc;--display:"Barlow Condensed","Arial Narrow",sans-serif}
 .finale #overlay{z-index:2}
 .finale #boot,.finale #pause{z-index:4}
 .finale #hurtEdge{display:block;position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 51%,rgba(104,8,21,.36) 79%,rgba(179,23,37,.88) 100%);z-index:0}
@@ -88,15 +88,15 @@ progress{width:100%;height:7px;margin-top:15px;accent-color:#bac89d}
 .finale #status{top:48px;color:#fff0cf;background:#141b20;padding:3px 9px;border-radius:1px;font:700 clamp(13px,1.2vw,17px)/1.15 var(--display);letter-spacing:.025em;text-shadow:0 1px #111}
 .finale #status:empty{display:none}
 .finale #hint{bottom:74px;color:#e4e8df;font-size:11px;text-shadow:0 1px 3px #081116,0 0 4px #081116}
-.finale #skills{bottom:14px;gap:6px}
-.finale .skill{width:143px;height:51px;padding:4px 7px 4px 30px;display:grid;grid-template-columns:32px 1fr;gap:4px;align-items:center;border:1px solid #897855;border-top:2px solid #d3b585;border-radius:2px;background:linear-gradient(125deg,#263238,#101a1f 72%);color:#ffe7af;box-shadow:0 4px 9px #0007}
-.finale .skill kbd{top:6px;left:5px;padding:1px 5px;background:#d1b487;color:#171a1b;font:700 14px/16px var(--display)}
-.finale .skill .icon{grid-column:1;grid-row:1}
-.finale .skill svg{width:31px;height:32px;margin:0}
-.finale .skill .sr{position:static;grid-column:2;grid-row:1;justify-self:start;width:auto;height:auto;clip:auto;margin:0;overflow:visible;white-space:normal;text-align:left;font:700 16px/15px var(--display);text-transform:uppercase;letter-spacing:.025em}
-.finale .skill:disabled{color:#a5adab;border-color:#505f5f}
-.finale .skill:disabled kbd{background:#56636a;color:#f1e4cd}
-.finale .skill .cooldown{left:3px;bottom:5px;width:23px;font:700 11px/12px var(--display);color:#f5d19e}
+:is(.finale,.survivor) #skills{bottom:14px;gap:6px}
+:is(.finale,.survivor) .skill{width:143px;height:51px;padding:4px 7px 4px 30px;display:grid;grid-template-columns:32px 1fr;gap:4px;align-items:center;border:1px solid #897855;border-top:2px solid #d3b585;border-radius:2px;background:linear-gradient(125deg,#263238,#101a1f 72%);color:#ffe7af;box-shadow:0 4px 9px #0007}
+:is(.finale,.survivor) .skill kbd{top:6px;left:5px;padding:1px 5px;background:#d1b487;color:#171a1b;font:700 14px/16px var(--display)}
+:is(.finale,.survivor) .skill .icon{grid-column:1;grid-row:1}
+:is(.finale,.survivor) .skill svg{width:31px;height:32px;margin:0}
+:is(.finale,.survivor) .skill .sr{position:static;grid-column:2;grid-row:1;justify-self:start;width:auto;height:auto;clip:auto;margin:0;overflow:visible;white-space:normal;text-align:left;font:700 16px/15px var(--display);text-transform:uppercase;letter-spacing:.025em}
+:is(.finale,.survivor) .skill:disabled{color:#a5adab;border-color:#505f5f}
+:is(.finale,.survivor) .skill:disabled kbd{background:#56636a;color:#f1e4cd}
+:is(.finale,.survivor) .skill .cooldown{left:3px;bottom:5px;width:23px;font:700 11px/12px var(--display);color:#f5d19e}
 .finale .bossBar.seat{height:9px;width:80px;padding:2px;background:#19151a;border:0;border-radius:1px;box-shadow:0 0 0 1px #05090caa}
 .finale .bossBar.seat .fill{border-radius:0;background:linear-gradient(90deg,#a34444,#e37b66);box-shadow:inset 0 1px #ffa894aa}
 .finale .bossBar.seat small{bottom:11px;color:#f6e0d0;background:#181c20ed;min-width:0;font:700 14px/14px var(--display);padding:2px 4px;border-radius:1px;letter-spacing:.015em}
@@ -118,7 +118,7 @@ progress{width:100%;height:7px;margin-top:15px;accent-color:#bac89d}
 .finale .floatLeader{height:1px}
 .finale .floatLeader::before{width:4px;height:4px;top:-1.5px}
 @media(max-height:600px){.finale #training{top:5px;padding:3px 16px 5px}.finale #status{top:33px;padding:1px 7px 2px}}
-@media(max-width:760px){.finale #target{top:60px;right:7px;max-width:35vw}.finale #health{left:7px;width:155px}.finale #status{max-width:44vw}.finale .skill{width:128px;height:44px;padding-left:27px;grid-template-columns:26px 1fr}.finale .skill svg{width:26px;height:26px}.finale .skill .sr{font-size:15px}.finale #skills{bottom:8px}.finale #hint{bottom:58px}}
+@media(max-width:760px){.finale #target{top:60px;right:7px;max-width:35vw}.finale #health{left:7px;width:155px}.finale #status{max-width:44vw}:is(.finale,.survivor) .skill{width:128px;height:44px;padding-left:27px;grid-template-columns:26px 1fr}:is(.finale,.survivor) .skill svg{width:26px;height:26px}:is(.finale,.survivor) .skill .sr{font-size:15px}:is(.finale,.survivor) #skills{bottom:8px}.finale #hint{bottom:58px}}
 .finale-prefs{display:none}.finale .finale-prefs{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px;font-size:14px}
 .finale:has(#finaleNoNames:checked) :is(.bossBar.seat small,#target,#status){display:none}
 .finale .finale-prefs label{cursor:pointer}
@@ -184,19 +184,49 @@ window.engineCBootFailure=function(message){
   <div id="notice">Desktop mouse first. Mobile controls are outside this review.</div>
 </div>
 <div id="bossBars"></div><div id="floats"></div>
+<div id="journeyRelay" hidden></div>
+<div id="cudaLesson" role="status" hidden></div>
 <section id="journeyPanel" aria-labelledby="journeyTitle" hidden>
   <div class="journeyArt" aria-hidden="true"></div>
   <div class="journeyPage">
     <p id="journeyPlace"></p>
     <h1 id="journeyTitle"></h1>
     <p id="journeyStory"></p>
+    <a id="journeyNewsSource" href="https://nvidianews.nvidia.com/news/nvidia-board-reinstates-jensen-huang-as-president-ceo-and-board-director" target="_blank" rel="noopener noreferrer" hidden>Read NVIDIA’s November 23 announcement</a>
     <p id="journeyControls"></p>
+    <aside id="journeyScout" hidden>
+      <label for="journeyScoutSeat">Booth napkin <span>Scout a rival</span></label>
+      <div class="scoutChoice"><svg id="journeyScoutWeapon" viewBox="0 0 32 24" aria-hidden="true"><path></path></svg><select id="journeyScoutSeat" aria-label="Scout a rival"></select></div>
+      <p id="journeyScoutTip" aria-live="polite"></p>
+    </aside>
     <div id="journeyScore" hidden><ol id="journeySeats" aria-label="Seats defeated"></ol><div class="journeyRecordLine"><svg id="journeyWeapon" viewBox="0 0 32 24" aria-hidden="true"><path></path></svg><p id="journeyRecord"></p></div></div>
+    <div id="journeyPair" hidden>
+      <p class="relaySender"><svg id="journeySenderWeapon" viewBox="0 0 32 24" aria-hidden="true"><path></path></svg><span id="journeySender"></span></p>
+      <p class="relayOwn"><svg id="journeyOwnWeapon" viewBox="0 0 32 24" aria-hidden="true"><path></path></svg><span id="journeyOwn"></span></p>
+    </div>
+    <details id="journeyTab" open>
+      <summary>View the Ten Seats battle report</summary>
+      <aside id="journeyReport" aria-labelledby="journeyReportTitle" hidden>
+        <h2 id="journeyReportTitle">Tab settled <span>10 / 10</span></h2>
+        <dl class="receiptLines">
+          <div><dt>First down</dt><dd id="reportFirst"></dd></div>
+          <div><dt>Last down</dt><dd id="reportLast"></dd></div>
+          <div><dt>HP left</dt><dd id="reportHP"></dd></div>
+        </dl>
+        <p id="reportDare"></p>
+        <details id="reportPreview"><summary>Preview invitation</summary><p id="reportMessage"></p></details>
+      </aside>
+    </details>
     <div class="journeyActions">
       <button type="button" id="journeyAction"></button>
       <button type="button" id="journeyShare" hidden>Copy challenge</button>
       <a id="journeyOther" hidden></a>
     </div>
+    <form id="journeyImport" hidden>
+      <label for="journeyCode">Challenge code</label>
+      <input id="journeyCode" type="text" placeholder="JH3:5" autocomplete="off" spellcheck="false" required maxlength="16">
+      <button type="submit">Load challenge</button>
+    </form>
     <label id="journeyManual" hidden>Copy this challenge <textarea id="journeyText" readonly rows="3"></textarea></label>
     <p id="journeyNotice" role="status"></p>
   </div>
@@ -224,6 +254,9 @@ window.engineCBootFailure=function(message){
 <script defer src="../game/store.js"></script>
 <script defer src="./journey-setpiece.js"></script>
 <script defer src="./journey.js"></script>
+<script defer src="./survivor-skills.js"></script>
+<script defer src="./reflection-stage.js"></script>
+<script defer src="./reflection-combat.js"></script>
 <script defer src="./game.js" onerror="engineCBootFailure('Missing ./game.js')"></script>
 </body>
 </html>
